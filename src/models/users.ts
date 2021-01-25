@@ -9,6 +9,7 @@ export default class UserModel extends BaseModel<INewUser, IUser> {
   }
 
   public async getUserByResetEmail(resetEmail: string) {
+    // Find a user based on a row in `resets`
     this.logger.debug(`Retrieving user account from reset email ${resetEmail}`);
 
     const [user] = (await this.db
