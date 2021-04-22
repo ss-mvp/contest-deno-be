@@ -6,6 +6,8 @@ import {
   serviceCollection,
 } from '../../../../deps.ts';
 import FeedbackService from '../../../services/feedback.ts';
+import RumbleService from '../../../services/rumble.ts';
+import authHandler from '../../middlewares/authHandler.ts';
 import validate from '../../middlewares/validate.ts';
 
 const route = Router();
@@ -13,6 +15,8 @@ const route = Router();
 export default (app: IRouter) => {
   const logger: log.Logger = serviceCollection.get('logger');
   const feedbackServiceInstance = serviceCollection.get(FeedbackService);
+  const rumbleServiceInstance = serviceCollection.get(RumbleService);
+
   app.use('/feedback', route);
 
   // /feedback/complete?studentId=:studentId&rumbleId=:rumbleId
@@ -41,6 +45,16 @@ export default (app: IRouter) => {
       }
     }
   );
+
+  route.put('/', authHandler(), async (req, res) => {
+    try {
+      await rumbleServiceInstance.addScoresToFeedback(req.body);
+      res.setStatus(204).end();
+    } catch (err) {
+      logger.error(err);
+      throw err;
+    }
+  });
 
   console.log('Feedback router loaded.');
 };
