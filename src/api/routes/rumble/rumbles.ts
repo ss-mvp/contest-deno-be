@@ -16,7 +16,7 @@ export default (app: IRouter) => {
   route.get('/:rumbleId', authHandler(), async (req, res) => {
     try {
       const [rumble] = await rumbleModelInstance.get({
-        id: parseInt(req.params.id),
+        id: parseInt(req.params.rumbleId, 10),
       });
       res.setStatus(200).json(rumble);
     } catch (err) {
