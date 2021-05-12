@@ -1,17 +1,17 @@
 import {
-  Service,
-  Inject,
-  serviceCollection,
-  jwt,
   bcrypt,
   createError,
-  v5,
+  Inject,
+  jwt,
   moment,
+  Service,
+  serviceCollection,
+  v5,
 } from '../../deps.ts';
 import env from '../config/env.ts';
 import { IAuthResponse } from '../interfaces/apiResponses.ts';
 import { Roles } from '../interfaces/roles.ts';
-import { IUser, INewUser } from '../interfaces/users.ts';
+import { INewUser, IUser } from '../interfaces/users.ts';
 import ResetModel from '../models/resets.ts';
 import UserModel from '../models/users.ts';
 import ValidationModel from '../models/validations.ts';
@@ -33,6 +33,7 @@ export default class AuthService extends BaseService {
     try {
       // Initialize variable to store sendTo email for validation
       let sendTo: string;
+      let isParent = false;
       // Check body data one more time for safety since we explicitly cast later
       if (!body.age) throw createError(400, 'No age received');
       if (!body.email) throw createError(400, 'No email received');
@@ -47,6 +48,7 @@ export default class AuthService extends BaseService {
           );
         } else {
           sendTo = body.parentEmail;
+          isParent = true;
         }
       } else {
         sendTo = body.email;
@@ -67,7 +69,15 @@ export default class AuthService extends BaseService {
         // Generate Validation for user
         const { url, code } = this.generateValidationURL(body.codename, sendTo);
         await this.validationModel.add({ code, userId: id, email: sendTo });
-        await this.mailer.sendValidationEmail(sendTo, url);
+        if (!isParent) {
+          await this.mailer.sendValidationEmail(sendTo, url);
+        } else {
+          await this.mailer.sendParentValidationEmail(
+            sendTo,
+            url,
+            body.firstname
+          );
+        }
 
         this.logger.debug(`User (ID: ${id}) successfully registered`);
       });

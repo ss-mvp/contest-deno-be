@@ -1,11 +1,11 @@
 import {
-  Service,
+  Handlebars,
   Inject,
+  log,
+  SendEmailCommand,
+  Service,
   serviceCollection,
   SES,
-  SendEmailCommand,
-  log,
-  Handlebars,
 } from '../../deps.ts';
 import hbsConfig from '../../hbsConfig.ts';
 import env from '../config/env.ts';
@@ -44,6 +44,45 @@ export default class MailService {
       await this.mailer.send(emailContent);
       this.logger.debug(
         `Activation email successfully sent for user (EMAIL: ${email})`
+      );
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  public async sendParentValidationEmail(
+    email: string,
+    url: string,
+    firstname: string
+  ) {
+    try {
+      this.logger.debug(
+        `Sending parent activation email for child user (EMAIL: ${email})`
+      );
+      const handle = new Handlebars(hbsConfig());
+      const result = await handle.renderView('activation', { url });
+      const emailContent = new SendEmailCommand({
+        Destination: {
+          ToAddresses: [email],
+        },
+        FromEmailAddress: env.SES_CONFIG.email,
+        Content: {
+          Simple: {
+            Body: {
+              Html: {
+                Data: result,
+              },
+            },
+            Subject: {
+              Data: `Please verify ${firstname}'s Story Squad Account!`,
+            },
+          },
+        },
+      });
+      await this.mailer.send(emailContent);
+      this.logger.debug(
+        `Activation email successfully sent to parent for child user (EMAIL: ${email})`
       );
     } catch (err) {
       this.logger.error(err);
