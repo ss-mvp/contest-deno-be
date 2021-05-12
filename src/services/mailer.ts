@@ -61,7 +61,7 @@ export default class MailService {
         `Sending parent activation email for child user (EMAIL: ${email})`
       );
       const handle = new Handlebars(hbsConfig());
-      const result = await handle.renderView('activation', { url });
+      const result = await handle.renderView('parentActivation', { url });
       const emailContent = new SendEmailCommand({
         Destination: {
           ToAddresses: [email],
