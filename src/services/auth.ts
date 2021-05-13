@@ -12,6 +12,7 @@ import env from '../config/env.ts';
 import { IAuthResponse } from '../interfaces/apiResponses.ts';
 import { Roles } from '../interfaces/roles.ts';
 import { INewUser, IUser } from '../interfaces/users.ts';
+import { Validators } from '../interfaces/validations.ts';
 import ResetModel from '../models/resets.ts';
 import UserModel from '../models/users.ts';
 import ValidationModel from '../models/validations.ts';
@@ -68,7 +69,12 @@ export default class AuthService extends BaseService {
 
         // Generate Validation for user
         const { url, code } = this.generateValidationURL(body.codename, sendTo);
-        await this.validationModel.add({ code, userId: id, email: sendTo });
+        await this.validationModel.add({
+          code,
+          userId: id,
+          email: sendTo,
+          validatorId: isParent ? Validators.parent : Validators.user,
+        });
         if (!isParent) {
           await this.mailer.sendValidationEmail(sendTo, url);
         } else {

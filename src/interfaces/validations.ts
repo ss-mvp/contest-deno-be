@@ -8,4 +8,10 @@ export interface INewValidation {
   code: string;
   email: string;
   userId: number;
+  validatorId: Validators & number;
+}
+
+export enum Validators {
+  user = 1,
+  parent = 2,
 }
