@@ -39,7 +39,8 @@ export default {
       secretAccessKey: Deno.env.get('AWS_SECRET_KEY') || '',
     },
     region: Deno.env.get('S3_REGION') || '',
-    email: Deno.env.get('SES_EMAIL') || '',
+    // email: Deno.env.get('SES_EMAIL') || '',
+    email: `"Story Squad" <${Deno.env.get('SES_EMAIL') || ''}>`,
   },
   S3_CONFIG: {
     accessKeyID: Deno.env.get('AWS_ACCESS_KEY_ID') || '',

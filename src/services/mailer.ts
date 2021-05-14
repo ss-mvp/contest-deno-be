@@ -11,6 +11,8 @@ import hbsConfig from '../../hbsConfig.ts';
 import env from '../config/env.ts';
 import { IUser } from '../interfaces/users.ts';
 
+const EMAIL_FROM_NAME = 'StorySquad';
+
 @Service()
 export default class MailService {
   constructor(
@@ -61,7 +63,10 @@ export default class MailService {
         `Sending parent activation email for child user (EMAIL: ${email})`
       );
       const handle = new Handlebars(hbsConfig());
-      const result = await handle.renderView('parentActivation', { url });
+      const result = await handle.renderView('parentActivation', {
+        url,
+        firstname,
+      });
       const emailContent = new SendEmailCommand({
         Destination: {
           ToAddresses: [email],
