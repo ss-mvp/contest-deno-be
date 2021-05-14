@@ -30,7 +30,7 @@ export default class AuthService extends BaseService {
     super();
   }
 
-  public async SignUp(body: INewUser) {
+  public async SignUp(body: INewUser): Promise<IAuthResponse> {
     try {
       // Initialize variable to store sendTo email for validation
       let sendTo: string;
@@ -54,6 +54,8 @@ export default class AuthService extends BaseService {
       } else {
         sendTo = body.email;
       }
+
+      let response: IAuthResponse | undefined;
       // Start a transaction for data integrity
       await this.db.transaction(async () => {
         // Further sanitize data
@@ -62,31 +64,27 @@ export default class AuthService extends BaseService {
 
         // Create a new user object
         const hashedPassword = await this.hashPassword(body.password);
-        const { id } = await this.userModel.add(
+        const user = await this.userModel.add(
           { ...body, password: hashedPassword, roleId: Roles['user'] },
           true
         );
 
-        // Generate Validation for user
-        const { url, code } = this.generateValidationURL(body.codename, sendTo);
-        await this.validationModel.add({
-          code,
-          userId: id,
-          email: sendTo,
-          validatorId: isParent ? Validators.parent : Validators.user,
+        // send validation email
+        this.SendValidationEmail({
+          sendTo,
+          isParent,
+          user,
         });
-        if (!isParent) {
-          await this.mailer.sendValidationEmail(sendTo, url);
-        } else {
-          await this.mailer.sendParentValidationEmail(
-            sendTo,
-            url,
-            body.firstname
-          );
-        }
 
-        this.logger.debug(`User (ID: ${id}) successfully registered`);
+        // Remove password hash from response body
+        Reflect.deleteProperty(user, 'password');
+        const token = await this.generateToken(user);
+        response = { user, token };
+        this.logger.debug(`User (ID: ${user.id}) successfully registered`);
       });
+
+      if (response === undefined) throw createError(500);
+      return response;
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -100,8 +98,6 @@ export default class AuthService extends BaseService {
     try {
       const user = await this.userModel.get({ codename }, { first: true });
       if (!user) throw createError(404, 'User not found');
-      if (!user.isValidated)
-        throw createError(403, 'Account must be validated');
 
       this.logger.debug(`Verifying password for user (CODENAME: ${codename})`);
       const validPassword = await bcrypt.compare(password, user.password);
@@ -153,6 +149,72 @@ export default class AuthService extends BaseService {
         user: updatedUser,
         token: jwt,
       };
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  // public async GetNewValidationEmail(user: IUser): Promise<IAuthResponse> {
+  //   try {
+  //     let sendTo: string;
+  //     let isParent = false;
+
+  //     if (!user.age) throw createError(400, 'No age received');
+
+  //     if (user.age < 13) {
+  //       if (!user.parentEmail || user.email === user.parentEmail) {
+  //         throw createError(
+  //           400,
+  //           'Underage users must have a parent email on file'
+  //         );
+  //       } else {
+  //         sendTo = user.parentEmail;
+  //         isParent = true;
+  //       }
+  //     } else {
+  //       if (!user.email) {
+  //         throw createError(400, 'No email received');
+  //       } else {
+  //         sendTo = user.email;
+  //       }
+  //     }
+
+  //     let response: IAuthResponse | undefined;
+  //     // Start a transaction for data integrity
+  //     await this.db.transaction(async () => {
+  //       // Further sanitize data
+  //       Reflect.deleteProperty(user, 'age');
+  //       Reflect.deleteProperty(user, 'parentEmail');
+
+  //       // send validation email
+  //       await this.SendValidationEmail({
+  //         sendTo,
+  //         isParent,
+  //         user,
+  //       });
+  //     });
+
+  //     if (response === undefined) throw createError(500);
+  //     return response;
+  //   } catch (err) {
+  //     this.logger.error(err);
+  //     throw err;
+  //   }
+  // }
+
+  public async ResendValidationEmail(user: IUser): Promise<void> {
+    try {
+      const [validation] = await this.validationModel.get(
+        { userId: user.id },
+        { orderBy: 'created_at', order: 'DESC', limit: 1 }
+      );
+
+      await this.SendValidationEmail({
+        sendTo: validation.email,
+        isParent: validation.validatorId === Validators.parent,
+        user,
+      });
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -225,6 +287,33 @@ export default class AuthService extends BaseService {
     } catch (err) {
       this.logger.error(err);
       throw err;
+    }
+  }
+
+  private async SendValidationEmail(args: {
+    sendTo: string;
+    isParent: boolean;
+    user: IUser;
+  }) {
+    // Generate Validation for user
+    const { url, code } = this.generateValidationURL(
+      args.user.codename,
+      args.sendTo
+    );
+    await this.validationModel.add({
+      code,
+      userId: args.user.id,
+      email: args.sendTo,
+      validatorId: args.isParent ? Validators.parent : Validators.user,
+    });
+    if (!args.isParent) {
+      await this.mailer.sendValidationEmail(args.sendTo, url);
+    } else {
+      await this.mailer.sendParentValidationEmail(
+        args.sendTo,
+        url,
+        args.user.firstname
+      );
     }
   }
 
