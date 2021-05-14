@@ -81,6 +81,15 @@ const seedUsers = [
     isValidated: true,
     roleId: 1,
   },
+  {
+    codename: 'Student5',
+    email: 's.angelo@example.net',
+    firstname: 'Angelo',
+    lastname: 'Sawayn',
+    password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
+    isValidated: false,
+    roleId: 1,
+  },
 ];
 
 async function seed_users(knex) {
