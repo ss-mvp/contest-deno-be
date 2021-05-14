@@ -100,8 +100,6 @@ export default class AuthService extends BaseService {
     try {
       const user = await this.userModel.get({ codename }, { first: true });
       if (!user) throw createError(404, 'User not found');
-      if (!user.isValidated)
-        throw createError(403, 'Account must be validated');
 
       this.logger.debug(`Verifying password for user (CODENAME: ${codename})`);
       const validPassword = await bcrypt.compare(password, user.password);
