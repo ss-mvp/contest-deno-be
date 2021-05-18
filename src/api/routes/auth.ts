@@ -116,20 +116,16 @@ export default (app: IRouter) => {
   );
 
   // PUT /activation
-  route.put(
-    '/activation',
-    authHandler({ authRequired: true }),
-    async (req: Request, res: Response) => {
-      console.log('req.body.user', req.body.user);
-      try {
-        await authServiceInstance.ResendValidationEmail(req.body.user);
-        res.setStatus(204).json();
-      } catch (err) {
-        logger.error(err);
-        throw err;
-      }
+  route.put('/activation', authHandler(), async (req, res) => {
+    console.log('req.body.user', req.body.user);
+    try {
+      await authServiceInstance.ResendValidationEmail(req.body.user);
+      res.setStatus(204).json();
+    } catch (err) {
+      logger.error(err);
+      throw err;
     }
-  );
+  });
 
   // GET /reset
   route.get(
