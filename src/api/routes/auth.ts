@@ -117,7 +117,6 @@ export default (app: IRouter) => {
 
   // PUT /activation
   route.put('/activation', authHandler(), async (req, res) => {
-    console.log('req.body.user', req.body.user);
     try {
       await authServiceInstance.ResendValidationEmail(req.body.user);
       res.setStatus(204).json();
