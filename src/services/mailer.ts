@@ -75,7 +75,7 @@ export default class MailService {
               },
             },
             Subject: {
-              Data: `${firstname} has requested that you verify their Story Squad account`,
+              Data: `${firstname} needs their Story Squad account verified`,
             },
           },
         },
