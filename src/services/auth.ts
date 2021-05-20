@@ -11,8 +11,11 @@ import {
 import env from '../config/env.ts';
 import { IAuthResponse } from '../interfaces/apiResponses.ts';
 import { Roles } from '../interfaces/roles.ts';
-import { INewUser, INewValidation, IUser } from '../interfaces/users.ts';
-import { Validators } from '../interfaces/validations.ts';
+import { INewUser, IUser } from '../interfaces/users.ts';
+import {
+  IGetNewValidationBody,
+  Validators,
+} from '../interfaces/validations.ts';
 import ResetModel from '../models/resets.ts';
 import UserModel from '../models/users.ts';
 import ValidationModel from '../models/validations.ts';
@@ -155,7 +158,9 @@ export default class AuthService extends BaseService {
     }
   }
 
-  public async SendNewValidationEmail(data: INewValidation): Promise<void> {
+  public async SendNewValidationEmail(
+    data: IGetNewValidationBody
+  ): Promise<void> {
     try {
       let sendTo: string;
       let isParent = false;

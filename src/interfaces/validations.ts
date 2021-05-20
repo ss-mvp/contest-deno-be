@@ -1,3 +1,5 @@
+import { IUser } from './users.ts';
+
 export interface IValidation extends INewValidation {
   id: number;
   created_at: Date;
@@ -14,4 +16,10 @@ export interface INewValidation {
 export enum Validators {
   user = 1,
   parent = 2,
+}
+
+export interface IGetNewValidationBody {
+  newEmail: string;
+  age: number;
+  user: IUser;
 }
