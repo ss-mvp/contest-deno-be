@@ -30,8 +30,6 @@
     "deploy": "yarn build && docker push storysquadllc/deno-be:latest"
   },
   "dependencies": {
-    "@reshiftsecurity/reshift-plugin-npm": "^1.3.2",
-    "@types/json-schema": "^7.0.7",
     "dotenv": "^8.2.0",
     "knex": "^0.21.15",
     "knex-cleaner": "^1.3.1",

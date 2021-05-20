@@ -1,11 +1,11 @@
 import {
+  createError,
   jwt,
+  log,
+  NextFunction,
   Request,
   Response,
-  NextFunction,
-  createError,
   serviceCollection,
-  log,
 } from '../../../deps.ts';
 import env from '../../config/env.ts';
 import UserModel from '../../models/users.ts';
