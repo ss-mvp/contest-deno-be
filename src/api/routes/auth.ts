@@ -119,7 +119,7 @@ export default (app: IRouter) => {
   route.put('/activation', authHandler(), async (req, res) => {
     try {
       await authServiceInstance.ResendValidationEmail(req.body.user);
-      res.setStatus(204).json();
+      res.setStatus(204).end();
     } catch (err) {
       logger.error(err);
       throw err;
@@ -137,7 +137,7 @@ export default (app: IRouter) => {
     async (req, res) => {
       try {
         await authServiceInstance.SendNewValidationEmail(req.body);
-        res.setStatus(204).json();
+        res.setStatus(204).end();
       } catch (err) {
         logger.error(err);
         throw err;
