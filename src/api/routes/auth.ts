@@ -126,6 +126,25 @@ export default (app: IRouter) => {
     }
   });
 
+  // POST /activation
+  route.post(
+    '/activation',
+    authHandler(),
+    validate({
+      newEmail: [required, isEmail, match(emailRegex)],
+      age: [required, isNumber],
+    }),
+    async (req, res) => {
+      try {
+        await authServiceInstance.SendNewValidationEmail(req.body);
+        res.setStatus(204).json();
+      } catch (err) {
+        logger.error(err);
+        throw err;
+      }
+    }
+  );
+
   // GET /reset
   route.get(
     '/reset',
