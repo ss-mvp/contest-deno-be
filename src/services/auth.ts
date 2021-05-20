@@ -12,7 +12,10 @@ import env from '../config/env.ts';
 import { IAuthResponse } from '../interfaces/apiResponses.ts';
 import { Roles } from '../interfaces/roles.ts';
 import { INewUser, IUser } from '../interfaces/users.ts';
-import { Validators } from '../interfaces/validations.ts';
+import {
+  IGetNewValidationBody,
+  Validators,
+} from '../interfaces/validations.ts';
 import ResetModel from '../models/resets.ts';
 import UserModel from '../models/users.ts';
 import ValidationModel from '../models/validations.ts';
@@ -155,61 +158,64 @@ export default class AuthService extends BaseService {
     }
   }
 
-  // public async GetNewValidationEmail(user: IUser): Promise<IAuthResponse> {
-  //   try {
-  //     let sendTo: string;
-  //     let isParent = false;
+  public async SendNewValidationEmail(
+    data: IGetNewValidationBody
+  ): Promise<void> {
+    try {
+      let sendTo: string;
+      let isParent = false;
 
-  //     if (!user.age) throw createError(400, 'No age received');
+      if (!data.age) throw createError(400, 'No age received');
 
-  //     if (user.age < 13) {
-  //       if (!user.parentEmail || user.email === user.parentEmail) {
-  //         throw createError(
-  //           400,
-  //           'Underage users must have a parent email on file'
-  //         );
-  //       } else {
-  //         sendTo = user.parentEmail;
-  //         isParent = true;
-  //       }
-  //     } else {
-  //       if (!user.email) {
-  //         throw createError(400, 'No email received');
-  //       } else {
-  //         sendTo = user.email;
-  //       }
-  //     }
+      if (data.age < 13) {
+        if (data.newEmail === data.user.email) {
+          throw createError(400, 'Underage users must send to parent email');
+        } else {
+          sendTo = data.newEmail;
+          isParent = true;
+        }
+      } else {
+        if (!data.newEmail) {
+          throw createError(400, 'No email received');
+        } else {
+          sendTo = data.newEmail;
+        }
+      }
 
-  //     let response: IAuthResponse | undefined;
-  //     // Start a transaction for data integrity
-  //     await this.db.transaction(async () => {
-  //       // Further sanitize data
-  //       Reflect.deleteProperty(user, 'age');
-  //       Reflect.deleteProperty(user, 'parentEmail');
+      // checks time since last email sent
+      const validation = await this.validationModel.getRecentByUserId(
+        data.user.id
+      );
 
-  //       // send validation email
-  //       await this.SendValidationEmail({
-  //         sendTo,
-  //         isParent,
-  //         user,
-  //       });
-  //     });
+      if (!validation) throw createError(404, 'No validation found');
 
-  //     if (response === undefined) throw createError(500);
-  //     return response;
-  //   } catch (err) {
-  //     this.logger.error(err);
-  //     throw err;
-  //   }
-  // }
+      const timeSinceLastRequest = Date.now() - validation.created_at.getTime();
+
+      if (timeSinceLastRequest < 600000) {
+        throw createError(429, 'Cannot send another email so soon');
+      } else {
+        // Able to generate another code, so delete the old one
+        await this.resetModel.update(validation.id, { completed: true });
+      }
+
+      // send validation email
+      await this.SendValidationEmail({
+        sendTo,
+        isParent,
+        user: data.user,
+      });
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
 
   public async ResendValidationEmail(user: IUser): Promise<void> {
     try {
-      const [validation] = await this.validationModel.get(
-        { userId: user.id },
-        { orderBy: 'created_at', order: 'DESC', limit: 1 }
-      );
-
+      const validation = await this.validationModel.getRecentByUserId(user.id);
+      if (!validation) {
+        throw createError(404, 'No validation found');
+      }
       await this.SendValidationEmail({
         sendTo: validation.email,
         isParent: validation.validatorId === Validators.parent,
@@ -228,7 +234,7 @@ export default class AuthService extends BaseService {
 
       const resetItem = await this.resetModel.get(
         { userId: user.id },
-        { first: true }
+        { first: true, orderBy: 'created_at', order: 'DESC' }
       );
 
       await this.db.transaction(async () => {
@@ -236,7 +242,7 @@ export default class AuthService extends BaseService {
           const timeSinceLastRequest =
             Date.now() - resetItem.created_at.getTime();
           if (timeSinceLastRequest < 600000) {
-            throw createError(429, 'Cannot get another code so soon');
+            throw createError(429, 'Cannot send another email so soon');
           } else {
             // Able to generate another code, so delete the old one
             await this.resetModel.update(resetItem.id, { completed: true });
@@ -244,10 +250,9 @@ export default class AuthService extends BaseService {
         }
 
         const code = this.generateResetCode(user);
-        await this.db.transaction(async () => {
-          await this.resetModel.add({ code, userId: user.id });
-          await this.mailer.sendPasswordResetEmail(user, code);
-        });
+
+        await this.resetModel.add({ code, userId: user.id });
+        await this.mailer.sendPasswordResetEmail(user, code);
       });
     } catch (err) {
       this.logger.error(err);

@@ -10,6 +10,16 @@ export default class ValidationModel extends BaseModel<
   constructor() {
     super('validations');
   }
+
+  public async getRecentByUserId(
+    userId: number
+  ): Promise<IValidation | undefined> {
+    const [validation] = await this.get(
+      { userId },
+      { orderBy: 'created_at', order: 'DESC', limit: 1 }
+    );
+    return validation;
+  }
 }
 
 serviceCollection.addTransient(ValidationModel);

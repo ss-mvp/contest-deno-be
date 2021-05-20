@@ -73,6 +73,9 @@ export default class BaseModel<NewItem, FullItem> {
     if (filter) {
       sql.where(...Object.entries(filter)[0]);
     }
+    if (config?.first) {
+      sql.limit(1);
+    }
     if (config?.limit) {
       sql.limit(config.limit);
     }
