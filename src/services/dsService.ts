@@ -1,27 +1,28 @@
 import {
+  axiod,
   Inject,
   log,
-  PutObjectResponse,
+  // PutObjectResponse,
   Service,
-  serviceCollection
+  serviceCollection,
 } from '../../deps.ts';
+import env from '../config/env.ts';
+import { INewRumbleFeedback } from '../interfaces/rumbleFeedback.ts';
 import { IDSResponse } from '../interfaces/submissions.ts';
-import SubmissionModel from '../models/submissions.ts';
-import RumbleService from './rumble.ts';
-import SubmissionService from './submission.ts';
 
 @Service()
 export default class DSService {
-  constructor(
-    @Inject('logger') private logger: log.Logger,
-    @Inject(SubmissionService) private subService: SubmissionService,
-    @Inject(SubmissionModel) private subModel: SubmissionModel,
-    @Inject(RumbleService) private rumbleService: RumbleService
-  ) {}
+  constructor(@Inject('logger') private logger: log.Logger) {
+    this.api = axiod.create({
+      baseURL: env.DS_API_URL,
+      headers: {
+        Authorization: env.DS_API_TOKEN,
+      },
+    });
+  }
+  private api: typeof axiod;
 
-  public async sendSubmissionToDS(
-    s3Object: PutObjectResponse
-  ): Promise<IDSResponse> {
+  public async sendSubmissionToDS(): Promise<IDSResponse> {
     const res = await Promise.resolve<IDSResponse>({
       transcription: 'asdaksfmnasdlkcfmnasdlfkasmfdlkasdf',
       confidence: 50,
@@ -32,42 +33,43 @@ export default class DSService {
     return res;
   }
 
-  public async startFeedback(rumbleId: number): Promise<void> {
-    // TODO implement DS scripts
-    const subs = await this.
-    try {
-    } catch (err) {
-      this.logger.error(err);
-      throw err;
-    }
-  }
-
-  private generateFeedbackAssignments(
-    req: {
+  /**
+   * Written by Robert Sharp for Python, migrated to Typescript.
+   */
+  public generateFeedbackMatchups(
+    subs: {
       userId: number;
       submissionId: number;
     }[]
-  ): blahres[] {
-    const response: blahres[] = [];
+  ): INewRumbleFeedback[] {
+    const response: INewRumbleFeedback[] = [];
     const userIds: number[] = [];
     const submissionIds: number[] = [];
 
-    req.forEach((r) => {
+    subs.forEach((r) => {
       userIds.push(r.userId);
       submissionIds.push(r.submissionId);
     });
 
     // Edge cases to handle situations with < 4 submissions
-    if (req.length === 2 || req.length === 3) {
+    if (subs.length === 2 || subs.length === 3) {
       userIds.forEach((uId, i) => {
         submissionIds.forEach((sId, j) => {
           if (i !== j) response.push({ submissionId: sId, voterId: uId });
         });
       });
-    } else if (req.length === 1) {
+    } else if (subs.length === 1) {
       // do nothing
     } else {
       // standard use case
+      // move helpers somewhere else?
+      const rotate = <Type>(arr: Type[], by: number): Type[] => [
+        ...arr.slice(by),
+        ...arr.slice(0, by),
+      ];
+      const zip = <Type>(...arrs: Type[][]): Type[][] =>
+        arrs.map((_, i) => arrs.map((arr) => arr[i]));
+
       const rot1 = rotate(submissionIds, 1);
       const rot2 = rotate(submissionIds, 2);
       const rot3 = rotate(submissionIds, 3);
@@ -81,17 +83,22 @@ export default class DSService {
 
     return response;
   }
-}
 
-function rotate<Type>(arr: Type[], by: number): Type[] {
-  return [...arr.slice(by), ...arr.slice(0, by)];
-}
-const zip = <Type>(...arrs: Type[][]): Type[][] =>
-  arrs.map((_, i) => arrs.map((arr) => arr[i]));
-
-interface blahres {
-  voterId: number;
-  submissionId: number;
+  private async textSubmission(body: {
+    SubmissionID: number;
+    StoryId: number;
+    Pages: Record<number, { filekey: string; Checksum: string }>;
+  }): Promise<{
+    SubmissionID: number;
+    ModerationFlag: boolean;
+    Confidence: number;
+    SquadScore: number;
+    Rotation: number;
+    Transcription: string;
+  }> {
+    const { data } = await this.api.post(`/submission/text`, body);
+    return data;
+  }
 }
 
 serviceCollection.addTransient(DSService);

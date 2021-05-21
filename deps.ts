@@ -113,6 +113,9 @@ export type {
   ValidationResult,
   ValidationRules,
 } from 'https://deno.land/x/validasaur@v0.15.0/mod.ts';
+export { axiod };
+// axiod@0.21
+import axiod from 'https://deno.land/x/axiod@0.21/mod.ts';
 // clever
 // export { CleverClient } from '../../../Libraries/clever_sso_deno/mod.ts';
 // export type {
@@ -121,7 +124,6 @@ export type {
 //   ICleverProfile,
 //   ICleverUserInfo,
 // } from '../../../Libraries/clever_sso_deno/mod.ts';
-
 // di v0.1.1 (dependency injector)
 import { ServiceCollection } from 'https://deno.land/x/di@v0.1.1/mod.ts';
 export const serviceCollection = new ServiceCollection();

@@ -161,7 +161,8 @@ export default class SubmissionService extends BaseService {
     sourceId: Sources & number = Sources.FDSC // Default to FDSC
   ) {
     try {
-      const dsReponse = await this.dsService.sendSubmissionToDS(uploadResponse);
+      // const dsReponse = await this.dsService.sendSubmissionToDS(uploadResponse);
+      const dsReponse = await this.dsService.sendSubmissionToDS();
 
       const newSub = this.formatNewSub(
         uploadResponse,
@@ -286,22 +287,22 @@ export default class SubmissionService extends BaseService {
   }
 
   private formatNewSub(
-    u: IUploadResponse,
-    d: IDSResponse,
+    { etag, s3Label }: IUploadResponse,
+    { confidence, rotation, score, transcription }: IDSResponse,
     promptId: number,
     userId: number,
     sourceId: Sources & number
   ): INewSubmission {
     return {
-      confidence: d.confidence,
-      score: d.score,
-      transcription: d.transcription,
-      rotation: d.rotation,
-      etag: u.etag,
-      s3Label: u.s3Label,
-      userId: userId,
-      promptId: promptId,
-      sourceId: sourceId,
+      confidence,
+      score,
+      transcription,
+      rotation,
+      etag,
+      s3Label,
+      userId,
+      promptId,
+      sourceId,
     };
   }
 
