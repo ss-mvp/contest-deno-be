@@ -1,4 +1,4 @@
-import { PutObjectResponse } from '../../deps.ts';
+import { IDSTextSubmissionResponse } from './dsServiceTypes.ts';
 
 export interface ISubItem {
   id: number;
@@ -15,21 +15,10 @@ export interface ISubmission extends INewSubmission {
   created_at: Date;
 }
 
-export interface INewSubmission extends IDSResponse {
+export interface INewSubmission extends IDSTextSubmissionResponse {
   s3Label: string;
   etag: string;
   userId: number;
   promptId: number;
   sourceId?: number;
-}
-
-export interface IUploadResponse extends PutObjectResponse {
-  s3Label: string;
-}
-
-export interface IDSResponse {
-  transcription: string;
-  confidence: number;
-  score: number;
-  rotation: number;
 }

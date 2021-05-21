@@ -1,11 +1,13 @@
 import { createError, Inject, Service, serviceCollection } from '../../deps.ts';
+import {
+  IDSTextSubmissionResponse,
+  IUploadResponse,
+} from '../interfaces/dsServiceTypes.ts';
 import { Sources } from '../interfaces/enumSources.ts';
 import {
-  IDSResponse,
   INewSubmission,
   ISubItem,
   ISubmission,
-  IUploadResponse,
 } from '../interfaces/submissions.ts';
 import { INewTop3 } from '../interfaces/top3.ts';
 import { IGetQuery } from '../models/baseModel.ts';
@@ -154,12 +156,17 @@ export default class SubmissionService extends BaseService {
     }
   }
 
-  public async processSubmission(
-    uploadResponse: IUploadResponse,
-    promptId: number,
-    userId: number,
-    sourceId: Sources & number = Sources.FDSC // Default to FDSC
-  ) {
+  public async processSubmission({
+    promptId,
+    uploadResponse,
+    userId,
+    sourceId = Sources.FDSC, // Default to FDSC
+  }: {
+    uploadResponse: IUploadResponse;
+    promptId: number;
+    userId: number;
+    sourceId: Sources & number;
+  }) {
     try {
       // const dsReponse = await this.dsService.sendSubmissionToDS(uploadResponse);
       const dsReponse = await this.dsService.sendSubmissionToDS();
@@ -288,7 +295,7 @@ export default class SubmissionService extends BaseService {
 
   private formatNewSub(
     { etag, s3Label }: IUploadResponse,
-    { confidence, rotation, score, transcription }: IDSResponse,
+    { confidence, rotation, score, transcription }: IDSTextSubmissionResponse,
     promptId: number,
     userId: number,
     sourceId: Sources & number

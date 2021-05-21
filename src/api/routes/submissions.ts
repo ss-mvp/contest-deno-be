@@ -54,12 +54,12 @@ export default (app: IRouter) => {
     upload('story'),
     async (req: Request, res: Response) => {
       try {
-        await subServiceInstance.processSubmission(
-          req.body.story[0],
-          parseInt(req.body.promptId, 10),
-          req.body.user.id,
-          req.query.sourceId
-        );
+        await subServiceInstance.processSubmission({
+          uploadResponse: req.body.story[0],
+          promptId: parseInt(req.body.promptId, 10),
+          userId: req.body.user.id,
+          sourceId: req.query.sourceId,
+        });
         res.setStatus(201).json({ message: 'Upload successful!' });
       } catch (err) {
         logger.error(err);

@@ -1,13 +1,13 @@
 import {
-  S3Bucket,
-  Service,
+  createError,
   Inject,
   log,
+  S3Bucket,
+  Service,
   serviceCollection,
-  createError,
   v4,
 } from '../../deps.ts';
-import { IUploadResponse } from '../interfaces/submissions.ts';
+import { IUploadResponse } from '../interfaces/dsServiceTypes.ts';
 
 @Service()
 export default class BucketService {
