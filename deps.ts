@@ -89,6 +89,7 @@ export type {
   PutObjectOptions,
   PutObjectResponse,
 } from 'https://deno.land/x/s3@0.3.0/mod.ts';
+export { sha512 } from 'https://deno.land/x/sha512@v1.0.3/mod.ts';
 // validasaur v0.15.0
 export {
   firstMessages,
@@ -113,17 +114,9 @@ export type {
   ValidationResult,
   ValidationRules,
 } from 'https://deno.land/x/validasaur@v0.15.0/mod.ts';
+// axiod v0.21
 export { axiod };
-// axiod@0.21
 import axiod from 'https://deno.land/x/axiod@0.21/mod.ts';
-// clever
-// export { CleverClient } from '../../../Libraries/clever_sso_deno/mod.ts';
-// export type {
-//   CleverGradeType,
-//   CleverSubjectType,
-//   ICleverProfile,
-//   ICleverUserInfo,
-// } from '../../../Libraries/clever_sso_deno/mod.ts';
-// di v0.1.1 (dependency injector)
 import { ServiceCollection } from 'https://deno.land/x/di@v0.1.1/mod.ts';
+
 export const serviceCollection = new ServiceCollection();

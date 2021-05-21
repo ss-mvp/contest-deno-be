@@ -1,12 +1,13 @@
 import {
+  createError,
+  extension,
+  FormFile,
+  log,
+  NextFunction,
   Request,
   Response,
-  NextFunction,
   serviceCollection,
-  log,
-  createError,
-  FormFile,
-  extension,
+  sha512,
 } from '../../../deps.ts';
 import BucketService from '../../services/bucket.ts';
 
@@ -51,4 +52,19 @@ export default (...fileNames: string[]) => async (
     logger.error(err);
     throw err;
   }
+};
+
+const generateChecksum = (
+  file: Uint8Array | string,
+  {
+    inputEncoding = 'utf8',
+    outputEncoding = 'hex',
+  }: {
+    inputEncoding?: 'utf8' | 'hex' | 'base64';
+    outputEncoding?: 'utf8' | 'hex' | 'base64';
+  }
+): string => {
+  const hash = sha512(file, inputEncoding, outputEncoding).toString();
+  console.log({ hash });
+  return hash;
 };

@@ -1,11 +1,4 @@
-import {
-  axiod,
-  Inject,
-  log,
-  // PutObjectResponse,
-  Service,
-  serviceCollection,
-} from '../../deps.ts';
+import { axiod, Inject, log, Service, serviceCollection } from '../../deps.ts';
 import env from '../config/env.ts';
 import { INewRumbleFeedback } from '../interfaces/rumbleFeedback.ts';
 import { IDSResponse } from '../interfaces/submissions.ts';
@@ -23,11 +16,19 @@ export default class DSService {
   private api: typeof axiod;
 
   public async sendSubmissionToDS(): Promise<IDSResponse> {
-    const res = await Promise.resolve<IDSResponse>({
-      transcription: 'asdaksfmnasdlkcfmnasdlfkasmfdlkasdf',
-      confidence: 50,
-      score: Math.floor(Math.random() * 40 + 10), // Rand 10-50
-      rotation: 0,
+    // const res = await Promise.resolve<IDSResponse>({
+    //   transcription: 'asdaksfmnasdlkcfmnasdlfkasmfdlkasdf',
+    //   confidence: 50,
+    //   score: Math.floor(Math.random() * 40 + 10), // Rand 10-50
+    //   rotation: 0,
+    // });
+
+    const res = await this.submitTextSubmissionToDSAPI({
+      StoryId: 1,
+      SubmissionID: 1,
+      Pages: {
+        1: {},
+      },
     });
 
     return res;
@@ -84,7 +85,7 @@ export default class DSService {
     return response;
   }
 
-  private async textSubmission(body: {
+  private async submitTextSubmissionToDSAPI(body: {
     SubmissionID: number;
     StoryId: number;
     Pages: Record<number, { filekey: string; Checksum: string }>;
