@@ -1,6 +1,7 @@
 import { createError, Inject, Service, serviceCollection } from '../../deps.ts';
 import {
-  IDSTextSubmissionResponse,
+  IDSAPIPageSubmission,
+  IProcessedDSResponse,
   IUploadResponse,
 } from '../interfaces/dsServiceTypes.ts';
 import { Sources } from '../interfaces/enumSources.ts';
@@ -162,14 +163,17 @@ export default class SubmissionService extends BaseService {
     userId,
     sourceId = Sources.FDSC, // Default to FDSC
   }: {
-    uploadResponse: IUploadResponse;
+    uploadResponse: IDSAPIPageSubmission;
     promptId: number;
     userId: number;
     sourceId: Sources & number;
   }) {
     try {
       // const dsReponse = await this.dsService.sendSubmissionToDS(uploadResponse);
-      const dsReponse = await this.dsService.sendSubmissionToDS();
+      const dsReponse = await this.dsService.sendSubmissionToDS([
+        uploadResponse,
+      ]);
+      console.log('res', uploadResponse);
 
       const newSub = this.formatNewSub(
         uploadResponse,
@@ -295,7 +299,7 @@ export default class SubmissionService extends BaseService {
 
   private formatNewSub(
     { etag, s3Label }: IUploadResponse,
-    { confidence, rotation, score, transcription }: IDSTextSubmissionResponse,
+    { confidence, rotation, score, transcription }: IProcessedDSResponse,
     promptId: number,
     userId: number,
     sourceId: Sources & number

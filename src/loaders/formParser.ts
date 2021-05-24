@@ -32,8 +32,6 @@ export default () => async (
     if (form.fields) {
       req.body = { ...req.body, ...form.fields };
     }
-    console.log('form', form.fields, form.files);
-    console.log('v bodsy', req.body);
     next();
   } catch (err) {
     logger.error(err);

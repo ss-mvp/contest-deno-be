@@ -11,7 +11,7 @@ import {
 } from '../../../deps.ts';
 import {
   DSChecksumMap,
-  IDSPageSubmission,
+  IDSAPIPageSubmission,
 } from '../../interfaces/dsServiceTypes.ts';
 import BucketService from '../../services/bucket.ts';
 
@@ -52,12 +52,13 @@ export default (...fileNames: string[]) => async (
         Checksum: generateChecksum(content),
         filekey: name,
       }));
+      console.log('chsunm', checksumList[0].Checksum);
 
       // Resolve those promises together and replace the form data in the body with the file names
       const resolved = await Promise.all(promiseList);
 
       // Overwrite the previous fields in the body
-      req.body[fname] = resolved.map<IDSPageSubmission>((r, i) => ({
+      req.body[fname] = resolved.map<IDSAPIPageSubmission>((r, i) => ({
         // Add the processed request
         ...r,
         // And then add the checksum info for DS
@@ -91,6 +92,5 @@ const generateChecksum = (
     encoding?.input ?? 'utf8',
     encoding?.output ?? 'hex'
   ).toString();
-  console.log({ hash });
   return hash;
 };

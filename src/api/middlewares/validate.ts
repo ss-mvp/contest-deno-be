@@ -17,7 +17,6 @@ export default <ObjectInterface = undefined>(
   const logger: log.Logger = serviceCollection.get('logger');
   try {
     logger.debug(`Validating ${toValidate} for endpoint: ${req.path}`);
-    console.log(req.body);
     // Validate and pull errors
     const [passes, errors] = await validate(req[toValidate], schema);
     const errorFields = Object.keys(errors); // handle library bug edge cases

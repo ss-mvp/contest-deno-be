@@ -377,14 +377,28 @@ export default class RumbleService extends BaseService {
   public async startFeedback(rumbleId: number): Promise<void> {
     try {
       const subs = await this.subModel.getFeedbackIDsByRumbleID(rumbleId);
-      console.log('pre ds', subs);
+      console.log('subs to be processed for feedback', subs);
+
+      // Return early! Nothing to generate.
+      // TODO - should we throw an error for this??
+      if (subs.length === 0 || !subs) return;
 
       const matchups = this.dsService.generateFeedbackMatchups(subs);
-      console.log('post ds', matchups);
 
-      const feedback = await this.rumbleFeedback.add(matchups);
-      console.log('post db', feedback);
-      // If it successfully adds these rows, the promise is resolved and we end the query
+      // Get the ID of the cross-reference that connects a section to a rumble
+      // TODO make sure this works
+      const { id: rumbleSectionId } = await this.rumbleSections.get(
+        { rumbleId },
+        { first: true }
+      );
+
+      await this.db.transaction(async () => {
+        await this.rumbleSections.update(rumbleSectionId, {
+          phase: 'FEEDBACK',
+        });
+        await this.rumbleFeedback.add(matchups);
+        // If it successfully adds these rows, the promise is resolved and we end the query
+      });
     } catch (err) {
       this.logger.error(err);
       throw err;

@@ -1,25 +1,36 @@
 import { PutObjectResponse } from '../../deps.ts';
 
-export interface IDSPageSubmission extends IUploadResponse {
-  filekey: string;
-  Checksum: string;
-}
-
 export interface IUploadResponse extends PutObjectResponse {
   s3Label: string;
 }
 
-export type DSChecksumMap = Record<number, IDSPageSubmission>;
+export interface IProcessedDSResponse {
+  transcription: string;
+  confidence: number;
+  score: number;
+  rotation: number;
+}
 
-export interface IDSTextSubmissionPostBody {
+export type DSChecksumMap = Record<
+  number,
+  Pick<IDSAPIPageSubmission, 'Checksum' | 'filekey'>
+>;
+export interface IDSAPITextSubmissionPostBody {
   SubmissionID: number;
   StoryId: number;
   Pages: DSChecksumMap;
 }
 
-export interface IDSTextSubmissionResponse {
-  transcription: string;
-  confidence: number;
-  score: number;
-  rotation: number;
+export interface IDSAPITextSubmissionResponse {
+  SubmissionID: number;
+  ModerationFlag: boolean;
+  Confidence: number;
+  SquadScore: number;
+  Rotation: number;
+  Transcription: string;
+}
+
+export interface IDSAPIPageSubmission extends IUploadResponse {
+  filekey: string;
+  Checksum: string;
 }

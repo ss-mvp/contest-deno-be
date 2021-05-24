@@ -55,7 +55,7 @@ export default (app: IRouter) => {
     async (req: Request, res: Response) => {
       try {
         await subServiceInstance.processSubmission({
-          uploadResponse: req.body.story[0],
+          uploadResponse: req.body.story[0], // TODO This endpoint is restricted to one submission for now
           promptId: parseInt(req.body.promptId, 10),
           userId: req.body.user.id,
           sourceId: req.query.sourceId,
