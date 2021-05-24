@@ -324,7 +324,7 @@ export default class AuthService extends BaseService {
 
   public generateToken(user: Omit<IUser, 'password'>) {
     this.logger.debug(`Generating JWT for user (ID: ${user.id})`);
-    const daysUntilExpiry = 2;
+    const daysUntilExpiry = 30;
     const exp = moment.utc().add(daysUntilExpiry, 'd');
 
     this.logger.debug(`Signing JWT for user (ID: ${user.id})`);
