@@ -20,6 +20,7 @@ const envPrefix = () => {
 const REACT_APP_URL = Deno.env.get('REACT_APP_URL') || 'http://localhost:3000';
 
 export default {
+  REACT_APP_URL,
   DENO_ENV: DENO_ENV === 'ci' ? 'testing' : DENO_ENV,
   PORT: parseInt(PORT, 10),
   UUID_NAMESPACE: Deno.env.get('UUID_NAMESPACE') || '',
@@ -27,7 +28,13 @@ export default {
   DB_URL: Deno.env.get(envPrefix() + 'DB_URL'),
   DS_API_URL: Deno.env.get('DS_API_URL') || '',
   DS_API_TOKEN: Deno.env.get('DS_API_TOKEN') || '',
-  REACT_APP_URL,
+
+  // Time in days, defaults to 30 if not set in .env
+  AUTH_TOKEN_EXP_TIME: parseInt(
+    Deno.env.get('AUTH_TOKEN_EXP_TIME') || '30',
+    10
+  ),
+
   DB_CONFIG: {
     database: Deno.env.get(envPrefix() + 'DB_NAME') || '',
     hostname: Deno.env.get(envPrefix() + 'DB_HOST') || '',
