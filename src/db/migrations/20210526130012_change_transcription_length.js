@@ -6,7 +6,7 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.table('submissions', (t) => {
-    t.dropColumn('transcription');
+  return knex.schema.alterTable('submissions', (t) => {
+    t.string('transcription', 255).alter();
   });
 };
