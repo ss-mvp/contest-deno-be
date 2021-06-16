@@ -190,7 +190,7 @@ export default class SubmissionService extends BaseService {
       });
       if (!submission) throw createError(409, 'File upload failed');
 
-      return submission;
+      return this.retrieveSubItem(submission);
     } catch (err) {
       // If any part of upload fails, attempt to remove the item from the bucket for data integrity
       try {

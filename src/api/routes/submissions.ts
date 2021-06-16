@@ -54,13 +54,13 @@ export default (app: IRouter) => {
     upload('story'),
     async (req: Request, res: Response) => {
       try {
-        await subServiceInstance.processSubmission({
+        const submission = await subServiceInstance.processSubmission({
           uploadResponse: req.body.story[0], // TODO This endpoint is restricted to one submission for now
           promptId: parseInt(req.body.promptId, 10),
           userId: req.body.user.id,
           sourceId: req.query.sourceId,
         });
-        res.setStatus(201).json({ message: 'Upload successful!' });
+        res.setStatus(201).json(submission);
       } catch (err) {
         logger.error(err);
         throw err;

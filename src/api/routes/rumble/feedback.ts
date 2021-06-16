@@ -5,6 +5,7 @@ import {
   Router,
   serviceCollection,
 } from '../../../../deps.ts';
+import RumbleFeedbackModel from '../../../models/rumbleFeedback.ts';
 import FeedbackService from '../../../services/feedback.ts';
 import RumbleService from '../../../services/rumble.ts';
 import authHandler from '../../middlewares/authHandler.ts';
@@ -15,6 +16,7 @@ const route = Router();
 export default (app: IRouter) => {
   const logger: log.Logger = serviceCollection.get('logger');
   const feedbackServiceInstance = serviceCollection.get(FeedbackService);
+  const feedbackModelInstance = serviceCollection.get(RumbleFeedbackModel);
   const rumbleServiceInstance = serviceCollection.get(RumbleService);
 
   app.use('/feedback', route);
@@ -39,6 +41,31 @@ export default (app: IRouter) => {
         );
 
         res.setStatus(200).json(hasVoted);
+      } catch (err) {
+        logger.error(err);
+        throw err;
+      }
+    }
+  );
+
+  route.get(
+    '/',
+    validate(
+      {
+        studentId: [required],
+        rumbleId: [required],
+      },
+      'query'
+    ),
+    async (req, res) => {
+      try {
+        const feedback = await feedbackModelInstance.getFeedbackByRumbleAndVoterIds(
+          {
+            rumbleId: parseInt(req.query.rumbleId, 10),
+            voterId: parseInt(req.query.studentId, 10),
+          }
+        );
+        res.setStatus(200).json(feedback);
       } catch (err) {
         logger.error(err);
         throw err;

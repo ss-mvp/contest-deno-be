@@ -1,21 +1,19 @@
 import {
-  Router,
-  Request,
-  Response,
-  isString,
-  isNumber,
-  isEmail,
-  minLength,
-  maxLength,
-  required,
-  match,
-  IRouter,
-  serviceCollection,
-  isIn,
-  isBool,
   createError,
+  IRouter,
+  isBool,
+  isEmail,
+  isIn,
+  isNumber,
+  isString,
   log,
+  match,
+  maxLength,
+  minLength,
   moment,
+  required,
+  Router,
+  serviceCollection,
 } from '../../../deps.ts';
 import {
   codenameRegex,
@@ -35,7 +33,24 @@ export default (app: IRouter) => {
   app.use('/users', route);
 
   // GET /
-  route.get('/', async (req: Request, res: Response) => {
+  route.get('/', async (req, res) => {
+    try {
+      const userList = await userModelInstance.get(undefined, {
+        limit: parseInt(req.params.limit, 10) || 10,
+        offset: parseInt(req.params.offset, 10) || 0,
+        orderBy: (req.params.orderBy as keyof IUser) || 'id',
+        order: (req.params.order as 'ASC' | 'DESC') || 'ASC',
+        first: req.params.first === 'true',
+      });
+
+      res.setStatus(200).json(userList);
+    } catch (err) {
+      logger.error(err);
+      throw err;
+    }
+  });
+
+  route.head('/', async (req, res) => {
     try {
       const userList = await userModelInstance.get(undefined, {
         limit: parseInt(req.params.limit, 10) || 10,
@@ -53,7 +68,7 @@ export default (app: IRouter) => {
   });
 
   // GET /:id
-  route.get('/:id', async (req: Request, res: Response) => {
+  route.get('/:id', async (req, res) => {
     try {
       const userId = req.params.id;
       const user = await userModelInstance.get(
@@ -70,7 +85,7 @@ export default (app: IRouter) => {
   });
 
   // GET /:id/submissions
-  route.get('/:id/submissions', async (req: Request, res: Response) => {
+  route.get('/:id/submissions', async (req, res) => {
     try {
       const subServiceInstance = serviceCollection.get(SubmissionService);
       const subs = await subServiceInstance.getUserSubs(
@@ -104,7 +119,7 @@ export default (app: IRouter) => {
       age: [required, isNumber],
       roleId: [required, isNumber, isIn([1, 2])],
     }),
-    async (req: Request, res: Response) => {
+    async (req, res) => {
       try {
         const newUser = await userModelInstance.add(req.body, true);
 
@@ -128,7 +143,7 @@ export default (app: IRouter) => {
       roleId: [isNumber, isIn([1, 2])],
       isValidated: [isBool],
     }),
-    async (req: Request, res: Response) => {
+    async (req, res) => {
       try {
         const userId = req.params.id;
         await userModelInstance.update(parseInt(userId), {
@@ -145,7 +160,7 @@ export default (app: IRouter) => {
   );
 
   // DELETE /:id
-  route.delete('/:id', async (req: Request, res: Response) => {
+  route.delete('/:id', async (req, res) => {
     try {
       const userId = req.params.id;
       await userModelInstance.delete(parseInt(userId));
