@@ -27,6 +27,7 @@ const route = Router();
 export default (app: IRouter) => {
   const logger: log.Logger = serviceCollection.get('logger');
   const subServiceInstance = serviceCollection.get(SubmissionService);
+  const subModelInstance = serviceCollection.get(SubmissionModel);
   const feedbackModelInstance = serviceCollection.get(RumbleFeedbackModel);
 
   app.use(['/submit', '/submission', '/submissions'], route);
@@ -74,12 +75,20 @@ export default (app: IRouter) => {
     authHandler({ roles: [Roles.admin] }),
     async (req: Request, res: Response) => {
       try {
-        // TODO read query params into a generic query!
-        const subs = await subServiceInstance.getSubs({
+        const idQuery = req.query.ids;
+        const idList =
+          typeof idQuery === 'string'
+            ? idQuery.split(',').map((id) => +id) // Split into a string array and cast those strings to ints
+            : typeof idQuery === 'number'
+            ? [idQuery]
+            : undefined;
+
+        const subs = await subModelInstance.get(undefined, {
           limit: parseInt(req.query.limit, 10) || 10,
           offset: parseInt(req.query.offset, 10) || 0,
           orderBy: req.query.orderBy || 'id',
           order: req.query.order || 'ASC',
+          ids: idList,
         });
 
         res.setStatus(200).json(subs);

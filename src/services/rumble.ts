@@ -77,6 +77,26 @@ export default class RumbleService extends BaseService {
     }
   }
 
+  public async getById(
+    rumbleId: number
+  ): Promise<IRumbleWithSectionInfo | undefined> {
+    try {
+      this.logger.debug('Getting rumble with ID', rumbleId);
+
+      const [rumble] = await this.rumbleModel.get({ id: rumbleId });
+      if (!rumble) return undefined;
+
+      const processedRumble = await this.rumbleModel.getRumbleInfo(rumble);
+      console.log({ processedRumble });
+
+      this.logger.debug('Got rumble with id', rumbleId);
+      return processedRumble;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
   public async addScoresToFeedback(feedback: IRumbleFeedback[]): Promise<void> {
     try {
       this.logger.debug(`Updating feedback scores...`);

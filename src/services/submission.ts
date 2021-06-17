@@ -11,7 +11,6 @@ import {
   ISubmission,
 } from '../interfaces/submissions.ts';
 import { INewTop3 } from '../interfaces/top3.ts';
-import { IGetQuery } from '../models/baseModel.ts';
 import PromptModel from '../models/prompts.ts';
 import SubmissionModel from '../models/submissions.ts';
 import Top3Model from '../models/top3.ts';
@@ -86,16 +85,6 @@ export default class SubmissionService extends BaseService {
       .execute()) as unknown[]) as ISubmission[];
 
     return { subs: processedSubs, hasVoted: top3.length > 0 };
-  }
-
-  public async getSubs(
-    config?: Omit<IGetQuery<false, keyof ISubmission>, 'first'>
-  ) {
-    const subs = await this.submissionModel.get(undefined, config);
-    const subItems = await Promise.all(
-      subs.map((s) => this.retrieveSubItem(s))
-    );
-    return subItems;
   }
 
   public async getById(id: number) {

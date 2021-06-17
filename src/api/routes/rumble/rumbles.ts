@@ -1,6 +1,5 @@
 import { IRouter, log, Router, serviceCollection } from '../../../../deps.ts';
 import { Roles } from '../../../interfaces/roles.ts';
-import RumbleModel from '../../../models/rumbles.ts';
 import RumbleService from '../../../services/rumble.ts';
 import authHandler from '../../middlewares/authHandler.ts';
 
@@ -9,15 +8,14 @@ const route = Router();
 export default (app: IRouter) => {
   const logger: log.Logger = serviceCollection.get('logger');
   const rumbleServiceInstance = serviceCollection.get(RumbleService);
-  const rumbleModelInstance = serviceCollection.get(RumbleModel);
 
   app.use('/rumbles', route);
 
   route.get('/:rumbleId', authHandler(), async (req, res) => {
     try {
-      const [rumble] = await rumbleModelInstance.get({
-        id: parseInt(req.params.rumbleId, 10),
-      });
+      const rumble = await rumbleServiceInstance.getById(
+        parseInt(req.params.rumbleId, 10)
+      );
       res.setStatus(200).json(rumble);
     } catch (err) {
       logger.error(err);
