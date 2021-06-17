@@ -152,25 +152,26 @@ export default class SubmissionService extends BaseService {
     uploadResponse,
     userId,
     sourceId = Sources.FDSC, // Default to FDSC
+    rumbleId,
   }: {
     uploadResponse: IDSAPIPageSubmission;
     promptId: number;
     userId: number;
     sourceId: Sources & number;
+    rumbleId?: number;
   }) {
     try {
-      // const dsReponse = await this.dsService.sendSubmissionToDS(uploadResponse);
       const dsReponse = await this.dsService.sendSubmissionToDS([
         uploadResponse,
       ]);
-      console.log('res', uploadResponse);
 
       const newSub = this.formatNewSub(
         uploadResponse,
         dsReponse,
         promptId,
         userId,
-        sourceId
+        sourceId,
+        rumbleId
       );
 
       let submission: ISubmission | undefined;
@@ -280,6 +281,7 @@ export default class SubmissionService extends BaseService {
         rotation: sub.rotation,
         codename,
         userId: sub.userId,
+        rumbleId: sub.rumbleId,
       };
     } catch (err) {
       this.logger.error(err);
@@ -292,7 +294,8 @@ export default class SubmissionService extends BaseService {
     { confidence, rotation, score, transcription }: IProcessedDSResponse,
     promptId: number,
     userId: number,
-    sourceId: Sources & number
+    sourceId: Sources & number,
+    rumbleId?: number
   ): INewSubmission {
     return {
       confidence,
@@ -304,6 +307,7 @@ export default class SubmissionService extends BaseService {
       userId,
       promptId,
       sourceId,
+      rumbleId,
     };
   }
 
