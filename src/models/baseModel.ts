@@ -70,9 +70,27 @@ export default class BaseModel<NewItem, FullItem> {
     this.logger.debug(`Attempting to retrieve rows from ${this.tableName}`);
 
     const sql = this.db.table(this.tableName).select('*');
-    if (filter) {
-      sql.where(...Object.entries(filter)[0]);
-    }
+
+    // The library can only handle one where clause, the rest HAVE to be or statements,
+    // this boolean lets us track if we have a where clause yet
+    let hasWhere = false;
+    const filters = Object.entries(filter || {});
+    filters.forEach((fil) => {
+      if (hasWhere) {
+        sql.or(...fil);
+      } else {
+        sql.where(...fil);
+        hasWhere = true;
+      }
+    });
+    config?.ids?.forEach((id) => {
+      if (hasWhere) {
+        sql.or('id', id);
+      } else {
+        sql.where('id', id);
+        hasWhere = true;
+      }
+    });
     if (config?.first) {
       sql.limit(1);
     }
@@ -116,10 +134,11 @@ export default class BaseModel<NewItem, FullItem> {
   }
 }
 
-export interface IGetQuery<B = boolean, K = string> {
+export interface IGetQuery<B = boolean, K = string, IdType = number> {
   first?: B;
   limit?: number;
   offset?: number;
   orderBy?: K;
   order?: OrderDirection;
+  ids?: IdType[];
 }
