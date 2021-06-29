@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const dotenv = require('dotenv');
 dotenv.config();
 

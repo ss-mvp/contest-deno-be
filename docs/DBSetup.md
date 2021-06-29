@@ -22,7 +22,7 @@ To log in to PGAdmin, open [http://localhost:5950](http://localhost:5950) in you
 
 ## Known Error
 
-**IF YOU LOG IN TO PGADMIN AND YOU ONLY SEE 2 DATABASES IN THE SERVER:**
+**IF YOU LOG IN TO PGADMIN AND YOU ONLY SEE 2 DATABASES IN THE SERVER (`postgres` and `docker`):**
 
 1. run `docker-compose -f docker/docker-compose.yml down`
 2. delete the repo (sorry, you have to)
@@ -33,8 +33,6 @@ To log in to PGAdmin, open [http://localhost:5950](http://localhost:5950) in you
 If this doesn't fix the issue, feel free to reach out to a project manager for assistance.
 
 ## Database Migrations and Seeding
-
-To handle our database migrations, we're using a Node shell around the application. The currently existing database migration tools for Deno have bugged imports and cause crashes on run. Eventually, we'd like to use the but for now we're using Knex.
 
 For initial databse setup, you need only run the following:
 
