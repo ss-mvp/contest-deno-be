@@ -1,7 +1,7 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { SSOLookups } from '../interfaces/ssoLookups.ts';
-import { INewUser, IUser, IValidationByUser } from '../interfaces/users.ts';
-import BaseModel from './baseModel.ts';
+import { Service, serviceCollection } from '../../deps';
+import { SSOLookups } from '../interfaces/ssoLookups';
+import { INewUser, IUser, IValidationByUser } from '../interfaces/users';
+import BaseModel from './baseModel';
 
 @Service()
 export default class UserModel extends BaseModel<INewUser, IUser> {

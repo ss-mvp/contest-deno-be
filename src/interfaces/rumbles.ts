@@ -1,4 +1,4 @@
-import { RumblePhases } from './rumbleSections.ts';
+import { RumblePhases } from './rumbleSections';
 
 // TODO update this to include full section instead of this, requires a lot of fe/be work
 export interface IRumbleWithSectionInfo extends IRumble {

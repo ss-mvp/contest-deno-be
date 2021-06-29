@@ -1,12 +1,11 @@
-import { Opine } from '../../deps.ts';
+import { Express } from 'express';
+import dependencyInjector from './dependencyInjector';
+import errorHandlers from './errorHandlers';
+import addExpressMiddleware from './express';
 
-import opineLoader from './opine.ts';
-import dependencyInjector from './dependencyInjector.ts';
-import errorHandlers from './errorHandlers.ts';
-
-export default async ({ opineApp }: { opineApp: Opine }) => {
+export default async ({ expressApp }: { expressApp: Express }) => {
   console.log('Running loaders...');
   await dependencyInjector();
-  opineLoader(opineApp);
-  errorHandlers(opineApp);
+  addExpressMiddleware(expressApp);
+  errorHandlers(expressApp);
 };

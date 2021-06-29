@@ -5,33 +5,30 @@ import {
   Service,
   serviceCollection,
   v5,
-} from '../../deps.ts';
-import env from '../config/env.ts';
+} from '../../deps';
+import env from '../config/env';
 import {
   ISection,
   ISectionPostBody,
   ISectionWithRumbles,
-} from '../interfaces/cleverSections.ts';
-import { IStudentWithSubmissions } from '../interfaces/cleverStudents.ts';
-import { Roles } from '../interfaces/roles.ts';
-import { IRumbleFeedback } from '../interfaces/rumbleFeedback.ts';
-import {
-  IRumblePostBody,
-  IRumbleWithSectionInfo,
-} from '../interfaces/rumbles.ts';
-import { ISubItem } from '../interfaces/submissions.ts';
-import { IUser } from '../interfaces/users.ts';
-import CleverSectionModel from '../models/cleverSections.ts';
-import CleverStudentModel from '../models/cleverStudents.ts';
-import CleverTeacherModel from '../models/cleverTeachers.ts';
-import RumbleFeedbackModel from '../models/rumbleFeedback.ts';
-import RumbleModel from '../models/rumbles.ts';
-import RumbleSectionsModel from '../models/rumbleSections.ts';
-import SubmissionModel from '../models/submissions.ts';
-import UserModel from '../models/users.ts';
-import BaseService from './baseService.ts';
-import DSService from './dsService.ts';
-import SubmissionService from './submission.ts';
+} from '../interfaces/cleverSections';
+import { IStudentWithSubmissions } from '../interfaces/cleverStudents';
+import { Roles } from '../interfaces/roles';
+import { IRumbleFeedback } from '../interfaces/rumbleFeedback';
+import { IRumblePostBody, IRumbleWithSectionInfo } from '../interfaces/rumbles';
+import { ISubItem } from '../interfaces/submissions';
+import { IUser } from '../interfaces/users';
+import CleverSectionModel from '../models/cleverSections';
+import CleverStudentModel from '../models/cleverStudents';
+import CleverTeacherModel from '../models/cleverTeachers';
+import RumbleFeedbackModel from '../models/rumbleFeedback';
+import RumbleModel from '../models/rumbles';
+import RumbleSectionsModel from '../models/rumbleSections';
+import SubmissionModel from '../models/submissions';
+import UserModel from '../models/users';
+import BaseService from './baseService';
+import DSService from './dsService';
+import SubmissionService from './submission';
 
 @Service()
 export default class RumbleService extends BaseService {

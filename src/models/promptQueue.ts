@@ -1,9 +1,9 @@
-import { Service, serviceCollection } from '../../deps.ts';
+import { Service, serviceCollection } from '../../deps';
 import {
   INewPromptQueueItem,
   IPromptQueueItem,
-} from '../interfaces/promptQueue.ts';
-import BaseModel from './baseModel.ts';
+} from '../interfaces/promptQueue';
+import BaseModel from './baseModel';
 
 @Service()
 export default class PromptQueueModel extends BaseModel<

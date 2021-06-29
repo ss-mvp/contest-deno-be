@@ -1,6 +1,6 @@
-import { IRouter, log, Router, serviceCollection } from '../../../../deps.ts';
-import CleverService from '../../../services/cleverService.ts';
-import authHandler from '../../middlewares/authHandler.ts';
+import { IRouter, log, Router, serviceCollection } from '../../../../deps';
+import CleverService from '../../../services/cleverService';
+import authHandler from '../../middlewares/authHandler';
 
 const route = Router();
 

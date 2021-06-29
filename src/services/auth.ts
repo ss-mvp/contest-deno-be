@@ -7,20 +7,17 @@ import {
   Service,
   serviceCollection,
   v5,
-} from '../../deps.ts';
-import env from '../config/env.ts';
-import { IAuthResponse } from '../interfaces/apiResponses.ts';
-import { Roles } from '../interfaces/roles.ts';
-import { INewUser, IUser } from '../interfaces/users.ts';
-import {
-  IGetNewValidationBody,
-  Validators,
-} from '../interfaces/validations.ts';
-import ResetModel from '../models/resets.ts';
-import UserModel from '../models/users.ts';
-import ValidationModel from '../models/validations.ts';
-import BaseService from './baseService.ts';
-import MailService from './mailer.ts';
+} from '../../deps';
+import env from '../config/env';
+import { IAuthResponse } from '../interfaces/apiResponses';
+import { Roles } from '../interfaces/roles';
+import { INewUser, IUser } from '../interfaces/users';
+import { IGetNewValidationBody, Validators } from '../interfaces/validations';
+import ResetModel from '../models/resets';
+import UserModel from '../models/users';
+import ValidationModel from '../models/validations';
+import BaseService from './baseService';
+import MailService from './mailer';
 
 @Service()
 export default class AuthService extends BaseService {

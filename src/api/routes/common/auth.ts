@@ -1,37 +1,18 @@
-import {
-  createError,
-  IRouter,
-  isDate,
-  isEmail,
-  isNumber,
-  isString,
-  log,
-  match,
-  Request,
-  required,
-  Response,
-  Router,
-  serviceCollection,
-} from '../../../deps.ts';
-import {
-  codenameRegex,
-  emailRegex,
-  passwordRegex,
-  uuidV5Regex,
-} from '../../config/dataConstraints.ts';
-import env from '../../config/env.ts';
-import { Roles } from '../../interfaces/roles.ts';
-import { INewUser } from '../../interfaces/users.ts';
-import AuthService from '../../services/auth.ts';
-import authHandler from '../middlewares/authHandler.ts';
-import validate from '../middlewares/validate.ts';
-import oauth from './oauth.ts';
+import { Request, Router } from 'express';
+import Container from 'typedi';
+import { Logger } from 'winston';
+import env from '../../../config/env';
+import { Roles } from '../../../interfaces/roles';
+import AuthService from '../../../services/auth';
+import { HTTPError } from '../../../utils';
+import authHandler from '../../middlewares/authHandler';
+import oauth from './oauth';
 
 const route = Router();
 
-export default (app: IRouter) => {
-  const logger: log.Logger = serviceCollection.get('logger');
-  const authServiceInstance = serviceCollection.get(AuthService);
+export default function AuthRouter(app: Router) {
+  const logger: Logger = Container.get('logger');
+  const authServiceInstance = Container.get(AuthService);
   app.use('/auth', route);
   // Add the oauth routes
   oauth(route);
@@ -39,16 +20,16 @@ export default (app: IRouter) => {
   // POST /register
   route.post(
     '/register',
-    validate<INewUser>({
-      codename: [required, isString, match(codenameRegex)],
-      email: [required, isEmail, match(emailRegex)],
-      parentEmail: [isEmail, match(emailRegex)],
-      password: [required, isString, match(passwordRegex)],
-      dob: [required, isDate],
-      firstname: [required, isString],
-      lastname: [required, isString],
-    }),
-    async (req: Request, res: Response) => {
+    // validate<INewUser>({
+    //   codename: [required, isString, match(codenameRegex)],
+    //   email: [required, isEmail, match(emailRegex)],
+    //   parentEmail: [isEmail, match(emailRegex)],
+    //   password: [required, isString, match(passwordRegex)],
+    //   dob: [required, isDate],
+    //   firstname: [required, isString],
+    //   lastname: [required, isString],
+    // }),
+    async (req, res) => {
       try {
         const response = await authServiceInstance.register({
           codename: req.body.codename,
@@ -62,7 +43,7 @@ export default (app: IRouter) => {
           parentEmail: req.body.parentEmail,
         });
 
-        res.setStatus(201).json(response);
+        res.status(201).json(response);
       } catch (err) {
         logger.error(err);
         throw err;
@@ -73,11 +54,11 @@ export default (app: IRouter) => {
   // POST /login
   route.post(
     '/login',
-    validate({
-      codename: [required, isString],
-      password: [required, isString],
-    }),
-    async (req: Request, res: Response) => {
+    // validate({
+    //   codename: [required, isString],
+    //   password: [required, isString],
+    // }),
+    async (req, res) => {
       try {
         const response = await authServiceInstance.SignIn(
           req.body.codename,
@@ -85,11 +66,11 @@ export default (app: IRouter) => {
         );
 
         if (req.query.admin && response.user.roleId !== Roles.admin) {
-          throw createError(401, `Must be admin to login`);
+          throw HTTPError.create(401, `Must be admin to login`);
         }
 
         logger.debug(`User (ID: ${response.user.id}) successfully signed in`);
-        res.setStatus(201).json(response);
+        res.status(201).json(response);
       } catch (err) {
         logger.error(err);
         throw err;
@@ -100,14 +81,17 @@ export default (app: IRouter) => {
   // GET /activation
   route.get(
     '/activation',
-    validate(
-      {
-        token: [required, isString],
-        email: [required, isEmail, match(emailRegex)],
-      },
-      'query'
-    ),
-    async (req: Request, res: Response) => {
+    // validate(
+    //   {
+    //     token: [required, isString],
+    //     email: [required, isEmail, match(emailRegex)],
+    //   },
+    //   'query'
+    // ),
+    async (
+      req: Request<null, null, null, { email: string; token: string }>,
+      res
+    ) => {
       try {
         const { token, user } = await authServiceInstance.Validate(
           req.query.email,
@@ -130,7 +114,7 @@ export default (app: IRouter) => {
   route.put('/activation', authHandler(), async (req, res) => {
     try {
       await authServiceInstance.ResendValidationEmail(req.body.user);
-      res.setStatus(204).end();
+      res.status(204).end();
     } catch (err) {
       logger.error(err);
       throw err;
@@ -141,14 +125,14 @@ export default (app: IRouter) => {
   route.post(
     '/activation',
     authHandler(),
-    validate({
-      newEmail: [required, isEmail, match(emailRegex)],
-      age: [required, isNumber],
-    }),
+    // validate({
+    //   newEmail: [required, isEmail, match(emailRegex)],
+    //   age: [required, isNumber],
+    // }),
     async (req, res) => {
       try {
         await authServiceInstance.SendNewValidationEmail(req.body);
-        res.setStatus(204).end();
+        res.status(204).end();
       } catch (err) {
         logger.error(err);
         throw err;
@@ -159,12 +143,15 @@ export default (app: IRouter) => {
   // GET /reset
   route.get(
     '/reset',
-    validate({ email: [required, isEmail, match(emailRegex)] }, 'query'),
-    async (req: Request, res: Response) => {
+    // validate({ email: [required, isEmail, match(emailRegex)] }, 'query'),
+    async (
+      req: Request<null, { message: string }, null, { email: string }>,
+      res
+    ) => {
       try {
         await authServiceInstance.GetResetEmail(req.query.email);
 
-        res.setStatus(200).json({ message: 'Password reset email sent!' });
+        res.status(200).json({ message: 'Password reset email sent!' });
       } catch (err) {
         logger.error(err);
         throw err;
@@ -175,12 +162,12 @@ export default (app: IRouter) => {
   // POST /reset
   route.post(
     '/reset',
-    validate({
-      email: [required, isEmail, match(emailRegex)],
-      password: [required, isString, match(passwordRegex)],
-      code: [required, isString, match(uuidV5Regex)],
-    }),
-    async (req: Request, res: Response) => {
+    // validate({
+    //   email: [required, isEmail, match(emailRegex)],
+    //   password: [required, isString, match(passwordRegex)],
+    //   code: [required, isString, match(uuidV5Regex)],
+    // }),
+    async (req, res) => {
       try {
         await authServiceInstance.ResetPasswordWithCode(
           req.body.email,
@@ -188,7 +175,7 @@ export default (app: IRouter) => {
           req.body.code
         );
 
-        res.setStatus(204).end();
+        res.status(204).end();
       } catch (err) {
         logger.error(err);
         throw err;
@@ -197,4 +184,4 @@ export default (app: IRouter) => {
   );
 
   console.log('Auth router loaded.');
-};
+}

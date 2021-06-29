@@ -1,6 +1,6 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { INewValidation, IValidation } from '../interfaces/validations.ts';
-import BaseModel from './baseModel.ts';
+import { Service, serviceCollection } from '../../deps';
+import { INewValidation, IValidation } from '../interfaces/validations';
+import BaseModel from './baseModel';
 
 @Service()
 export default class ValidationModel extends BaseModel<

@@ -1,6 +1,6 @@
-import { Inject, Service, serviceCollection } from '../../deps.ts';
-import RumbleFeedbackModel from '../models/rumbleFeedback.ts';
-import BaseService from './baseService.ts';
+import { Inject, Service, serviceCollection } from '../../deps';
+import RumbleFeedbackModel from '../models/rumbleFeedback';
+import BaseService from './baseService';
 
 @Service()
 export default class FeedbackService extends BaseService {

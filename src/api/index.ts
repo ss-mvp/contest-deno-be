@@ -1,22 +1,17 @@
-import { Router } from '../../deps.ts';
-import auth from './routes/auth.ts';
-import contestRoutes from './routes/contest/index.ts';
-import users from './routes/users.ts';
-import rumbleRoutes from './routes/rumble/index.ts';
-import submissions from './routes/submissions.ts';
-import prompts from './routes/prompts.ts';
+import { Router } from 'express';
+import { commonRoutes, contestRoutes, rumbleRoutes } from './routes';
 
-export default () => {
+export default function loadAppRoutes() {
   console.log('Loading routers...');
   const app = Router();
 
-  auth(app);
-  users(app);
+  commonRoutes.auth(app);
+  commonRoutes.users(app);
+  commonRoutes.submissions(app);
+  commonRoutes.prompts(app);
   contestRoutes(app);
   rumbleRoutes(app);
-  submissions(app);
-  prompts(app);
 
   console.log('Routers loaded.');
   return app;
-};
+}

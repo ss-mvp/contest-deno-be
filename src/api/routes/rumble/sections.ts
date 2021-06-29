@@ -5,11 +5,11 @@ import {
   required,
   Router,
   serviceCollection,
-} from '../../../../deps.ts';
-import { Roles } from '../../../interfaces/roles.ts';
-import RumbleService from '../../../services/rumble.ts';
-import authHandler from '../../middlewares/authHandler.ts';
-import validate from '../../middlewares/validate.ts';
+} from '../../../../deps';
+import { Roles } from '../../../interfaces/roles';
+import RumbleService from '../../../services/rumble';
+import authHandler from '../../middlewares/authHandler';
+import validate from '../../middlewares/validate';
 
 const route = Router();
 

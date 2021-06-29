@@ -10,13 +10,13 @@ import {
   Response,
   Router,
   serviceCollection,
-} from '../../../deps.ts';
-import { INewPrompt, IPrompt } from '../../interfaces/prompts.ts';
-import { Roles } from '../../interfaces/roles.ts';
-import PromptModel from '../../models/prompts.ts';
-import AdminService from '../../services/admin.ts';
-import authHandler from '../middlewares/authHandler.ts';
-import validate from '../middlewares/validate.ts';
+} from '../../../deps';
+import { INewPrompt, IPrompt } from '../../interfaces/prompts';
+import { Roles } from '../../interfaces/roles';
+import PromptModel from '../../models/prompts';
+import AdminService from '../../services/admin';
+import authHandler from '../middlewares/authHandler';
+import validate from '../middlewares/validate';
 
 const route = Router();
 

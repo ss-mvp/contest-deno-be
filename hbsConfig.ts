@@ -1,5 +1,5 @@
-import { HandlebarsConfig } from './deps.ts';
-import helpers from './views/helpers/index.ts';
+import { HandlebarsConfig } from './deps';
+import helpers from './views/helpers';
 
 export default () => {
   const hbc: HandlebarsConfig = {

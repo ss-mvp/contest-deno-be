@@ -1,12 +1,12 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { ISection } from '../interfaces/cleverSections.ts';
-import { IStudentWithSubmissions } from '../interfaces/cleverStudents.ts';
+import { Service, serviceCollection } from '../../deps';
+import { ISection } from '../interfaces/cleverSections';
+import { IStudentWithSubmissions } from '../interfaces/cleverStudents';
 import {
   INewRumble,
   IRumble,
   IRumbleWithSectionInfo,
-} from '../interfaces/rumbles.ts';
-import BaseModel from './baseModel.ts';
+} from '../interfaces/rumbles';
+import BaseModel from './baseModel';
 
 @Service()
 export default class RumbleModel extends BaseModel<INewRumble, IRumble> {

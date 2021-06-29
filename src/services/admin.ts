@@ -1,13 +1,13 @@
 import {
-  Service,
-  Inject,
-  serviceCollection,
   createError,
+  Inject,
   moment,
-} from '../../deps.ts';
-import PromptQueueModel from '../models/promptQueue.ts';
-import PromptModel from '../models/prompts.ts';
-import BaseService from './baseService.ts';
+  Service,
+  serviceCollection,
+} from '../../deps';
+import PromptQueueModel from '../models/promptQueue';
+import PromptModel from '../models/prompts';
+import BaseService from './baseService';
 
 @Service()
 export default class AdminService extends BaseService {

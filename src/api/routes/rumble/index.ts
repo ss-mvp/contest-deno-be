@@ -1,10 +1,10 @@
-import { IRouter, Router } from '../../../../deps.ts';
-import data from './data.ts';
-import feedback from './feedback.ts';
-import rumbles from './rumbles.ts';
-import sections from './sections.ts';
-import students from './students.ts';
-import teachers from './teachers.ts';
+import { IRouter, Router } from '../../../../deps';
+import data from './data';
+import feedback from './feedback';
+import rumbles from './rumbles';
+import sections from './sections';
+import students from './students';
+import teachers from './teachers';
 
 export default (app: IRouter) => {
   console.log('Loading rumble routers...');

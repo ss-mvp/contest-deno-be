@@ -1,6 +1,6 @@
-import { IRouter, Router } from '../../../../deps.ts';
-import leaderboard from './leaderboard.ts';
-import votes from './votes.ts';
+import { IRouter, Router } from '../../../../deps';
+import leaderboard from './leaderboard';
+import votes from './votes';
 
 export default (app: IRouter) => {
   console.log('Loading contest routers...');

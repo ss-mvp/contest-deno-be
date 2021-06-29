@@ -1,6 +1,6 @@
-import { moment, Q, Service, serviceCollection } from '../../deps.ts';
-import { INewPrompt, IPrompt, IPromptInQueue } from '../interfaces/prompts.ts';
-import BaseModel from './baseModel.ts';
+import { moment, Q, Service, serviceCollection } from '../../deps';
+import { INewPrompt, IPrompt, IPromptInQueue } from '../interfaces/prompts';
+import BaseModel from './baseModel';
 
 @Service()
 export default class PromptModel extends BaseModel<INewPrompt, IPrompt> {

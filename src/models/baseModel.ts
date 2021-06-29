@@ -5,7 +5,7 @@ import {
   PostgresAdapter,
   QueryValues,
   serviceCollection,
-} from '../../deps.ts';
+} from '../../deps';
 
 /**
  * Type NewItem: new item interface, should be the fields required to

@@ -1,8 +1,8 @@
-import { Service, serviceCollection, Inject, moment } from '../../deps.ts';
-import { INewVote } from '../interfaces/votes.ts';
-import PromptModel from '../models/prompts.ts';
-import VoteModel from '../models/votes.ts';
-import BaseService from './baseService.ts';
+import { Inject, moment, Service, serviceCollection } from '../../deps';
+import { INewVote } from '../interfaces/votes';
+import PromptModel from '../models/prompts';
+import VoteModel from '../models/votes';
+import BaseService from './baseService';
 
 @Service()
 export default class ContestService extends BaseService {

@@ -1,5 +1,5 @@
-import { ISubItem } from './submissions.ts';
-import { IUser } from './users.ts';
+import { ISubItem } from './submissions';
+import { IUser } from './users';
 
 export interface IStudent extends INewStudent {
   id: number;

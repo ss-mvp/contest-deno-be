@@ -1,12 +1,12 @@
 import {
-  Router,
   IRouter,
+  log,
   Request,
   Response,
-  log,
+  Router,
   serviceCollection,
-} from '../../../../deps.ts';
-import ContestService from '../../../services/contest.ts';
+} from '../../../../deps';
+import ContestService from '../../../services/contest';
 
 const route = Router();
 

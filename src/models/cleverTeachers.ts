@@ -1,7 +1,7 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { ISection } from '../interfaces/cleverSections.ts';
-import { INewTeacher, ITeacher } from '../interfaces/cleverTeachers.ts';
-import BaseModel from './baseModel.ts';
+import { Service, serviceCollection } from '../../deps';
+import { ISection } from '../interfaces/cleverSections';
+import { INewTeacher, ITeacher } from '../interfaces/cleverTeachers';
+import BaseModel from './baseModel';
 
 @Service()
 export default class CleverTeacherModel extends BaseModel<

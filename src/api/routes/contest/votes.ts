@@ -7,10 +7,10 @@ import {
   Router,
   serviceCollection,
   validateArray,
-} from '../../../../deps.ts';
-import ContestService from '../../../services/contest.ts';
-import authHandler from '../../middlewares/authHandler.ts';
-import validate from '../../middlewares/validate.ts';
+} from '../../../../deps';
+import ContestService from '../../../services/contest';
+import authHandler from '../../middlewares/authHandler';
+import validate from '../../middlewares/validate';
 
 const route = Router();
 

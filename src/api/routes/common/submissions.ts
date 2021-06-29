@@ -12,15 +12,15 @@ import {
   serviceCollection,
   validateArray,
   validateObject,
-} from '../../../deps.ts';
-import { Roles } from '../../interfaces/roles.ts';
-import { INewSubmission } from '../../interfaces/submissions.ts';
-import RumbleFeedbackModel from '../../models/rumbleFeedback.ts';
-import SubmissionModel from '../../models/submissions.ts';
-import SubmissionService from '../../services/submission.ts';
-import authHandler from '../middlewares/authHandler.ts';
-import upload from '../middlewares/upload.ts';
-import validate from '../middlewares/validate.ts';
+} from '../../../deps';
+import { Roles } from '../../interfaces/roles';
+import { INewSubmission } from '../../interfaces/submissions';
+import RumbleFeedbackModel from '../../models/rumbleFeedback';
+import SubmissionModel from '../../models/submissions';
+import SubmissionService from '../../services/submission';
+import authHandler from '../middlewares/authHandler';
+import upload from '../middlewares/upload';
+import validate from '../middlewares/validate';
 
 const route = Router();
 

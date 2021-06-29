@@ -6,10 +6,10 @@ import {
   Service,
   serviceCollection,
   SES,
-} from '../../deps.ts';
-import hbsConfig from '../../hbsConfig.ts';
-import env from '../config/env.ts';
-import { IUser } from '../interfaces/users.ts';
+} from '../../deps';
+import hbsConfig from '../../hbsConfig';
+import env from '../config/env';
+import { IUser } from '../interfaces/users';
 
 @Service()
 export default class MailService {
@@ -27,7 +27,7 @@ export default class MailService {
         Destination: {
           ToAddresses: [email],
         },
-        FromEmailAddress: env.SES_CONFIG.email,
+        FromEmailAddress: env.SES_EMAIL,
         Content: {
           Simple: {
             Body: {
@@ -69,7 +69,7 @@ export default class MailService {
         Destination: {
           ToAddresses: [email],
         },
-        FromEmailAddress: env.SES_CONFIG.email,
+        FromEmailAddress: env.SES_EMAIL,
         Content: {
           Simple: {
             Body: {
@@ -110,7 +110,7 @@ export default class MailService {
         Destination: {
           ToAddresses: [user.email],
         },
-        FromEmailAddress: env.SES_CONFIG.email,
+        FromEmailAddress: env.SES_EMAIL,
         Content: {
           Simple: {
             Body: {

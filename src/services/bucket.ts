@@ -6,8 +6,8 @@ import {
   Service,
   serviceCollection,
   v4,
-} from '../../deps.ts';
-import { IUploadResponse } from '../interfaces/dsServiceTypes.ts';
+} from '../../deps';
+import { IUploadResponse } from '../interfaces/dsServiceTypes';
 
 @Service()
 export default class BucketService {

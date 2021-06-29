@@ -5,14 +5,14 @@ import {
   QueryValues,
   Service,
   serviceCollection,
-} from '../../deps.ts';
+} from '../../deps';
 import {
   IDSAPIPageSubmission,
   IDSAPITextSubmissionResponse,
-} from '../interfaces/dsServiceTypes.ts';
-import { Sources } from '../interfaces/enumSources.ts';
-import { ISubItem } from '../interfaces/submissions.ts';
-import { IUser } from '../interfaces/users.ts';
+} from '../interfaces/dsServiceTypes';
+import { Sources } from '../interfaces/enumSources';
+import { ISubItem } from '../interfaces/submissions';
+import { IUser } from '../interfaces/users';
 
 @Service()
 export default class DSModel {

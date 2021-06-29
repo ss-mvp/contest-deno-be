@@ -1,5 +1,5 @@
-import { DatabaseResult } from '../../deps.ts';
-import { Roles } from './roles.ts';
+import { DatabaseResult } from '../../deps';
+import { Roles } from './roles';
 
 export interface IUser extends Omit<INewUser, 'parentEmail'> {
   id: number;

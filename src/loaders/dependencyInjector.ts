@@ -1,35 +1,30 @@
-import { serviceCollection } from '../../deps.ts';
-import bucket from './bucket.ts';
-import clever from './clever.ts';
-import logger from './logger.ts';
-import mailer from './mailer.ts';
-import postgres from './postgres.ts';
-import redis from './redis.ts';
+import Container from 'typedi';
+import aws from './aws';
+import clever from './clever';
+import logger from './logger';
+import postgres from './postgres';
 
-export default async () => {
+export default async function dependencyInjector() {
   try {
-    const log = await logger();
-    serviceCollection.addStatic('logger', log);
+    const log = logger();
+    Container.set('logger', log);
 
     const pgMain = await postgres.main();
-    serviceCollection.addStatic('pg', pgMain);
+    Container.set('pg', pgMain);
 
     const pgDS = await postgres.ds();
-    serviceCollection.addStatic('ds', pgDS);
+    Container.set('ds', pgDS);
 
-    const mail = mailer();
-    serviceCollection.addStatic('mail', mail);
+    const mail = aws.ses();
+    Container.set('mail', mail);
 
-    const s3 = bucket();
-    serviceCollection.addStatic('s3', s3);
+    const s3 = aws.s3();
+    Container.set('s3', s3);
 
     const cleverClient = clever();
-    serviceCollection.addStatic('clever', cleverClient);
-
-    const redisClient = redis();
-    serviceCollection.addStatic('redis', redisClient);
+    Container.set('clever', cleverClient);
   } catch (err) {
     console.log({ err });
     throw err;
   }
-};
+}

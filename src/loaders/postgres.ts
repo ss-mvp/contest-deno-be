@@ -1,18 +1,15 @@
-import { connect } from '../../deps.ts';
-import env from '../config/env.ts';
+import knex from 'knex';
+import { env, knexfile } from '../config';
 
 export default {
   main: async () => {
     console.log('Connecting to DB...');
 
     try {
-      const db = await connect({
-        type: 'postgres',
-        ...env.DB_CONFIG,
-      });
+      const db = knex(knexfile[env.NODE_ENV]);
 
       console.log('Testing DB connection...');
-      await db.query('SELECT * FROM users');
+      await db.from('users').select();
 
       console.log('DB connected!');
 
@@ -26,13 +23,10 @@ export default {
     console.log('Connecting to DS DB...');
 
     try {
-      const db = await connect({
-        type: 'postgres',
-        ...env.DS_DB_CONFIG,
-      });
+      const db = knex(knexfile['ds']);
 
       console.log('Testing DS DB connection...');
-      await db.query('SELECT * FROM submissions');
+      await db.from('submissions').select();
 
       console.log('DS DB connected!');
 

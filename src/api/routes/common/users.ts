@@ -14,16 +14,16 @@ import {
   required,
   Router,
   serviceCollection,
-} from '../../../deps.ts';
+} from '../../../deps';
 import {
   codenameRegex,
   emailRegex,
   passwordRegex,
-} from '../../config/dataConstraints.ts';
-import { IUser } from '../../interfaces/users.ts';
-import UserModel from '../../models/users.ts';
-import SubmissionService from '../../services/submission.ts';
-import validate from '../middlewares/validate.ts';
+} from '../../config/dataConstraints';
+import { IUser } from '../../interfaces/users';
+import UserModel from '../../models/users';
+import SubmissionService from '../../services/submission';
+import validate from '../middlewares/validate';
 
 const route = Router();
 

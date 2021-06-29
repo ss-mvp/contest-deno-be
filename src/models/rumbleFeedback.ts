@@ -1,9 +1,9 @@
-import { QueryValues, Service, serviceCollection } from '../../deps.ts';
+import { QueryValues, Service, serviceCollection } from '../../deps';
 import {
   INewRumbleFeedback,
   IRumbleFeedback,
-} from '../interfaces/rumbleFeedback.ts';
-import BaseModel from './baseModel.ts';
+} from '../interfaces/rumbleFeedback';
+import BaseModel from './baseModel';
 
 @Service()
 export default class RumbleFeedbackModel extends BaseModel<

@@ -4,12 +4,12 @@ import {
   required,
   Router,
   serviceCollection,
-} from '../../../../deps.ts';
-import RumbleFeedbackModel from '../../../models/rumbleFeedback.ts';
-import FeedbackService from '../../../services/feedback.ts';
-import RumbleService from '../../../services/rumble.ts';
-import authHandler from '../../middlewares/authHandler.ts';
-import validate from '../../middlewares/validate.ts';
+} from '../../../../deps';
+import RumbleFeedbackModel from '../../../models/rumbleFeedback';
+import FeedbackService from '../../../services/feedback';
+import RumbleService from '../../../services/rumble';
+import authHandler from '../../middlewares/authHandler';
+import validate from '../../middlewares/validate';
 
 const route = Router();
 

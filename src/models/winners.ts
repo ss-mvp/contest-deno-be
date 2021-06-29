@@ -1,6 +1,6 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { INewWinner, IWinner } from '../interfaces/winners.ts';
-import BaseModel from './baseModel.ts';
+import { Service, serviceCollection } from '../../deps';
+import { INewWinner, IWinner } from '../interfaces/winners';
+import BaseModel from './baseModel';
 
 @Service()
 export default class WinnerModel extends BaseModel<INewWinner, IWinner> {

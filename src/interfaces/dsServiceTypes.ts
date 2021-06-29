@@ -1,4 +1,4 @@
-import { PutObjectResponse } from '../../deps.ts';
+import { PutObjectResponse } from '../../deps';
 
 export interface IUploadResponse extends PutObjectResponse {
   s3Label: string;

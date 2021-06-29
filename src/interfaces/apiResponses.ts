@@ -1,6 +1,6 @@
-import { ICleverProfile } from '../../deps.ts';
-import { Roles } from './roles.ts';
-import { IUser } from './users.ts';
+import { ICleverProfile } from '../../deps';
+import { Roles } from './roles';
+import { IUser } from './users';
 
 export interface IAuthResponse {
   user: Omit<IUser, 'password'>;

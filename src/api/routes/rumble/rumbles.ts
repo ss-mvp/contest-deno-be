@@ -1,7 +1,7 @@
-import { IRouter, log, Router, serviceCollection } from '../../../../deps.ts';
-import { Roles } from '../../../interfaces/roles.ts';
-import RumbleService from '../../../services/rumble.ts';
-import authHandler from '../../middlewares/authHandler.ts';
+import { IRouter, log, Router, serviceCollection } from '../../../../deps';
+import { Roles } from '../../../interfaces/roles';
+import RumbleService from '../../../services/rumble';
+import authHandler from '../../middlewares/authHandler';
 
 const route = Router();
 

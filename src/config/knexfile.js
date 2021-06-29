@@ -62,6 +62,7 @@ module.exports = {
   // DS Database connection
   ds: {
     client: 'pg',
+    // TODO think about how we should set up the TEST db url?
     connection: process.env.DS_DB_URL,
     pool: {
       min: 2,

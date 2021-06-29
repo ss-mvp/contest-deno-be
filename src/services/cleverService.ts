@@ -4,24 +4,24 @@ import {
   Inject,
   Service,
   serviceCollection,
-} from '../../deps.ts';
+} from '../../deps';
 import {
   CleverAuthResponseType,
   IAuthResponse,
   ICleverEnumData,
   ISelectOption,
-} from '../interfaces/apiResponses.ts';
-import { ISectionWithRumbles } from '../interfaces/cleverSections.ts';
-import { Roles } from '../interfaces/roles.ts';
-import { SSOLookups } from '../interfaces/ssoLookups.ts';
-import { IOAuthUser, IUser } from '../interfaces/users.ts';
-import CleverStudentModel from '../models/cleverStudents.ts';
-import CleverTeacherModel from '../models/cleverTeachers.ts';
-import SSOLookupModel from '../models/ssoLookups.ts';
-import UserModel from '../models/users.ts';
-import AuthService from './auth.ts';
-import BaseService from './baseService.ts';
-import RumbleService from './rumble.ts';
+} from '../interfaces/apiResponses';
+import { ISectionWithRumbles } from '../interfaces/cleverSections';
+import { Roles } from '../interfaces/roles';
+import { SSOLookups } from '../interfaces/ssoLookups';
+import { IOAuthUser, IUser } from '../interfaces/users';
+import CleverStudentModel from '../models/cleverStudents';
+import CleverTeacherModel from '../models/cleverTeachers';
+import SSOLookupModel from '../models/ssoLookups';
+import UserModel from '../models/users';
+import AuthService from './auth';
+import BaseService from './baseService';
+import RumbleService from './rumble';
 
 @Service()
 export default class CleverService extends BaseService {

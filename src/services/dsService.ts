@@ -1,11 +1,11 @@
-import { axiod, Inject, log, Service, serviceCollection } from '../../deps.ts';
-import env from '../config/env.ts';
+import { axiod, Inject, log, Service, serviceCollection } from '../../deps';
+import env from '../config/env';
 import {
   IDSAPIPageSubmission,
   IDSAPITextSubmissionPostBody,
   IDSAPITextSubmissionResponse,
-} from '../interfaces/dsServiceTypes.ts';
-import { INewRumbleFeedback } from '../interfaces/rumbleFeedback.ts';
+} from '../interfaces/dsServiceTypes';
+import { INewRumbleFeedback } from '../interfaces/rumbleFeedback';
 
 @Service()
 export default class DSService {

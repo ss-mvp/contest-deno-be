@@ -1,9 +1,9 @@
-import { Service, serviceCollection } from '../../deps.ts';
+import { Service, serviceCollection } from '../../deps';
 import {
   INewRumbleSections,
   IRumbleSections,
-} from '../interfaces/rumbleSections.ts';
-import BaseModel from './baseModel.ts';
+} from '../interfaces/rumbleSections';
+import BaseModel from './baseModel';
 
 @Service()
 export default class RumbleSectionsModel extends BaseModel<

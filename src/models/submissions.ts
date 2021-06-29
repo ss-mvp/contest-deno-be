@@ -1,7 +1,7 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { Sources } from '../interfaces/enumSources.ts';
-import { INewSubmission, ISubmission } from '../interfaces/submissions.ts';
-import BaseModel from './baseModel.ts';
+import { Service, serviceCollection } from '../../deps';
+import { Sources } from '../interfaces/enumSources';
+import { INewSubmission, ISubmission } from '../interfaces/submissions';
+import BaseModel from './baseModel';
 
 @Service()
 export default class SubmissionModel extends BaseModel<

@@ -1,4 +1,4 @@
-import { serviceCollection, PostgresAdapter, log } from '../../deps.ts';
+import { log, PostgresAdapter, serviceCollection } from '../../deps';
 
 export default class BaseService {
   constructor() {

@@ -1,7 +1,7 @@
-import { CleverGradeType, CleverSubjectType } from '../../deps.ts';
-import { Grades } from './enumGrades.ts';
-import { Subjects } from './enumSubjects.ts';
-import { IRumbleWithSectionInfo } from './rumbles.ts';
+import { CleverGradeType, CleverSubjectType } from '../../deps';
+import { Grades } from './enumGrades';
+import { Subjects } from './enumSubjects';
+import { IRumbleWithSectionInfo } from './rumbles';
 
 export interface ISectionWithRumbles extends ISection {
   rumbles: IRumbleWithSectionInfo[];

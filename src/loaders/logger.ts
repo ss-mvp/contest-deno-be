@@ -1,34 +1,18 @@
-import { log } from '../../deps.ts';
-import env from '../config/env.ts';
+import { createLogger, format, transports } from 'winston';
+import { env } from '../config';
 
-export default async () => {
+export default () => {
   console.log('Initializing logger...');
-  await log.setup({
-    handlers: {
-      console: new log.handlers.ConsoleHandler('DEBUG', {
-        formatter: '[{levelName}] {msg}',
-      }),
-    },
-    loggers: {
-      default: {
-        level: 'DEBUG',
-        handlers: ['console'],
-      },
-      development: {
-        level: 'DEBUG',
-        handlers: ['console'],
-      },
-      production: {
-        level: 'DEBUG',
-        handlers: ['console'],
-      },
-      testing: {
-        level: 'CRITICAL',
-        handlers: ['console'],
-      },
-    },
+
+  const logger = createLogger({
+    ...env.LOGGER_CONFIG,
+    format: format.printf(({ level, message }) => {
+      return `[${level}] ${message}`;
+    }),
+    transports: [new transports.Console()],
   });
+
   console.log('Logger initialized!');
 
-  return log.getLogger(env.DENO_ENV);
+  return logger;
 };

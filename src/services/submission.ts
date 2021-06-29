@@ -1,26 +1,26 @@
-import { createError, Inject, Service, serviceCollection } from '../../deps.ts';
+import { createError, Inject, Service, serviceCollection } from '../../deps';
 import {
   DSTranscriptionSources,
   IDSAPIPageSubmission,
   IDSAPITextSubmissionResponse,
   IUploadResponse,
-} from '../interfaces/dsServiceTypes.ts';
-import { Sources } from '../interfaces/enumSources.ts';
+} from '../interfaces/dsServiceTypes';
+import { Sources } from '../interfaces/enumSources';
 import {
   INewSubmission,
   ISubItem,
   ISubmission,
-} from '../interfaces/submissions.ts';
-import { INewTop3 } from '../interfaces/top3.ts';
-import { IUser } from '../interfaces/users.ts';
-import DSModel from '../models/dsModels.ts';
-import PromptModel from '../models/prompts.ts';
-import SubmissionModel from '../models/submissions.ts';
-import Top3Model from '../models/top3.ts';
-import UserModel from '../models/users.ts';
-import BaseService from './baseService.ts';
-import BucketService from './bucket.ts';
-import DSService from './dsService.ts';
+} from '../interfaces/submissions';
+import { INewTop3 } from '../interfaces/top3';
+import { IUser } from '../interfaces/users';
+import DSModel from '../models/dsModels';
+import PromptModel from '../models/prompts';
+import SubmissionModel from '../models/submissions';
+import Top3Model from '../models/top3';
+import UserModel from '../models/users';
+import BaseService from './baseService';
+import BucketService from './bucket';
+import DSService from './dsService';
 
 @Service()
 export default class SubmissionService extends BaseService {
