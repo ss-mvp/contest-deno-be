@@ -5,10 +5,7 @@ export default function loadAppRoutes() {
   console.log('Loading routers...');
   const app = Router();
 
-  commonRoutes.auth(app);
-  commonRoutes.users(app);
-  commonRoutes.submissions(app);
-  commonRoutes.prompts(app);
+  commonRoutes(app);
   contestRoutes(app);
   rumbleRoutes(app);
 

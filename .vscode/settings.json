@@ -8,5 +8,7 @@
     "source.fixAll.eslint": true,
     "source.organizeImports": true
   },
-  "files.exclude": {}
+  "files.exclude": {
+    "node_modules": true
+  }
 }

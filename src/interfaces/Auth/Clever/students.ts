@@ -1,5 +1,5 @@
-import { ISubItem } from './submissions';
-import { IUser } from './users';
+import { ISubItem } from '../../submissions';
+import { IUser } from '../../users';
 
 export interface IStudent extends INewStudent {
   id: number;

@@ -20,7 +20,7 @@ import validate from '../middlewares/validate';
 
 const route = Router();
 
-export default (app: IRouter) => {
+export default function promptRoute(app: IRouter) {
   const logger: log.Logger = serviceCollection.get('logger');
   const promptModelInstance = serviceCollection.get(PromptModel);
 
@@ -200,4 +200,4 @@ export default (app: IRouter) => {
   );
 
   console.log('Prompt router loaded.');
-};
+}

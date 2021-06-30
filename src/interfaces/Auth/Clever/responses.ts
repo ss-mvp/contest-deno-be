@@ -1,21 +1,6 @@
-import { ICleverProfile } from '../../deps';
-import { Roles } from './roles';
-import { IUser } from './users';
-
-export interface IAuthResponse {
-  user: Omit<IUser, 'password'>;
-  token: string;
-}
-
-export interface ICleverEnumData {
-  grades: ISelectOption[];
-  subjects: ISelectOption[];
-}
-
-export interface ISelectOption {
-  value: string;
-  label: string;
-}
+import { Roles } from '../../Enum/roles';
+import { IUser } from '../../users';
+import { IAuthResponse } from '../responses';
 
 /**
  * # Clever Auth Response
@@ -59,22 +44,38 @@ export interface ISelectOption {
  * reduce friction and improve the user experience.
  */
 
-export type CleverAuthResponseType =
-  | {
-      actionType: 'SUCCESS';
-      roleId: Roles & number;
-      body: IAuthResponse;
-      cleverId: string;
-    }
-  | {
-      actionType: 'MERGE';
-      roleId: Roles & number;
-      body: IUser;
-      cleverId: string;
-    }
-  | {
-      actionType: 'NEW';
-      roleId: Roles & number;
-      body: ICleverProfile['data'];
-      cleverId: string;
-    };
+export interface IProfile {
+  data: { id?: string };
+}
+
+export interface ISuccessResponse {
+  actionType: 'SUCCESS';
+  roleId: Roles & number;
+  body: IAuthResponse;
+  cleverId: string;
+}
+export function isSuccess(res: unknown): res is ISuccessResponse {
+  return (res as ISuccessResponse)?.actionType === 'SUCCESS';
+}
+
+export interface IMergeResponse {
+  actionType: 'MERGE';
+  roleId: Roles & number;
+  body: IUser;
+  cleverId: string;
+}
+export function isMerge(res: unknown): res is IMergeResponse {
+  return (res as IMergeResponse)?.actionType === 'MERGE';
+}
+
+export interface INewResponse {
+  actionType: 'NEW';
+  roleId: Roles & number;
+  body: IProfile['data'];
+  cleverId: string;
+}
+export function isNew(res: unknown): res is INewResponse {
+  return (res as INewResponse)?.actionType === 'NEW';
+}
+
+export type IResponse = ISuccessResponse | IMergeResponse | INewResponse;

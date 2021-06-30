@@ -10,8 +10,8 @@ import {
   validateArray,
   validateObject,
 } from '../../../../deps';
-import { INewSection } from '../../../interfaces/cleverSections';
-import { Roles } from '../../../interfaces/roles';
+import { INewSection } from '../../../interfaces/Clever/sections';
+import { Roles } from '../../../interfaces/Enum/roles';
 import RumbleService from '../../../services/rumble';
 import authHandler from '../../middlewares/authHandler';
 import validate from '../../middlewares/validate';

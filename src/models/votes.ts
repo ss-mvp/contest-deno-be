@@ -1,9 +1,8 @@
 import { Service, serviceCollection } from '../../deps';
-import { INewVote, IVote } from '../interfaces/votes';
 import BaseModel from './baseModel';
 
 @Service()
-export default class VoteModel extends BaseModel<INewVote, IVote> {
+export default class VoteModel extends BaseModel<Contest, IVote> {
   constructor() {
     super('votes');
   }

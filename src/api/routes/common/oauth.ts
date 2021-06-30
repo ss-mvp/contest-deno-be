@@ -5,7 +5,7 @@ import CleverService from '../../../services/cleverService';
 
 const route = Router();
 
-export default function OAuthRouter(app: Router) {
+export default function oAuthRoute(app: Router) {
   const logger: Logger = Container.get('logger');
   const cleverInstance = Container.get(CleverService);
   app.use('/o', route);

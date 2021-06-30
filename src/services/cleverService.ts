@@ -12,7 +12,7 @@ import {
   ISelectOption,
 } from '../interfaces/apiResponses';
 import { ISectionWithRumbles } from '../interfaces/cleverSections';
-import { Roles } from '../interfaces/roles';
+import { Roles } from '../interfaces/Enum/roles';
 import { SSOLookups } from '../interfaces/ssoLookups';
 import { IOAuthUser, IUser } from '../interfaces/users';
 import CleverStudentModel from '../models/cleverStudents';

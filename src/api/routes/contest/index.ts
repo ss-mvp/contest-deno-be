@@ -1,9 +1,9 @@
-import { IRouter, Router } from '../../../../deps';
+import { Router } from 'express';
 import leaderboard from './leaderboard';
 import votes from './votes';
 
-export default (app: IRouter) => {
-  console.log('Loading contest routers...');
+export default function contestRouteLoader(app: Router) {
+  console.log('Loading contest routes...');
   const contestRouter = Router();
   app.use('/contest', contestRouter);
 
@@ -11,4 +11,4 @@ export default (app: IRouter) => {
   leaderboard(contestRouter);
 
   console.log('Contest routers loaded.');
-};
+}

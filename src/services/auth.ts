@@ -10,7 +10,7 @@ import {
 } from '../../deps';
 import env from '../config/env';
 import { IAuthResponse } from '../interfaces/apiResponses';
-import { Roles } from '../interfaces/roles';
+import { Roles } from '../interfaces/Enum/roles';
 import { INewUser, IUser } from '../interfaces/users';
 import { IGetNewValidationBody, Validators } from '../interfaces/validations';
 import ResetModel from '../models/resets';

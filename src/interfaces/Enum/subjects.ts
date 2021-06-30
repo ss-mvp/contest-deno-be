@@ -1,4 +1,4 @@
-export interface ISubjectEnum {
+export interface ISubject {
   id: keyof SubjectType;
   subject: SubjectType[keyof SubjectType];
 }
@@ -18,7 +18,7 @@ export type SubjectType = {
   '': 'None';
 };
 
-export enum Subjects {
+export enum SubjectEnum {
   'english/language arts' = 'English/Language Arts',
   math = 'Math',
   science = 'Science',

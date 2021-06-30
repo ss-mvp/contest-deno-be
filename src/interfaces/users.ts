@@ -1,5 +1,4 @@
-import { DatabaseResult } from '../../deps';
-import { Roles } from './roles';
+import { Roles } from './Enum/roles';
 
 export interface IUser extends Omit<INewUser, 'parentEmail'> {
   id: number;
@@ -28,7 +27,7 @@ export interface IOAuthUser {
   password: string;
 }
 
-export interface IValidationByUser extends DatabaseResult {
+export interface IValidationByUser {
   validationEmail: string;
   validationId: number;
   isValidated: boolean;

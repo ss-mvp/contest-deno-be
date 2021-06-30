@@ -1,5 +1,5 @@
-import { Inject, moment, Service, serviceCollection } from '../../deps';
-import { INewVote } from '../interfaces/votes';
+import { Inject, Service } from 'typedi';
+import { Clash } from '../interfaces';
 import PromptModel from '../models/prompts';
 import VoteModel from '../models/votes';
 import BaseService from './baseService';
@@ -15,7 +15,7 @@ export default class ContestService extends BaseService {
 
   public async submitVote(subIds: number[], userId?: number) {
     try {
-      const voteItem: INewVote = {
+      const voteItem: Clash.votes.INewVote = {
         firstPlaceId: subIds[0],
         secondPlaceId: subIds[1],
         thirdPlaceId: subIds[2],

@@ -1,7 +1,9 @@
 import AWS from 'aws-sdk';
+import Bluebird from 'bluebird';
 import { env } from '../config';
 
 AWS.config.update(env.AWS_CONFIG);
+AWS.config.setPromisesDependency(Bluebird);
 
 export default {
   ses: function loadMailer() {
@@ -40,3 +42,5 @@ class TestSES {
 }
 
 class TestS3Bucket {}
+const x = new AWS.S3();
+// x.upload({}).promise().then(res => res.ETag);

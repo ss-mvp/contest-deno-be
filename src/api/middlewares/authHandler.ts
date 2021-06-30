@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import env from '../../config/env';
-import { Roles } from '../../interfaces/roles';
+import { Roles } from '../../interfaces/Enum/roles';
 import UserModel from '../../models/users';
 import { HTTPError } from '../../utils';
 

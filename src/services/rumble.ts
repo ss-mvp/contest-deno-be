@@ -7,13 +7,13 @@ import {
   v5,
 } from '../../deps';
 import env from '../config/env';
+import { Roles } from '../interfaces';
 import {
   ISection,
   ISectionPostBody,
   ISectionWithRumbles,
 } from '../interfaces/cleverSections';
 import { IStudentWithSubmissions } from '../interfaces/cleverStudents';
-import { Roles } from '../interfaces/roles';
 import { IRumbleFeedback } from '../interfaces/rumbleFeedback';
 import { IRumblePostBody, IRumbleWithSectionInfo } from '../interfaces/rumbles';
 import { ISubItem } from '../interfaces/submissions';

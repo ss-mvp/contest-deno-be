@@ -1,6 +1,6 @@
-import { Service, serviceCollection } from '../../deps';
-import { ISection } from '../interfaces/cleverSections';
-import { INewTeacher, ITeacher } from '../interfaces/cleverTeachers';
+import { Service } from 'typedi';
+import { ISection } from '../interfaces/Clever/sections';
+import { INewTeacher, ITeacher } from '../interfaces/Clever/teachers';
 import BaseModel from './baseModel';
 
 @Service()
@@ -37,5 +37,3 @@ export default class CleverTeacherModel extends BaseModel<
     }
   }
 }
-
-serviceCollection.addTransient(CleverTeacherModel);

@@ -1,4 +1,4 @@
-export interface IGradeEnum {
+export interface IGrade {
   id: keyof GradeType;
   grade: GradeType[keyof GradeType];
 }
@@ -28,7 +28,7 @@ export type GradeType = {
   '': 'None';
 };
 
-export enum Grades {
+export enum GradeEnum {
   '1st' = 1,
   '2nd' = 2,
   '3rd' = 3,

@@ -39,6 +39,7 @@
     "@types/luxon": "^1.27.0",
     "aws-sdk": "^2.936.0",
     "axios": "^0.21.1",
+    "bluebird": "^3.7.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -56,6 +57,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.35",
     "@types/cors": "^2.8.10",
     "@types/express": "^4.17.12",
     "@types/jsonwebtoken": "^8.5.2",

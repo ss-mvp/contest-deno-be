@@ -2,7 +2,7 @@ import { Request, Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import env from '../../../config/env';
-import { Roles } from '../../../interfaces/roles';
+import { Roles } from '../../../interfaces/Enum/roles';
 import AuthService from '../../../services/auth';
 import { HTTPError } from '../../../utils';
 import authHandler from '../../middlewares/authHandler';
@@ -10,7 +10,7 @@ import oauth from './oauth';
 
 const route = Router();
 
-export default function AuthRouter(app: Router) {
+export default function authRoute(app: Router) {
   const logger: Logger = Container.get('logger');
   const authServiceInstance = Container.get(AuthService);
   app.use('/auth', route);
