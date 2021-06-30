@@ -3,9 +3,13 @@ import dependencyInjector from './dependencyInjector';
 import errorHandlers from './errorHandlers';
 import addExpressMiddleware from './express';
 
-export default async ({ expressApp }: { expressApp: Express }) => {
+export default async function dependencyAndMiddlewareLoader({
+  expressApp,
+}: {
+  expressApp: Express;
+}) {
   console.log('Running loaders...');
   await dependencyInjector();
   addExpressMiddleware(expressApp);
   errorHandlers(expressApp);
-};
+}

@@ -11,20 +11,18 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
   public async getUserByResetEmail(resetEmail: string) {
     this.logger.debug(`Retrieving user account from reset email ${resetEmail}`);
 
-    const [user] = (await this.db
-      .table('users')
+    const user = await this.db('users')
       .innerJoin('validations', 'users.id', 'validations.userId')
       .where('validations.email', resetEmail)
-      .order('validations.id', 'DESC')
-      .first()
+      .orderBy('validations.id', 'DESC')
       .select(
-        ['validations.email', 'validationEmail'],
-        ['validations.id', 'validationId'],
+        'validations.email as validationEmail',
+        'validations.id as validationId',
         'users.isValidated',
         'users.id',
         'validations.code'
       )
-      .execute()) as Users.IValidationByUser[];
+      .first();
 
     this.logger.debug('User retrieved');
     return user;
@@ -33,12 +31,11 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
   public async getRole(userId: number) {
     this.logger.debug(`Getting role for user (ID: ${userId})`);
 
-    const [role] = (await this.db
-      .table('users')
+    const role = await this.db('users')
       .innerJoin('roles', 'roles.id', 'users.roleId')
       .where('id', userId)
       .select('roles.id', 'roles.role')
-      .execute()) as { id: number; role: string }[];
+      .first();
 
     return role;
   }
@@ -46,13 +43,12 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
   public async findByCleverId(cleverId: string) {
     this.logger.debug(`Attempting to retrieve user with clever id ${cleverId}`);
 
-    const [user] = ((await this.db
-      .table('users')
+    const user = await this.db('users')
       .innerJoin('sso_lookup', 'users.id', 'sso_lookup.userId')
       .where('sso_lookup.providerId', SSOLookups.LookupEnum.Clever)
-      .where('sso_lookup.accessToken', cleverId)
+      .andWhere('sso_lookup.accessToken', cleverId)
       .select('users.*')
-      .execute()) as unknown) as (Users.IUser | undefined)[];
+      .first();
 
     return user;
   }

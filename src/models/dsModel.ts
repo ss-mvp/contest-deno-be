@@ -1,22 +1,15 @@
-import {
-  Inject,
-  log,
-  PostgresAdapter,
-  QueryValues,
-  serviceCollection,
-} from '../../deps';
-import {
-  IDSAPIPageSubmission,
-  IDSAPITextSubmissionResponse,
-} from '../interfaces/dsServiceTypes';
-import { Sources } from '../interfaces/enumSources';
-import { ISubItem } from '../interfaces/submissions';
-import { IUser } from '../interfaces/users';
+import Knex from 'knex';
+import { Inject } from 'typedi';
+import { Logger } from 'winston';
+import { API, DS, Sources, Submissions, Users } from '../interfaces';
 
 export default class DSModel {
-  protected dsDB: PostgresAdapter;
-  constructor(@Inject('logger') private logger: log.Logger) {
-    this.dsDB = serviceCollection.get('ds');
+  // protected dsDB: Knex;
+  constructor(
+    @Inject('logger') private logger: Logger,
+    @Inject('ds') protected dsDB: Knex
+  ) {
+    // this.dsDB = Container.get('ds');
   }
 
   public async addTranscription({
@@ -28,17 +21,17 @@ export default class DSModel {
     transcription,
     transcriptionSourceId,
   }: {
-    uploadResponse: IDSAPIPageSubmission;
-    dsResponse: IDSAPITextSubmissionResponse;
-    subItem: ISubItem;
-    user: IUser;
+    uploadResponse: API.middleware.upload.IResponseWithChecksum;
+    dsResponse: DS.api.IDSAPITextSubmissionResponse;
+    subItem: Submissions.ISubItem;
+    user: Users.IUser;
     sourceId: number;
     transcription?: string;
     transcriptionSourceId: number;
   }) {
     try {
       this.logger.debug(`Adding sub ${subItem.id} to DS database`);
-      await this.dsDB.transaction(async () => {
+      await this.dsDB.transaction(async (trx) => {
         const dsSubId = await this.addSubmissionRow({
           confidence: dsResponse.Confidence,
           email: user.email,
@@ -57,11 +50,14 @@ export default class DSModel {
             submissionId: dsSubId,
           });
         }
-        await this.addTranscriptionRow({
-          sourceId: DSTranscriptionSources.DS,
-          transcription: dsResponse.Transcription,
-          submissionId: dsSubId,
-        });
+        await this.addTranscriptionRow(
+          {
+            sourceId: DSTranscriptionSources.DS,
+            transcription: dsResponse.Transcription,
+            submissionId: dsSubId,
+          },
+          trx
+        );
       });
       this.logger.debug(
         `Successfully added submission ${subItem.id} to DS database`
@@ -73,19 +69,22 @@ export default class DSModel {
     }
   }
 
-  private async addSubmissionRow(sub: INewDSSubmissionRow): Promise<number> {
-    const [{ id }] = ((await this.dsDB
-      .table('submissions')
-      .insert((sub as unknown) as QueryValues)
-      .returning('id')
-      .execute()) as unknown) as { id: number }[];
+  private async addSubmissionRow(
+    sub: INewDSSubmissionRow,
+    knexClient?: Knex
+  ): Promise<number> {
+    const client = knexClient ?? this.dsDB;
+    const [{ id }] = await client<Submissions.ISubmission>(
+      'submissions'
+    ).insert(sub, '*');
     return id;
   }
-  private addTranscriptionRow(tsc: INewDSTranscriptionRow): Promise<unknown> {
-    return this.dsDB
-      .table('transcriptions')
-      .insert((tsc as unknown) as QueryValues)
-      .execute();
+  private addTranscriptionRow(
+    tsc: INewDSTranscriptionRow,
+    knexClient?: Knex
+  ): Promise<unknown> {
+    const client = knexClient ?? this.dsDB;
+    return client('transcriptions').insert(tsc);
   }
 }
 
@@ -99,7 +98,7 @@ interface INewDSSubmissionRow {
   rotation?: number;
   moderationFlag?: boolean;
   originSubmissionId?: number;
-  originId?: Sources & number;
+  originId?: Sources.SourceEnum & number;
 }
 enum DSTranscriptionSources {
   'DS' = 1,
@@ -110,5 +109,3 @@ interface INewDSTranscriptionRow {
   sourceId?: DSTranscriptionSources & number;
   submissionId?: number;
 }
-
-serviceCollection.addTransient(DSModel);

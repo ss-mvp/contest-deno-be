@@ -1,14 +1,11 @@
-import { QueryValues, Service, serviceCollection } from '../../deps';
-import {
-  INewRumbleFeedback,
-  IRumbleFeedback,
-} from '../interfaces/rumbleFeedback';
+import { Service } from 'typedi';
+import { Feedback } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class RumbleFeedbackModel extends BaseModel<
-  INewRumbleFeedback,
-  IRumbleFeedback
+  Feedback.INewFeedbackItem,
+  Feedback.IFeedbackItem
 > {
   constructor() {
     super('rumble_feedback');
@@ -20,9 +17,8 @@ export default class RumbleFeedbackModel extends BaseModel<
   }: {
     rumbleId: number;
     voterId: number;
-  }): Promise<IRumbleFeedback[]> {
-    const feedback = ((await this.db
-      .table('rumble_feedback')
+  }): Promise<Feedback.IFeedbackItem[]> {
+    const feedback = await this.db('rumble_feedback')
       .innerJoin(
         'submissions',
         'submissions.id',
@@ -32,8 +28,7 @@ export default class RumbleFeedbackModel extends BaseModel<
       .innerJoin('rumbles', 'rumbles.promptId', 'prompts.id')
       .where('rumble_feedback.voterId', voterId)
       .where('rumbles.id', rumbleId)
-      .select('rumble_feedback.*')
-      .execute()) as unknown) as IRumbleFeedback[];
+      .select('rumble_feedback.*');
 
     return feedback;
   }
@@ -42,14 +37,11 @@ export default class RumbleFeedbackModel extends BaseModel<
     submissionId,
     voterId,
     ...scores
-  }: Omit<IRumbleFeedback, 'id'>): Promise<void> {
+  }: Omit<Feedback.IFeedbackItem, 'id'>): Promise<void> {
     await this.db
       .table('rumble_feedback')
       .where('voterId', voterId)
       .where('submissionId', submissionId)
-      .update((scores as unknown) as QueryValues)
-      .execute();
+      .update(scores);
   }
 }
-
-serviceCollection.addTransient(RumbleFeedbackModel);

@@ -1,6 +1,6 @@
-import { Roles } from '../../Enum';
-import { IUser } from '../../users';
-import { IAuthResponse } from '../auth';
+import { IAuthResponse } from '../Auth';
+import { Roles } from '../Enum';
+import { IUser } from '../Users';
 import { IProfile } from './api';
 
 /**

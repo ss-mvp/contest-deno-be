@@ -1,14 +1,11 @@
-import { Service, serviceCollection } from '../../deps';
-import {
-  INewRumbleSections,
-  IRumbleSections,
-} from '../interfaces/rumbleSections';
+import { Service } from 'typedi';
+import { Rumbles } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class RumbleSectionsModel extends BaseModel<
-  INewRumbleSections,
-  IRumbleSections
+  Rumbles.rumble_sections.INewRumbleSections,
+  Rumbles.rumble_sections.IRumbleSections
 > {
   constructor() {
     super('rumble_sections');
@@ -23,17 +20,12 @@ export default class RumbleSectionsModel extends BaseModel<
       `Attempting to mark rumble (${rumbleId}) active for section ${sectionId}`
     );
 
-    await this.db
-      .table(this.tableName)
-      .where('sectionId', sectionId)
-      .where('rumbleId', rumbleId)
-      .update({ end_time: endTime, phase: 'WRITING' })
-      .execute();
+    await this.db(this.tableName)
+      .where({ sectionId, rumbleId })
+      .update({ end_time: endTime, phase: 'WRITING' });
 
     this.logger.debug(
       `Successfully marked rumble (${rumbleId}) active for section ${sectionId}`
     );
   }
 }
-
-serviceCollection.addTransient(RumbleSectionsModel);

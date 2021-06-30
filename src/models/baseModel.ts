@@ -9,7 +9,10 @@ import { Logger } from 'winston';
  *
  * This is important if you want good linting from member functions!
  */
-export default class BaseModel<NewItem, FullItem> {
+export default class BaseModel<
+  NewItem,
+  FullItem extends { id: number | string }
+> {
   constructor(tableName: string) {
     this.tableName = tableName;
     this.db = Container.get('pg');
@@ -32,11 +35,8 @@ export default class BaseModel<NewItem, FullItem> {
     first?: boolean
   ): Promise<FullItem | FullItem[]> {
     this.logger.debug(`Attempting to add field to table ${this.tableName}`);
-    const response = ((await this.db
-      .table(this.tableName)
-      .insert(body)
-      .returning('*')
-      .execute()) as unknown[]) as FullItem[];
+
+    const response = await this.db(this.tableName).insert(body).returning('*');
 
     this.logger.debug(`Successfully added row to table ${this.tableName}`);
     return first ? response[0] : response;
@@ -64,57 +64,55 @@ export default class BaseModel<NewItem, FullItem> {
   ): Promise<FullItem | FullItem[]> {
     this.logger.debug(`Attempting to retrieve rows from ${this.tableName}`);
 
-    const sql = this.db.table(this.tableName).select('*');
+    const response = await this.db(this.tableName)
+      .select('*')
+      .modify((QB) => {
+        if (filter) QB.where(filter);
+        if (config?.ids) QB.whereIn('id', config.ids);
+        if (config?.first) QB.limit(1).first();
+        if (config?.limit) QB.limit(config.limit);
+        if (config?.orderBy) QB.orderBy(config.orderBy, config?.order || 'ASC');
+        if (config?.offset) QB.offset(config.offset);
+      });
 
-    // The library can only handle one where clause, the rest HAVE to be or statements,
-    // this boolean lets us track if we have a where clause yet
-    let hasWhere = false;
-    const filters = Object.entries(filter || {});
-    filters.forEach((fil) => {
-      if (hasWhere) {
-        sql.or(...fil);
-      } else {
-        sql.where(...fil);
-        hasWhere = true;
-      }
-    });
-    config?.ids?.forEach((id) => {
-      if (hasWhere) {
-        sql.or('id', id);
-      } else {
-        sql.where('id', id);
-        hasWhere = true;
-      }
-    });
-    if (config?.first) {
-      sql.limit(1);
-    }
-    if (config?.limit) {
-      sql.limit(config.limit);
-    }
-    if (config?.orderBy) {
-      sql.order(config.orderBy as string, config?.order || 'ASC');
-    }
-    if (config?.offset) {
-      sql.offset(config.offset);
-    }
-    const response = (await (sql.execute() as unknown)) as FullItem[];
-
-    return config?.first ? response[0] : response;
+    return response;
   }
+
+  // public async update(updatedItems: Partial<FullItem>[]): Promise<FullItem[]>;
+  // public async update(
+  //   idOrUpdates: number | Partial<FullItem> | Partial<FullItem>[],
+  //   changes?: Partial<FullItem>
+  // ): Promise<FullItem | FullItem[]> {
+  //   this.logger.debug(`Attempting to retrieve one row from ${this.tableName}`);
+  //   let singleReturn = true;
+
+  //   if (Array.isArray(idOrUpdates)) {
+  //     singleReturn = false;
+  //   } else if (typeof idOrUpdates === 'number') {
+  //     const id = idOrUpdates;
+  //     const [response] = await this.db(this.tableName)
+  //       .where({ id })
+  //       .update(changes, '*');
+  //   } else {
+  //     const { id, ...changes } = idOrUpdates;
+  //     const [response] = await this.db(this.tableName)
+  //       .where('id', id)
+  //       .update(changes, '*');
+  //   }
+
+  //   this.logger.debug(`Successfully updated row from ${this.tableName}`);
+  //   return singleReturn ? response[0] : response;
+  // } update(updatedItems: Partial<FullItem>[]): Promise<FullItem[]>;
 
   public async update(
     id: number,
-    changes: Partial<FullItem>
+    changes?: Partial<FullItem>
   ): Promise<FullItem> {
     this.logger.debug(`Attempting to retrieve one row from ${this.tableName}`);
 
-    const [response] = ((await this.db
-      .table(this.tableName)
-      .where('id', id)
-      .update(changes)
-      .returning('*')
-      .execute()) as unknown) as FullItem[];
+    const [response] = await this.db(this.tableName)
+      .where({ id })
+      .update(changes, '*');
 
     this.logger.debug(`Successfully updated row from ${this.tableName}`);
     return response;
@@ -123,7 +121,7 @@ export default class BaseModel<NewItem, FullItem> {
   public async delete(id: number): Promise<void> {
     this.logger.debug(`Attempting to delete row ${id} from ${this.tableName}`);
 
-    await this.db.table(this.tableName).where('id', id).delete().execute();
+    await this.db(this.tableName).where({ id }).del();
 
     this.logger.debug(`Successfully deleted row ${id} from ${this.tableName}`);
   }
@@ -138,6 +136,6 @@ export interface IGetQuery<
   limit?: number;
   offset?: number;
   orderBy?: DataProperties;
-  order?: 'ASC' | 'DESC';
+  order?: 'asc' | 'desc' | 'ASC' | 'DESC';
   ids?: IdType[];
 }

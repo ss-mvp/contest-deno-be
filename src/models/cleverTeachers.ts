@@ -1,12 +1,11 @@
 import { Service } from 'typedi';
-import { ISection } from '../interfaces/Clever/sections';
-import { INewTeacher, ITeacher } from '../interfaces/Clever/teachers';
+import { Clever } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class CleverTeacherModel extends BaseModel<
-  INewTeacher,
-  ITeacher
+  Clever.teachers.INewTeacher,
+  Clever.teachers.ITeacher
 > {
   constructor() {
     super('clever_teachers');
@@ -18,8 +17,7 @@ export default class CleverTeacherModel extends BaseModel<
         `Attempting to get sections for teacher with ID: ${teacherId}`
       );
 
-      const sections = ((await this.db
-        .table('clever_sections')
+      const sections = await this.db('clever_sections')
         .innerJoin(
           'clever_teachers',
           'clever_sections.id',
@@ -27,8 +25,7 @@ export default class CleverTeacherModel extends BaseModel<
         )
         .innerJoin('users', 'clever_teachers.userId', 'users.id')
         .where('users.id', teacherId)
-        .select('clever_sections.*')
-        .execute()) as unknown[]) as ISection[];
+        .select('clever_sections.*');
 
       return sections;
     } catch (err) {

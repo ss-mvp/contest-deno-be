@@ -11,6 +11,10 @@ export interface IUser extends Omit<INewUser, 'parentEmail'> {
   updated_at: Date;
 }
 
+export interface ICleanUser extends Omit<IUser, 'password'> {
+  __clean: true;
+}
+
 export interface INewUser extends IOAuthUser {
   email?: string;
   roleId: Roles.RoleEnum & number;

@@ -1,12 +1,11 @@
-import { Service, serviceCollection } from '../../deps';
-import { Sources } from '../interfaces/enumSources';
-import { INewSubmission, ISubmission } from '../interfaces/submissions';
+import { Service } from 'typedi';
+import { Sources, Submissions } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class SubmissionModel extends BaseModel<
-  INewSubmission,
-  ISubmission
+  Submissions.INewSubmission,
+  Submissions.ISubmission
 > {
   constructor() {
     super('submissions');
@@ -21,8 +20,7 @@ export default class SubmissionModel extends BaseModel<
         `Getting subs for user ${studentId} in section ${sectionId}`
       );
 
-      const subs = ((await this.db
-        .table('submissions')
+      const subs = await this.db('submissions')
         .innerJoin('prompts', 'prompts.id', 'submissions.promptId')
         .innerJoin('rumbles', 'rumbles.promptId', 'prompts.id')
         .innerJoin('rumble_sections', 'rumble_sections.rumbleId', 'rumbles.id')
@@ -32,10 +30,9 @@ export default class SubmissionModel extends BaseModel<
           'rumble_sections.sectionId'
         )
         .where('submissions.userId', studentId)
-        .where('clever_sections.id', sectionId)
-        .where('submissions.sourceId', Sources.Rumble)
-        .select('submissions.*')
-        .execute()) as unknown[]) as ISubmission[];
+        .andWhere('clever_sections.id', sectionId)
+        .andWhere('submissions.sourceId', Sources.SourceEnum.Rumble)
+        .select('submissions.*');
 
       return subs;
     } catch (err) {
@@ -47,15 +44,16 @@ export default class SubmissionModel extends BaseModel<
   public async getSubByStudentAndRumbleId(
     studentId: number,
     rumbleId: number
-  ): Promise<ISubmission | undefined> {
+  ): Promise<Submissions.ISubmission | undefined> {
     try {
-      const subs = ((await this.db
-        .table('submissions')
-        .where('rumbleId', rumbleId)
-        .where('userId', studentId)
-        .select('submissions.*')
-        .execute()) as unknown[]) as ISubmission[];
-      return subs[0];
+      const submission = await this.db('submissions')
+        .where({
+          rumbleId,
+          userId: studentId,
+        })
+        .first();
+
+      return submission;
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -65,10 +63,9 @@ export default class SubmissionModel extends BaseModel<
   public async getSubsForFeedback(
     studentId: number,
     rumbleId: number
-  ): Promise<ISubmission[]> {
+  ): Promise<Submissions.ISubmission[]> {
     try {
-      const subs = ((await this.db
-        .table('rumble_feedback')
+      const subs = await this.db('rumble_feedback')
         .innerJoin(
           'submissions',
           'submissions.id',
@@ -77,9 +74,8 @@ export default class SubmissionModel extends BaseModel<
         .innerJoin('prompts', 'prompts.id', 'submissions.promptId')
         .innerJoin('rumbles', 'rumbles.promptId', 'prompts.id')
         .where('rumble_feedback.voterId', studentId)
-        .where('rumbles.id', rumbleId)
-        .select('submissions.*')
-        .execute()) as unknown) as ISubmission[];
+        .andWhere('rumbles.id', rumbleId)
+        .select('submissions.*');
       return subs;
     } catch (err) {
       this.logger.error(err);
@@ -91,11 +87,10 @@ export default class SubmissionModel extends BaseModel<
     rumbleId: number
   ): Promise<{ submissionId: number; userId: number }[]> {
     try {
-      const subs = ((await this.db
-        .table('submissions')
-        .where('rumbleId', rumbleId)
-        .select('id', 'userId')
-        .execute()) as unknown) as ISubmission[];
+      const subs = await this.db<Submissions.ISubmission>('submissions')
+        .where({ rumbleId })
+        .select('id', 'userId');
+
       return subs.map(({ userId, id }) => ({ userId, submissionId: id }));
     } catch (err) {
       this.logger.error(err);
@@ -103,5 +98,3 @@ export default class SubmissionModel extends BaseModel<
     }
   }
 }
-
-serviceCollection.addTransient(SubmissionModel);

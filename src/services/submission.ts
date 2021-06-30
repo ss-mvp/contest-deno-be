@@ -13,7 +13,7 @@ import {
 } from '../interfaces/submissions';
 import { INewTop3 } from '../interfaces/top3';
 import { IUser } from '../interfaces/users';
-import DSModel from '../models/dsModels';
+import DSModel from '../models/dsModel';
 import PromptModel from '../models/prompts';
 import SubmissionModel from '../models/submissions';
 import Top3Model from '../models/top3';

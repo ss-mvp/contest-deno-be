@@ -9,3 +9,9 @@ export interface INewReset {
   code: string;
   userId: number;
 }
+
+export interface IResetPostBody {
+  email: string;
+  password: string;
+  code: string;
+}

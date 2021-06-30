@@ -1,12 +1,11 @@
-import { Service, serviceCollection } from '../../deps';
-import { INewSection, ISection } from '../interfaces/cleverSections';
-import { IStudentWithSubmissions } from '../interfaces/cleverStudents';
+import { Service } from 'typedi';
+import { Clever } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class CleverSectionModel extends BaseModel<
-  INewSection,
-  ISection
+  Clever.sections.INewSection,
+  Clever.sections.ISection
 > {
   constructor() {
     super('clever_sections');
@@ -14,8 +13,7 @@ export default class CleverSectionModel extends BaseModel<
 
   public async getStudentsBySectionId(sectionId: number) {
     try {
-      const students = ((await this.db
-        .table('clever_sections')
+      const students = await this.db('clever_sections')
         .innerJoin(
           'clever_students',
           'clever_students.sectionId',
@@ -23,8 +21,7 @@ export default class CleverSectionModel extends BaseModel<
         )
         .innerJoin('users', 'users.id', 'clever_students.userId')
         .where('clever_sections.id', sectionId)
-        .select('users.*')
-        .execute()) as unknown[]) as IStudentWithSubmissions[];
+        .select('users.*');
 
       return students;
     } catch (err) {
@@ -33,5 +30,3 @@ export default class CleverSectionModel extends BaseModel<
     }
   }
 }
-
-serviceCollection.addTransient(CleverSectionModel);

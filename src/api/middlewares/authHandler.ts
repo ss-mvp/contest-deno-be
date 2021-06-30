@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import env from '../../config/env';
-import { Roles } from '../../interfaces/Enum/roles';
+import { Auth, Roles } from '../../interfaces';
 import UserModel from '../../models/users';
 import { HTTPError } from '../../utils';
 
@@ -11,10 +11,17 @@ import { HTTPError } from '../../utils';
  * Defaults to requiring any authenticated user.
  * Adds to body: { user: IUser };
  */
-export default function authHandlerGenerator(config?: IAuthHandlerConfig) {
+export default function authHandlerGenerator<
+  Param = Record<string, unknown>,
+  Res = Record<string, unknown>,
+  Req extends Auth.WithHandler<unknown> = Auth.WithHandler<
+    Record<string, unknown>
+  >,
+  Query = Record<string, unknown>
+>(config?: IAuthHandlerConfig) {
   return async function authHandlerMiddleware(
-    req: Request,
-    res: Response,
+    req: Request<Param, Res, Req, Query>,
+    res: Response<Res>,
     next: NextFunction
   ) {
     // Set defaults for these config values
@@ -47,12 +54,15 @@ export default function authHandlerGenerator(config?: IAuthHandlerConfig) {
         } else {
           logger.debug(
             `Successfully authenticated, authorizing for roles: \
-            ${roles.join(', ')}`
+              ${roles.join(', ')}`
           );
           // Get an instance of the UserModel if we need to role check
           const userModelInstance = Container.get(UserModel);
           const [user] = await userModelInstance.get({ id: parseInt(id, 10) });
-          if (user.roleId !== Roles.admin && !roles.includes(user.roleId)) {
+          if (
+            user.roleId !== Roles.RoleEnum.admin &&
+            !roles.includes(user.roleId)
+          ) {
             throw HTTPError.create(401, 'Not authorized (Access Restricted)');
           } else if (validationRequired && !user.isValidated) {
             throw HTTPError.create(401, 'Account must be validated');
@@ -64,7 +74,7 @@ export default function authHandlerGenerator(config?: IAuthHandlerConfig) {
           Reflect.deleteProperty(user, 'created_at');
           Reflect.deleteProperty(user, 'updated_at');
           Reflect.deleteProperty(user, 'isValidated');
-          req.body.user = user;
+          req.body.__user = { ...user, __clean: true };
 
           next();
         }

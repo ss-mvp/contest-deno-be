@@ -1,6 +1,6 @@
 # Routes
 
-This server application has been built with multiple applications in mind. All applications will share the same `/auth` and `/user` routes to improve auth across our various apps.
+This server application has been built with multiple applications in mind. All applications will share the same `common` routes.
 
 ## Pagination Param Details
 

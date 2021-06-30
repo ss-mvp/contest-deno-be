@@ -1,6 +1,6 @@
 # Interfaces
 
-Interfaces are namespaced for the sake of convenience. This means that in order to access interfaces across the application, you should attempt to automatically import their highest-level namespace.
+Interfaces are namespaced for the sake of convenience as well as (hopefully) clarity as to how the data is interralated. This means that in order to access interfaces across the application, you should attempt to automatically import their highest-level namespace.
 
 ```ts
 // Wrong

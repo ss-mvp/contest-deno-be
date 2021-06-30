@@ -36,6 +36,7 @@ export default function formParserGenerator() {
           if (fields) {
             req.body = { ...req.body, ...fields };
           }
+          console.log(req.body);
           next();
         }
       );
