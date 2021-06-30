@@ -1,4 +1,4 @@
-import { IUser } from './users';
+import { IUser } from '../users';
 
 export interface IValidation extends INewValidation {
   id: number;

@@ -1,3 +1,5 @@
+import { RumblePhases } from './rumbles';
+
 export interface IRumbleSections extends INewRumbleSections {
   id: number;
   created_at: Date;
@@ -10,5 +12,3 @@ export interface INewRumbleSections {
   start_time?: Date | string;
   end_time?: Date;
 }
-
-export type RumblePhases = 'WAITING' | 'WRITING' | 'FEEDBACK' | 'COMPLETE';

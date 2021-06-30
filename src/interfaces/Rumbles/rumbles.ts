@@ -1,4 +1,4 @@
-import { RumblePhases } from './rumbleSections';
+export type RumblePhases = 'WAITING' | 'WRITING' | 'FEEDBACK' | 'COMPLETE';
 
 // TODO update this to include full section instead of this, requires a lot of fe/be work
 export interface IRumbleWithSectionInfo extends IRumble {

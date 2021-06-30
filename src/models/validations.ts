@@ -1,5 +1,5 @@
 import { Service, serviceCollection } from '../../deps';
-import { INewValidation, IValidation } from '../interfaces/validations';
+import { INewValidation, IValidation } from '../interfaces/Auth/validations';
 import BaseModel from './baseModel';
 
 @Service()

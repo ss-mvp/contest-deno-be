@@ -1,4 +1,4 @@
-import { Roles } from './Enum/roles';
+import { Roles } from '../Enum';
 
 export interface IUser extends Omit<INewUser, 'parentEmail'> {
   id: number;
@@ -13,7 +13,7 @@ export interface IUser extends Omit<INewUser, 'parentEmail'> {
 
 export interface INewUser extends IOAuthUser {
   email?: string;
-  roleId: Roles & number;
+  roleId: Roles.RoleEnum & number;
   isValidated?: boolean;
   parentEmail?: string;
   dob?: Date | string;

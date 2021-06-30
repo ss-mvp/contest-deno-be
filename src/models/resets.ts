@@ -1,5 +1,5 @@
 import { Service, serviceCollection } from '../../deps';
-import { INewReset, IReset } from '../interfaces/resets';
+import { INewReset, IReset } from '../interfaces/Auth/resets';
 import BaseModel from './baseModel';
 
 @Service()

@@ -10,9 +10,12 @@ import {
 } from '../../deps';
 import env from '../config/env';
 import { IAuthResponse } from '../interfaces/apiResponses';
+import {
+  IGetNewValidationBody,
+  Validators,
+} from '../interfaces/Auth/validations';
 import { Roles } from '../interfaces/Enum/roles';
 import { INewUser, IUser } from '../interfaces/users';
-import { IGetNewValidationBody, Validators } from '../interfaces/validations';
 import ResetModel from '../models/resets';
 import UserModel from '../models/users';
 import ValidationModel from '../models/validations';
