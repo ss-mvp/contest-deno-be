@@ -3,7 +3,6 @@ import {
   log,
   PostgresAdapter,
   QueryValues,
-  Service,
   serviceCollection,
 } from '../../deps';
 import {
@@ -14,7 +13,6 @@ import { Sources } from '../interfaces/enumSources';
 import { ISubItem } from '../interfaces/submissions';
 import { IUser } from '../interfaces/users';
 
-@Service()
 export default class DSModel {
   protected dsDB: PostgresAdapter;
   constructor(@Inject('logger') private logger: log.Logger) {
