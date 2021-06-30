@@ -1,7 +1,7 @@
-import { HTTPError } from './HTTPError.model';
+import { IHTTPError } from './HTTPError.model';
 
 export default (function HTTPErrorInit() {
-  function HTTPErrorInit__create(...args: (string | number)[]): HTTPError {
+  function HTTPErrorInit__create(...args: (string | number)[]): IHTTPError {
     let errorMessage: string | undefined;
     let errorStatus: number | undefined;
     args.forEach((arg) => {
@@ -12,13 +12,13 @@ export default (function HTTPErrorInit() {
       }
     });
 
-    const res: HTTPError = new Error(errorMessage);
+    const res: IHTTPError = new Error(errorMessage);
     res.status = errorStatus;
     res.type = 'httpError';
     return res;
   }
   function HTTPErrorInit__isHTTPError(err: unknown) {
-    const errAsHTTPErr = err as HTTPError;
+    const errAsHTTPErr = err as IHTTPError;
     return errAsHTTPErr.type === 'httpError' || !!errAsHTTPErr.status;
   }
 

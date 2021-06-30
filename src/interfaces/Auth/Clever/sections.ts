@@ -1,5 +1,4 @@
-import { GradeType } from '../../enumGrades';
-import { SubjectType } from '../../enumSubjects';
+import { Grades, Subjects } from '../../Enum';
 import { IRumbleWithSectionInfo } from '../../rumbles';
 
 export interface ISectionWithRumbles extends ISection {
@@ -16,6 +15,6 @@ export interface INewSection extends ISectionPostBody {
 
 export interface ISectionPostBody {
   name: string;
-  subjectId: keyof SubjectType;
-  gradeId: keyof GradeType;
+  subjectId: keyof Subjects.SubjectType;
+  gradeId: keyof Grades.GradeType;
 }

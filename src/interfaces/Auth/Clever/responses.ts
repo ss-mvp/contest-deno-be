@@ -1,6 +1,7 @@
-import { Roles } from '../../Enum/roles';
+import { Roles } from '../../Enum';
 import { IUser } from '../../users';
-import { IAuthResponse } from '../responses';
+import { IAuthResponse } from '../auth';
+import { IProfile } from './api';
 
 /**
  * # Clever Auth Response
@@ -44,13 +45,9 @@ import { IAuthResponse } from '../responses';
  * reduce friction and improve the user experience.
  */
 
-export interface IProfile {
-  data: { id?: string };
-}
-
 export interface ISuccessResponse {
   actionType: 'SUCCESS';
-  roleId: Roles & number;
+  roleId: Roles.RoleEnum & number;
   body: IAuthResponse;
   cleverId: string;
 }
@@ -60,7 +57,7 @@ export function isSuccess(res: unknown): res is ISuccessResponse {
 
 export interface IMergeResponse {
   actionType: 'MERGE';
-  roleId: Roles & number;
+  roleId: Roles.RoleEnum & number;
   body: IUser;
   cleverId: string;
 }
@@ -70,7 +67,7 @@ export function isMerge(res: unknown): res is IMergeResponse {
 
 export interface INewResponse {
   actionType: 'NEW';
-  roleId: Roles & number;
+  roleId: Roles.RoleEnum & number;
   body: IProfile['data'];
   cleverId: string;
 }

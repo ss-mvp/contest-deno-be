@@ -1,24 +1,12 @@
-import {
-  bcrypt,
-  createError,
-  Inject,
-  jwt,
-  moment,
-  Service,
-  serviceCollection,
-  v5,
-} from '../../deps';
-import env from '../config/env';
-import { IAuthResponse } from '../interfaces/apiResponses';
-import {
-  IGetNewValidationBody,
-  Validators,
-} from '../interfaces/Auth/validations';
-import { Roles } from '../interfaces/Enum/roles';
-import { INewUser, IUser } from '../interfaces/users';
+import { DateTime } from 'luxon';
+import { Inject, Service } from 'typedi';
+import { v5 } from 'uuid';
+import { env } from '../config';
+import { Auth, Roles, Users, Validations } from '../interfaces';
 import ResetModel from '../models/resets';
 import UserModel from '../models/users';
 import ValidationModel from '../models/validations';
+import { HTTPError } from '../utils';
 import BaseService from './baseService';
 import MailService from './mailer';
 
@@ -33,22 +21,29 @@ export default class AuthService extends BaseService {
     super();
   }
 
-  public async register(body: INewUser): Promise<IAuthResponse> {
+  public async register(body: Users.INewUser): Promise<Auth.IAuthResponse> {
     try {
       // Check body data one more time for safety since we explicitly cast later
-      if (!body.dob) throw createError(400, 'No DOB received');
-      const age = moment().diff(moment(body.dob), 'years');
+      if (!body.dob) throw HTTPError.create(400, 'No DOB received');
+      const dob =
+        typeof body.dob === 'string'
+          ? DateTime.fromISO(body.dob)
+          : DateTime.fromJSDate(body.dob);
+      const now = DateTime.utc();
+      const { years } = now.diff(dob, 'years').toObject();
+      const age = years ?? 0;
 
       // Initialize variable to store sendTo email for validation
       let sendTo: string;
       let isParent = false;
-      if (!body.email) throw createError(400, 'No email received');
-      if (!body.password) throw createError(400, 'No password received');
-      if (!body.codename) throw createError(400, 'No codename received');
+      if (!body.email) throw HTTPError.create(400, 'No email received');
+      if (!body.password) throw HTTPError.create(400, 'No password received');
+      if (!body.codename) throw HTTPError.create(400, 'No codename received');
+
       // Underage users must have a parent email on file for validation
       if (age < 13) {
         if (!body.parentEmail || body.email === body.parentEmail) {
-          throw createError(
+          throw HTTPError.create(
             400,
             'Underage users must have a parent email on file'
           );
@@ -60,7 +55,7 @@ export default class AuthService extends BaseService {
         sendTo = body.email;
       }
 
-      let response: IAuthResponse | undefined;
+      let response: Auth.IAuthResponse | undefined;
       // Start a transaction for data integrity
       await this.db.transaction(async () => {
         // Further sanitize data
@@ -71,7 +66,7 @@ export default class AuthService extends BaseService {
         const [user] = await this.userModel.add({
           ...body,
           password: hashedPassword,
-          roleId: Roles['user'],
+          roleId: Roles.RoleEnum['user'],
         });
 
         // send validation email
@@ -88,7 +83,7 @@ export default class AuthService extends BaseService {
         this.logger.debug(`User (ID: ${user.id}) successfully registered`);
       });
 
-      if (response === undefined) throw createError(500);
+      if (response === undefined) throw HTTPError.create(500);
       return response;
     } catch (err) {
       this.logger.error(err);
@@ -99,14 +94,14 @@ export default class AuthService extends BaseService {
   public async SignIn(
     codename: string,
     password: string
-  ): Promise<IAuthResponse> {
+  ): Promise<Auth.IAuthResponse> {
     try {
       const user = await this.userModel.get({ codename }, { first: true });
-      if (!user) throw createError(404, 'User not found');
+      if (!user) throw HTTPError.create(404, 'User not found');
 
       this.logger.debug(`Verifying password for user (CODENAME: ${codename})`);
       const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword) throw createError(401, 'Invalid password');
+      if (!validPassword) throw HTTPError.create(401, 'Invalid password');
       this.logger.debug(`Password verified`);
 
       // Remove password hash from response body
@@ -119,22 +114,25 @@ export default class AuthService extends BaseService {
     }
   }
 
-  public async Validate(email: string, token: string): Promise<IAuthResponse> {
+  public async Validate(
+    email: string,
+    token: string
+  ): Promise<Auth.IAuthResponse> {
     try {
       // Attempt to validate the user
       const userValidation = await this.userModel.getUserByResetEmail(email);
-      if (!userValidation) throw createError(404, 'User not found');
+      if (!userValidation) throw HTTPError.create(404, 'User not found');
       if (userValidation.isValidated) {
-        throw createError(409, 'User has already been validated');
+        throw HTTPError.create(409, 'User has already been validated');
       }
       if (token !== userValidation.code) {
-        throw createError(401, 'Invalid activation code');
+        throw HTTPError.create(401, 'Invalid activation code');
       }
 
-      let updatedUser: IUser | undefined;
+      let updatedUser: Users.IUser | undefined;
 
       await this.db.transaction(async () => {
-        const now = moment.utc().format();
+        const now = DateTime.utc().toISO();
         updatedUser = await this.userModel.update(userValidation.id, {
           isValidated: true,
           updated_at: (now as unknown) as Date,
@@ -144,7 +142,7 @@ export default class AuthService extends BaseService {
         });
       });
 
-      if (!updatedUser) throw createError(409, 'Could not create user');
+      if (!updatedUser) throw HTTPError.create(409, 'Could not create user');
 
       // Remove password hash from response body
       Reflect.deleteProperty(updatedUser, 'password');
@@ -161,24 +159,27 @@ export default class AuthService extends BaseService {
   }
 
   public async SendNewValidationEmail(
-    data: IGetNewValidationBody
+    data: Validations.IGetNewValidationBody
   ): Promise<void> {
     try {
       let sendTo: string;
       let isParent = false;
 
-      if (!data.age) throw createError(400, 'No age received');
+      if (!data.age) throw HTTPError.create(400, 'No age received');
 
       if (data.age < 13) {
         if (data.newEmail === data.user.email) {
-          throw createError(400, 'Underage users must send to parent email');
+          throw HTTPError.create(
+            400,
+            'Underage users must send to parent email'
+          );
         } else {
           sendTo = data.newEmail;
           isParent = true;
         }
       } else {
         if (!data.newEmail) {
-          throw createError(400, 'No email received');
+          throw HTTPError.create(400, 'No email received');
         } else {
           sendTo = data.newEmail;
         }
@@ -189,12 +190,12 @@ export default class AuthService extends BaseService {
         data.user.id
       );
 
-      if (!validation) throw createError(404, 'No validation found');
+      if (!validation) throw HTTPError.create(404, 'No validation found');
 
       const timeSinceLastRequest = Date.now() - validation.created_at.getTime();
 
       if (timeSinceLastRequest < 600000) {
-        throw createError(429, 'Cannot send another email so soon');
+        throw HTTPError.create(429, 'Cannot send another email so soon');
       } else {
         // Able to generate another code, so delete the old one
         await this.resetModel.update(validation.id, { completed: true });
@@ -212,15 +213,15 @@ export default class AuthService extends BaseService {
     }
   }
 
-  public async ResendValidationEmail(user: IUser): Promise<void> {
+  public async ResendValidationEmail(user: Users.IUser): Promise<void> {
     try {
       const validation = await this.validationModel.getRecentByUserId(user.id);
       if (!validation) {
-        throw createError(404, 'No validation found');
+        throw HTTPError.create(404, 'No validation found');
       }
       await this.SendValidationEmail({
         sendTo: validation.email,
-        isParent: validation.validatorId === Validators.parent,
+        isParent: validation.validatorId === Validations.ValidatorEnum.parent,
         user,
       });
     } catch (err) {
@@ -232,7 +233,7 @@ export default class AuthService extends BaseService {
   public async GetResetEmail(email: string) {
     try {
       const user = await this.userModel.get({ email }, { first: true });
-      if (!user) throw createError(404, 'Email not found');
+      if (!user) throw HTTPError.create(404, 'Email not found');
 
       const resetItem = await this.resetModel.get(
         { userId: user.id },
@@ -244,7 +245,7 @@ export default class AuthService extends BaseService {
           const timeSinceLastRequest =
             Date.now() - resetItem.created_at.getTime();
           if (timeSinceLastRequest < 600000) {
-            throw createError(429, 'Cannot send another email so soon');
+            throw HTTPError.create(429, 'Cannot send another email so soon');
           } else {
             // Able to generate another code, so delete the old one
             await this.resetModel.update(resetItem.id, { completed: true });
@@ -269,15 +270,16 @@ export default class AuthService extends BaseService {
   ) {
     try {
       const user = await this.userModel.get({ email }, { first: true });
-      if (!user) throw createError(404, 'Email not found');
+      if (!user) throw HTTPError.create(404, 'Email not found');
 
       const resetItem = await this.resetModel.get(
         { userId: user.id },
         { first: true }
       );
-      if (!resetItem) throw createError(409, 'No password resets are active');
+      if (!resetItem)
+        throw HTTPError.create(409, 'No password resets are active');
       if (resetItem.code !== token)
-        throw createError(401, 'Invalid password reset code');
+        throw HTTPError.create(401, 'Invalid password reset code');
       this.logger.debug(
         `Password reset code verified for user (ID: ${user.id})`
       );
@@ -287,7 +289,7 @@ export default class AuthService extends BaseService {
       await this.db.transaction(async () => {
         await this.userModel.update(user.id, {
           password: hashedPassword,
-          updated_at: (moment.utc() as unknown) as Date,
+          updated_at: (DateTime.utc().toISO() as unknown) as Date,
         });
         await this.resetModel.update(resetItem.id, { completed: true });
       });
@@ -300,7 +302,7 @@ export default class AuthService extends BaseService {
   private async SendValidationEmail(args: {
     sendTo: string;
     isParent: boolean;
-    user: IUser;
+    user: Users.IUser;
   }) {
     // Generate Validation for user
     const { url, code } = this.generateValidationURL(
@@ -311,7 +313,9 @@ export default class AuthService extends BaseService {
       code,
       userId: args.user.id,
       email: args.sendTo,
-      validatorId: args.isParent ? Validators.parent : Validators.user,
+      validatorId: args.isParent
+        ? Validations.ValidatorEnum.parent
+        : Validations.ValidatorEnum.user,
     });
     if (!args.isParent) {
       await this.mailer.sendValidationEmail(args.sendTo, url);
@@ -324,9 +328,9 @@ export default class AuthService extends BaseService {
     }
   }
 
-  public generateToken(user: Omit<IUser, 'password'>) {
+  public generateToken(user: Omit<Users.IUser, 'password'>) {
     this.logger.debug(`Generating JWT for user (ID: ${user.id})`);
-    const exp = moment.utc().add(env.AUTH_TOKEN_EXP_TIME, 'd');
+    const exp = DateTime.utc().plus({ days: env.AUTH_TOKEN_EXP_TIME });
 
     this.logger.debug(`Signing JWT for user (ID: ${user.id})`);
     return jwt.create(
@@ -346,10 +350,7 @@ export default class AuthService extends BaseService {
       this.logger.debug(
         `Generating email validation token for user (EMAIL: ${email})`
       );
-      const token = v5.generate({
-        namespace: env.UUID_NAMESPACE,
-        value: codename,
-      }) as string; // Cast as string since we're not passing buffer
+      const token = v5(codename, env.UUID_NAMESPACE);
 
       const urlParams = new URLSearchParams({ token, email });
       const url =
@@ -362,15 +363,12 @@ export default class AuthService extends BaseService {
     }
   }
 
-  private generateResetCode(user: IUser) {
+  private generateResetCode(user: Users.IUser) {
     try {
       this.logger.debug(
         `Generating a new password reset code for user (ID: ${user.id})`
       );
-      const resetToken = v5.generate({
-        namespace: env.UUID_NAMESPACE,
-        value: user.codename,
-      }) as string; // Cast as string since we're not passing buffer
+      const resetToken = v5(user.codename, env.UUID_NAMESPACE);
       this.logger.debug(`Reset code generated for user (ID: ${user.id})`);
 
       return resetToken;

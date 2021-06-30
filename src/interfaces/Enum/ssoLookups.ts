@@ -4,10 +4,10 @@ export interface ISSOLookup extends INewSSOLookup {
 
 export interface INewSSOLookup {
   accessToken: string;
-  providerId: SSOLookups & number;
+  providerId: LookupEnum & number;
   userId: number;
 }
 
-export enum SSOLookups {
+export enum LookupEnum {
   'Clever' = 1,
 }

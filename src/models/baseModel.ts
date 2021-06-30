@@ -1,11 +1,6 @@
-import {
-  DatabaseResult,
-  log,
-  OrderDirection,
-  PostgresAdapter,
-  QueryValues,
-  serviceCollection,
-} from '../../deps';
+import Knex from 'knex';
+import Container from 'typedi';
+import { Logger } from 'winston';
 
 /**
  * Type NewItem: new item interface, should be the fields required to
@@ -17,12 +12,12 @@ import {
 export default class BaseModel<NewItem, FullItem> {
   constructor(tableName: string) {
     this.tableName = tableName;
-    this.db = serviceCollection.get('pg');
-    this.logger = serviceCollection.get('logger');
+    this.db = Container.get('pg');
+    this.logger = Container.get('logger');
   }
   protected tableName: string;
-  protected db: PostgresAdapter;
-  protected logger: log.Logger;
+  protected db: Knex;
+  protected logger: Logger;
 
   // Putting basic CRUD operations on all Models
 
@@ -33,7 +28,7 @@ export default class BaseModel<NewItem, FullItem> {
     first?: B
   ): Promise<B extends true ? FullItem : FullItem[]>;
   public async add(
-    body: (NewItem & QueryValues) | (NewItem & QueryValues)[],
+    body: NewItem | NewItem[],
     first?: boolean
   ): Promise<FullItem | FullItem[]> {
     this.logger.debug(`Attempting to add field to table ${this.tableName}`);
@@ -48,7 +43,7 @@ export default class BaseModel<NewItem, FullItem> {
   }
 
   public async get<B extends false, K extends keyof FullItem>(
-    filter?: (Partial<FullItem> & DatabaseResult) | undefined,
+    filter?: Partial<FullItem> | undefined,
     config?: IGetQuery<B | undefined, K>
   ): Promise<FullItem[]>;
   public async get<B extends boolean, K extends keyof FullItem>(
@@ -56,15 +51,15 @@ export default class BaseModel<NewItem, FullItem> {
     config?: IGetQuery<B, K>
   ): Promise<B extends true ? FullItem : FullItem[]>;
   public async get<B extends false, K extends keyof FullItem>(
-    filter?: Partial<FullItem> & DatabaseResult,
+    filter?: Partial<FullItem>,
     config?: IGetQuery<B, K>
   ): Promise<FullItem[]>;
   public async get<B extends boolean, K extends keyof FullItem>(
-    filter?: Partial<FullItem> & DatabaseResult,
+    filter?: Partial<FullItem>,
     config?: IGetQuery<B, K>
   ): Promise<B extends true ? FullItem : FullItem[]>;
   public async get(
-    filter?: (Partial<FullItem> & DatabaseResult) | undefined,
+    filter?: Partial<FullItem> | undefined,
     config?: IGetQuery
   ): Promise<FullItem | FullItem[]> {
     this.logger.debug(`Attempting to retrieve rows from ${this.tableName}`);
@@ -117,7 +112,7 @@ export default class BaseModel<NewItem, FullItem> {
     const [response] = ((await this.db
       .table(this.tableName)
       .where('id', id)
-      .update(changes as DatabaseResult)
+      .update(changes)
       .returning('*')
       .execute()) as unknown) as FullItem[];
 
@@ -134,11 +129,15 @@ export default class BaseModel<NewItem, FullItem> {
   }
 }
 
-export interface IGetQuery<B = boolean, K = string, IdType = number> {
-  first?: B;
+export interface IGetQuery<
+  IsFirst = boolean,
+  DataProperties = string,
+  IdType = number
+> {
+  first?: IsFirst;
   limit?: number;
   offset?: number;
-  orderBy?: K;
-  order?: OrderDirection;
+  orderBy?: DataProperties;
+  order?: 'ASC' | 'DESC';
   ids?: IdType[];
 }

@@ -1,11 +1,11 @@
 import { Request, Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import env from '../../../config/env';
-import { Roles } from '../../../interfaces/Enum/roles';
+import { env } from '../../../config';
+import { Roles } from '../../../interfaces';
 import AuthService from '../../../services/auth';
 import { HTTPError } from '../../../utils';
-import authHandler from '../../middlewares/authHandler';
+import { authHandler } from '../../middlewares';
 import oauth from './oauth';
 
 const route = Router();
@@ -65,7 +65,7 @@ export default function authRoute(app: Router) {
           req.body.password
         );
 
-        if (req.query.admin && response.user.roleId !== Roles.admin) {
+        if (req.query.admin && response.user.roleId !== Roles.RoleEnum.admin) {
           throw HTTPError.create(401, `Must be admin to login`);
         }
 

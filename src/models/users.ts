@@ -1,10 +1,9 @@
-import { Service, serviceCollection } from '../../deps';
-import { SSOLookups } from '../interfaces/ssoLookups';
-import { INewUser, IUser, IValidationByUser } from '../interfaces/users';
+import { Service } from 'typedi';
+import { SSOLookups, Users } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
-export default class UserModel extends BaseModel<INewUser, IUser> {
+export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
   constructor() {
     super('users');
   }
@@ -25,7 +24,7 @@ export default class UserModel extends BaseModel<INewUser, IUser> {
         'users.id',
         'validations.code'
       )
-      .execute()) as IValidationByUser[];
+      .execute()) as Users.IValidationByUser[];
 
     this.logger.debug('User retrieved');
     return user;
@@ -50,13 +49,11 @@ export default class UserModel extends BaseModel<INewUser, IUser> {
     const [user] = ((await this.db
       .table('users')
       .innerJoin('sso_lookup', 'users.id', 'sso_lookup.userId')
-      .where('sso_lookup.providerId', SSOLookups.Clever)
+      .where('sso_lookup.providerId', SSOLookups.LookupEnum.Clever)
       .where('sso_lookup.accessToken', cleverId)
       .select('users.*')
-      .execute()) as unknown) as (IUser | undefined)[];
+      .execute()) as unknown) as (Users.IUser | undefined)[];
 
     return user;
   }
 }
-
-serviceCollection.addTransient(UserModel);

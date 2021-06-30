@@ -1,11 +1,11 @@
-import { Service, serviceCollection } from '../../deps';
-import { INewValidation, IValidation } from '../interfaces/Auth/validations';
+import { Service } from 'typedi';
+import { Validations } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class ValidationModel extends BaseModel<
-  INewValidation,
-  IValidation
+  Validations.INewValidation,
+  Validations.IValidation
 > {
   constructor() {
     super('validations');
@@ -13,7 +13,7 @@ export default class ValidationModel extends BaseModel<
 
   public async getRecentByUserId(
     userId: number
-  ): Promise<IValidation | undefined> {
+  ): Promise<Validations.IValidation | undefined> {
     const [validation] = await this.get(
       { userId },
       { orderBy: 'created_at', order: 'DESC', limit: 1 }
@@ -21,5 +21,3 @@ export default class ValidationModel extends BaseModel<
     return validation;
   }
 }
-
-serviceCollection.addTransient(ValidationModel);

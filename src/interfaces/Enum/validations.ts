@@ -10,10 +10,10 @@ export interface INewValidation {
   code: string;
   email: string;
   userId: number;
-  validatorId: Validators & number;
+  validatorId: ValidatorEnum & number;
 }
 
-export enum Validators {
+export enum ValidatorEnum {
   user = 1,
   parent = 2,
 }
