@@ -33,10 +33,12 @@ export default (app: IRouter) => {
   app.use('/users', route);
 
   // GET /
+
   route.head('/', async (req, res) => {
     try {
-      const codename = req.params.codename;
-      const email = req.params.email;
+      //will return matches on both or 1 of the following:
+      const codename = req.query.codename;
+      const email = req.query.email;
       const userList = await userModelInstance.get(
         { codename: codename, email: email },
 
@@ -54,7 +56,7 @@ export default (app: IRouter) => {
         : userList === undefined
         ? 0
         : 1;
-      res.headers?.append('content-length', headerLength.toString());
+      res.set('content-length', headerLength.toString());
 
       res.setStatus(204).end();
     } catch (err) {
@@ -69,8 +71,8 @@ export default (app: IRouter) => {
         limit: parseInt(req.query.limit, 10) ?? 10,
         offset: parseInt(req.query.offset, 10) ?? 0,
         orderBy: (req.query.orderBy as keyof IUser) ?? 'id',
-        order: (req.params.order as 'ASC' | 'DESC') ?? 'ASC',
-        first: req.params.first === 'true',
+        order: (req.query.order as 'ASC' | 'DESC') ?? 'ASC',
+        first: req.query.first === 'true',
       });
 
       res.setStatus(200).json(userList);
