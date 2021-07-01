@@ -5,5 +5,5 @@ import { Users } from '..';
  * authHandler middleware is finished authorizing the request.
  */
 export type WithHandler<T> = T & {
-  __user: Users.ICleanUser;
+  __user: Users.IUser;
 };

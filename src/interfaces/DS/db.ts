@@ -1,4 +1,4 @@
-import { DSSources } from '../Enum';
+import { Sources } from '../Enum';
 
 export interface IDSSubmissionTableRow {
   Confidence?: number;
@@ -9,5 +9,5 @@ export interface IDSSubmissionTableRow {
 
 export interface IDSTranscriptionTableRow {
   transcription?: string;
-  transcriptionSourceId?: number & DSSources.SourceEnum;
+  transcriptionSourceId?: number & Sources.DsTrscSrcEnum;
 }
