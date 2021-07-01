@@ -3,9 +3,9 @@ import { Express, json, urlencoded } from 'express';
 import { DateTime } from 'luxon';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import loadAppRoutes from '../api';
+import appRoute__loader from '../api';
 
-export default function addExpressMiddleware(app: Express) {
+export default function expressMiddleware__loader(app: Express) {
   const logger: Logger = Container.get('logger');
   // Log all API calls to the server
   app.use((req, res, next) => {
@@ -15,12 +15,12 @@ export default function addExpressMiddleware(app: Express) {
   });
 
   // Test Endpoints
-  app.get('/status', (req, res) => {
-    logger.debug('GET 200 Test hit.');
+  app.get('/', (req, res) => {
+    logger.debug('HEAD 200 Test hit.');
     res.status(200).json({ message: 'API up!' });
   });
-  app.head('/status', (req, res) => {
-    logger.debug('HEAD 200 Test hit.');
+  app.get('/status', (req, res) => {
+    logger.debug('GET 200 Test hit.');
     res.status(200).json({ message: 'API up!' });
   });
 
@@ -30,5 +30,5 @@ export default function addExpressMiddleware(app: Express) {
   app.use(urlencoded({ extended: false }));
 
   // App Routes
-  app.use('/api', loadAppRoutes());
+  app.use('/api', appRoute__loader());
 }

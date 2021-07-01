@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import AuthService from '../../../../../services/auth';
+import AuthService from '../../../../../services/auth/auth';
 
 interface GetResetQueryParams {
   email: string;

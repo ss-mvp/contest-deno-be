@@ -4,7 +4,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth } from '../../../../../interfaces';
-import AuthService from '../../../../../services/auth';
+import AuthService from '../../../../../services/auth/auth';
 
 export default function authResetRoute__post(route: Router) {
   const logger: Logger = Container.get('logger');

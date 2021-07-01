@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { commonRoutes } from './routes';
 
-export default function loadAppRoutes() {
+export default function appRoute__loader() {
   console.log('Loading routers...');
   const app = Router();
 

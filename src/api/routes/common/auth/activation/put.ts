@@ -4,7 +4,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth } from '../../../../../interfaces';
-import AuthService from '../../../../../services/auth';
+import AuthService from '../../../../../services/auth/auth';
 import { authHandler } from '../../../../middlewares';
 
 export default function authActivationRoute__put(route: Router) {

@@ -1,39 +1,38 @@
 import knex from 'knex';
 import { env, knexfile } from '../config';
 
-export default {
-  main: async () => {
-    console.log('Connecting to DB...');
+export async function mainDB__loader() {
+  console.log('Connecting to DB...');
 
-    try {
-      const db = knex(knexfile[env.NODE_ENV]);
+  try {
+    const db = knex(knexfile[env.NODE_ENV]);
 
-      console.log('Testing DB connection...');
-      await db.from('users').select();
+    console.log('Testing DB connection...');
+    await db.from('users').select();
 
-      console.log('DB connected!');
+    console.log('DB connected!');
 
-      return db;
-    } catch (err) {
-      console.log(env.DB_CONFIG);
-      console.log(err.message, err);
-    }
-  },
-  ds: async () => {
-    console.log('Connecting to DS DB...');
+    return db;
+  } catch (err) {
+    console.log(env.DB_CONFIG);
+    console.log(err.message, err);
+  }
+}
 
-    try {
-      const db = knex(knexfile['ds']);
+export async function dsDB__loader() {
+  console.log('Connecting to DS DB...');
 
-      console.log('Testing DS DB connection...');
-      await db.from('submissions').select();
+  try {
+    const db = knex(knexfile['ds']);
 
-      console.log('DS DB connected!');
+    console.log('Testing DS DB connection...');
+    await db.from('submissions').select();
 
-      return db;
-    } catch (err) {
-      console.log(env.DS_DB_CONFIG);
-      console.log(err.message, err);
-    }
-  },
-};
+    console.log('DS DB connected!');
+
+    return db;
+  } catch (err) {
+    console.log(env.DS_DB_CONFIG);
+    console.log(err.message, err);
+  }
+}

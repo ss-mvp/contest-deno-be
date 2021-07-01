@@ -1,36 +1,31 @@
-import {
-  createError,
-  Inject,
-  moment,
-  Service,
-  serviceCollection,
-} from '../../deps';
-import PromptQueueModel from '../models/promptQueue';
-import PromptModel from '../models/prompts';
-import BaseService from './baseService';
+import { DateTime } from 'luxon';
+import { Service } from 'typedi';
+import { PromptModel, PromptQueueModel } from '../../models';
+import { HTTPError } from '../../utils';
+import BaseService from '../baseService';
 
 @Service()
 export default class AdminService extends BaseService {
   constructor(
-    @Inject(PromptModel) private promptModel: PromptModel,
-    @Inject(PromptQueueModel) private promptQueue: PromptQueueModel
+    private promptModel: PromptModel,
+    private promptQueue: PromptQueueModel
   ) {
     super();
   }
 
   public async updateActivePrompt() {
     try {
-      const startsAt = (moment.utc().format('YYYY-MM-DD') as unknown) as Date;
+      const startsAt = DateTime.utc().toFormat('yyyy-mm-dd') as unknown;
       const currentPrompt = await this.promptModel.get(
         { active: true },
         { first: true }
       );
       const { promptId: newId } = await this.promptQueue.get(
-        { starts_at: startsAt },
+        { starts_at: startsAt as Date },
         { first: true }
       );
       if (currentPrompt.id === newId) {
-        throw createError(409, 'Prompt is already up-to-date');
+        throw HTTPError.create(409, 'Prompt is already up-to-date');
       }
 
       await this.db.transaction(async () => {
@@ -44,5 +39,3 @@ export default class AdminService extends BaseService {
     }
   }
 }
-
-serviceCollection.addTransient(AdminService);

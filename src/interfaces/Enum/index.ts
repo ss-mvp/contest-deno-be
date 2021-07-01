@@ -1,3 +1,4 @@
+export * as Enum from './enum';
 export * as Flags from './flags';
 export * as Grades from './grades';
 export * as Roles from './roles';

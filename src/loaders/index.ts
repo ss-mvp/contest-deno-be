@@ -1,7 +1,7 @@
 import { Express } from 'express';
-import dependencyInjector from './dependencyInjector';
-import errorHandlers from './errorHandlers';
-import addExpressMiddleware from './express';
+import dependencyInjector__loader from './dependencyInjector';
+import errorHandler__routes from './errorHandlers';
+import expressMiddleware__loader from './express';
 
 export default async function dependencyAndMiddlewareLoader({
   expressApp,
@@ -9,7 +9,10 @@ export default async function dependencyAndMiddlewareLoader({
   expressApp: Express;
 }) {
   console.log('Running loaders...');
-  await dependencyInjector();
-  addExpressMiddleware(expressApp);
-  errorHandlers(expressApp);
+
+  await dependencyInjector__loader();
+  expressMiddleware__loader(expressApp);
+  errorHandler__routes(expressApp);
+
+  console.log('Loaders complete.');
 }

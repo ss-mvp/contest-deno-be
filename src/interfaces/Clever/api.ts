@@ -13,7 +13,7 @@ export interface ILink {
   uri: string;
 }
 
-export interface IUserInfo<UserType extends roles = roles> {
+export interface IUserInfo<UserType extends cleverUserType = cleverUserType> {
   type: UserType;
   data: {
     id: string;
@@ -24,7 +24,7 @@ export interface IUserInfo<UserType extends roles = roles> {
   links: ILink[];
 }
 
-export type roles = 'teacher' | 'student';
+export type cleverUserType = 'teacher' | 'student';
 
 export type subjects =
   | 'english/language arts'

@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 import { env } from '../config';
 
-export default () => {
+export default function logger__loader() {
   console.log('Initializing logger...');
 
   const logger = createLogger({
@@ -15,4 +15,4 @@ export default () => {
   console.log('Logger initialized!');
 
   return logger;
-};
+}

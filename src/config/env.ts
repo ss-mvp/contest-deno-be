@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
+import { Algorithm } from 'jsonwebtoken';
 import { LoggerOptions } from 'winston';
+import { Clever } from '../interfaces';
 
 export type envTypes = 'development' | 'production' | 'testing' | 'ci';
 const NODE_ENV = (process.env.NODE_ENV as envTypes) || 'development';
@@ -85,18 +87,16 @@ export default {
   } as AWS.ConfigurationOptions,
   SES_EMAIL: `"Story Squad" <${process.env['SES_EMAIL'] || ''}>`,
   SES_CONFIG: {},
-  // By having a dev label we can restrict pushing to main s3 bucket from DEV env
-  S3_BUCKET:
-    process.env[envPrefix({ enableDevLabel: true }) + 'S3_BUCKET'] || '',
+  S3_BUCKET: process.env[envPrefix() + 'S3_BUCKET'] || '',
   JWT: {
     SECRET: process.env['JWT_SECRET'] || 'somefakesecret',
-    ALGO: process.env['JWT_ALGORITHM'] || 'HS512',
+    ALGO: (process.env['JWT_ALGORITHM'] || 'HS512') as Algorithm,
   },
   CLEVER_CONFIG: {
     clientId: process.env['CLEVER_CLIENT_ID'] || '',
     clientSecret: process.env['CLEVER_CLIENT_SECRET'] || '',
     redirectURI: REACT_APP_URL + (process.env['CLEVER_REACT_APP_EP'] || ''),
-  },
+  } as Clever.client.IConfig,
 
   LOGGER_CONFIG: {
     level:

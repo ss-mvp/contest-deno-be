@@ -1,11 +1,10 @@
 import express from 'express';
 import loaders from './loaders';
 
-export default async function initializeServer() {
+export default async function app__init() {
   const app = express();
 
   await loaders({ expressApp: app });
-  console.log('Loaders complete.');
 
   return app;
 }

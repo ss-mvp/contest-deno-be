@@ -4,7 +4,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth, Roles } from '../../../../interfaces';
-import AuthService from '../../../../services/auth';
+import AuthService from '../../../../services/auth/auth';
 import { HTTPError } from '../../../../utils';
 
 interface AuthPostLoginBody {

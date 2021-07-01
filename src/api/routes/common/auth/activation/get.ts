@@ -4,7 +4,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { env } from '../../../../../config';
-import AuthService from '../../../../../services/auth';
+import AuthService from '../../../../../services/auth/auth';
 
 interface GetActivationQueryParams {
   email: string;
@@ -31,7 +31,7 @@ export default function authActivationRoute__get(route: Router) {
     // ),
     async (req, res) => {
       try {
-        const { token } = await authServiceInstance.Validate(
+        const { token } = await authServiceInstance.validate(
           req.query.email,
           req.query.token
         );
