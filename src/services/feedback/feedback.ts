@@ -1,16 +1,13 @@
-import { Inject, Service, serviceCollection } from '../../deps';
-import RumbleFeedbackModel from '../models/rumbleFeedback';
-import BaseService from './baseService';
+import { Service } from 'typedi';
+import { RumbleFeedbackModel } from '../../models';
+import BaseService from '../baseService';
 
 @Service()
 export default class FeedbackService extends BaseService {
-  constructor(
-    @Inject(RumbleFeedbackModel) private feedbackModel: RumbleFeedbackModel
-  ) {
+  constructor(private feedbackModel: RumbleFeedbackModel) {
     super();
   }
 
-  // TODO rename this
   public async checkIfFeedbackWasSubmitted({
     rumbleId,
     studentId,
@@ -37,5 +34,3 @@ export default class FeedbackService extends BaseService {
     }
   }
 }
-
-serviceCollection.addTransient(FeedbackService);

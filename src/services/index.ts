@@ -2,3 +2,8 @@ export { AdminService } from './admin';
 export { AuthService } from './auth';
 export { BucketService } from './bucket';
 export { CleverService } from './clever';
+export { ContestService } from './contest';
+export { DSService } from './ds';
+export { FeedbackService } from './feedback';
+export { RumbleService } from './rumble';
+export { SubmissionService } from './submission';

@@ -23,5 +23,5 @@ export interface INewRumble extends Omit<IRumblePostBody, 'start_time'> {
 export interface IRumblePostBody {
   numMinutes: number;
   promptId: number;
-  start_time?: Date;
+  start_time?: Date | string;
 }

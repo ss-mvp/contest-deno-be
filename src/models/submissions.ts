@@ -1,5 +1,6 @@
+import { DateTime } from 'luxon';
 import { Service } from 'typedi';
-import { Sources, Submissions } from '../interfaces';
+import { Clash, Sources, Submissions } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -96,5 +97,31 @@ export default class SubmissionModel extends BaseModel<
       this.logger.error(err);
       throw err;
     }
+  }
+
+  public async getLeaderboardFrom(
+    fromDate: Date | DateTime
+  ): Promise<Clash.ILeaderboardItem[]> {
+    let fromDateInISO: string;
+
+    if (fromDate instanceof Date) {
+      fromDateInISO = fromDate.toISOString();
+    } else {
+      fromDateInISO = fromDate.toISO();
+    }
+    const subs = await this.db('submissions')
+      .innerJoin<Clash.ILeaderboardItem>(
+        'users',
+        'users.id',
+        'submissions.userId'
+      )
+      .avg<{ score: number }>('submissions.score')
+      .groupBy('users.id')
+      .select('users.id', 'users.codename')
+      .orderBy('score', 'desc')
+      .limit(10)
+      .where('submissions.created_at', '>=', fromDateInISO);
+
+    return subs;
   }
 }

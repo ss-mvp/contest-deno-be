@@ -1,3 +1,5 @@
+import { DSSources } from '../Enum';
+
 export interface IDSSubmissionTableRow {
   Confidence?: number;
   SquadScore?: number;
@@ -7,10 +9,5 @@ export interface IDSSubmissionTableRow {
 
 export interface IDSTranscriptionTableRow {
   transcription?: string;
-  transcriptionSourceId?: number & DSTranscriptionSources;
-}
-
-export enum DSTranscriptionSources {
-  DS = 1,
-  iOS = 2,
+  transcriptionSourceId?: number & DSSources.SourceEnum;
 }

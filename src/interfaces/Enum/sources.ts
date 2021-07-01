@@ -7,7 +7,6 @@ export interface INewSource {
 }
 
 export enum SourceEnum {
-  FDSC = 1,
-  Rumble = 2,
-  Monster = 3,
+  DS = 1,
+  iOS = 2,
 }

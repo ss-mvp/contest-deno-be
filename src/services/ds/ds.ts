@@ -1,28 +1,28 @@
-import { axiod, Inject, log, Service, serviceCollection } from '../../deps';
-import env from '../config/env';
-import {
-  IDSAPIPageSubmission,
-  IDSAPITextSubmissionPostBody,
-  IDSAPITextSubmissionResponse,
-} from '../interfaces/dsServiceTypes';
-import { INewRumbleFeedback } from '../interfaces/rumbleFeedback';
+import axios, { AxiosInstance } from 'axios';
+import { Inject, Service } from 'typedi';
+import { Logger } from 'winston';
+import { env } from '../../config';
+import { API, DS, Feedback } from '../../interfaces';
 
 @Service()
 export default class DSService {
   // A connection to the DS FastAPI server on Elastic Beanstalk
-  constructor(@Inject('logger') private logger: log.Logger) {}
+  private api: AxiosInstance;
+  constructor(@Inject('logger') private logger: Logger) {
+    this.api = axios.create(env.DS_API_CONFIG);
+  }
 
   public async sendSubmissionToDS({
     pages,
     promptId,
     submissionId = 0,
   }: {
-    pages: IDSAPIPageSubmission[];
+    pages: API.middleware.upload.IResponseWithChecksum[];
     promptId: number;
     submissionId?: number;
-  }): Promise<IDSAPITextSubmissionResponse> {
+  }): Promise<DS.api.IDSAPITextSubmissionResponse> {
     /* Mock Data */
-    // const res = await Promise.resolve<IDSAPITextSubmissionResponse>({
+    // const res = await Promise.resolve<DS.api.IDSAPITextSubmissionResponse>({
     //   Transcription: 'asdaksfmnasdlkcfmnasdlfkasmfdlkasdf',
     //   Confidence: 50,
     //   SquadScore: Math.floor(Math.random() * 40 + 10), // Rand 10-50
@@ -40,7 +40,6 @@ export default class DSService {
       }),
       {}
     );
-    // TODO look into removing these?
     const dsReqBody = {
       StoryId: promptId,
       SubmissionID: submissionId,
@@ -58,8 +57,8 @@ export default class DSService {
       userId: number;
       submissionId: number;
     }[]
-  ): INewRumbleFeedback[] {
-    const response: INewRumbleFeedback[] = [];
+  ): Feedback.INewFeedbackItem[] {
+    const response: Feedback.INewFeedbackItem[] = [];
     const userIds: number[] = [];
     const submissionIds: number[] = [];
 
@@ -105,15 +104,11 @@ export default class DSService {
   }
 
   private async sendText(
-    body: IDSAPITextSubmissionPostBody
-  ): Promise<IDSAPITextSubmissionResponse> {
+    body: DS.api.IDSAPITextSubmissionPostBody
+  ): Promise<DS.api.IDSAPITextSubmissionResponse> {
     try {
       console.log('ds req start', body);
-      const { data } = await axiod.post(
-        `/submission/text`,
-        body,
-        env.DS_API_CONFIG
-      );
+      const { data } = await this.api.post(`/submission/text`, body);
       console.log('ds req end', data);
       return data;
     } catch (err) {
@@ -122,5 +117,3 @@ export default class DSService {
     }
   }
 }
-
-serviceCollection.addTransient(DSService);

@@ -1,48 +1,43 @@
+import { DateTime } from 'luxon';
+import { Service } from 'typedi';
+import { v5 } from 'uuid';
+import { env } from '../../config';
 import {
-  createError,
-  Inject,
-  moment,
-  Service,
-  serviceCollection,
-  v5,
-} from '../../deps';
-import env from '../config/env';
-import { Roles } from '../interfaces';
+  Clever,
+  Feedback,
+  Roles,
+  Rumbles,
+  Submissions,
+  Users,
+} from '../../interfaces';
 import {
-  ISection,
-  ISectionPostBody,
-  ISectionWithRumbles,
-} from '../interfaces/cleverSections';
-import { IStudentWithSubmissions } from '../interfaces/cleverStudents';
-import { IRumbleFeedback } from '../interfaces/rumbleFeedback';
-import { IRumblePostBody, IRumbleWithSectionInfo } from '../interfaces/rumbles';
-import { ISubItem } from '../interfaces/submissions';
-import { IUser } from '../interfaces/users';
-import CleverSectionModel from '../models/cleverSections';
-import CleverStudentModel from '../models/cleverStudents';
-import CleverTeacherModel from '../models/cleverTeachers';
-import RumbleFeedbackModel from '../models/rumbleFeedback';
-import RumbleModel from '../models/rumbles';
-import RumbleSectionsModel from '../models/rumbleSections';
-import SubmissionModel from '../models/submissions';
-import UserModel from '../models/users';
-import BaseService from './baseService';
-import DSService from './dsService';
-import SubmissionService from './submission';
+  CleverSectionModel,
+  CleverStudentModel,
+  CleverTeacherModel,
+  RumbleFeedbackModel,
+  RumbleModel,
+  RumbleSectionsModel,
+  SubmissionModel,
+  UserModel,
+} from '../../models';
+import { HTTPError } from '../../utils';
+import BaseService from '../baseService';
+import { DSService } from '../ds';
+import { SubmissionService } from '../submission';
 
 @Service()
 export default class RumbleService extends BaseService {
   constructor(
-    @Inject(UserModel) private userModel: UserModel,
-    @Inject(DSService) private dsService: DSService,
-    @Inject(RumbleModel) private rumbleModel: RumbleModel,
-    @Inject(SubmissionModel) private subModel: SubmissionModel,
-    @Inject(SubmissionService) private subService: SubmissionService,
-    @Inject(CleverTeacherModel) private teacherModel: CleverTeacherModel,
-    @Inject(CleverStudentModel) private studentModel: CleverStudentModel,
-    @Inject(CleverSectionModel) private sectionModel: CleverSectionModel,
-    @Inject(RumbleSectionsModel) private rumbleSections: RumbleSectionsModel,
-    @Inject(RumbleFeedbackModel) private rumbleFeedback: RumbleFeedbackModel
+    private userModel: UserModel,
+    private dsService: DSService,
+    private rumbleModel: RumbleModel,
+    private subModel: SubmissionModel,
+    private subService: SubmissionService,
+    private teacherModel: CleverTeacherModel,
+    private studentModel: CleverStudentModel,
+    private sectionModel: CleverSectionModel,
+    private rumbleSections: RumbleSectionsModel,
+    private rumbleFeedback: RumbleFeedbackModel
   ) {
     super();
   }
@@ -50,7 +45,7 @@ export default class RumbleService extends BaseService {
   public async getSubsForFeedback(
     studentId: number,
     rumbleId: number
-  ): Promise<ISubItem[]> {
+  ): Promise<Submissions.ISubItem[]> {
     try {
       this.logger.debug(
         `Getting submissions for feedback for user ${studentId}`
@@ -76,7 +71,7 @@ export default class RumbleService extends BaseService {
 
   public async getById(
     rumbleId: number
-  ): Promise<IRumbleWithSectionInfo | undefined> {
+  ): Promise<Rumbles.IRumbleWithSectionInfo | undefined> {
     try {
       this.logger.debug('Getting rumble with ID', rumbleId);
 
@@ -94,7 +89,9 @@ export default class RumbleService extends BaseService {
     }
   }
 
-  public async addScoresToFeedback(feedback: IRumbleFeedback[]): Promise<void> {
+  public async addScoresToFeedback(
+    feedback: Feedback.IFeedbackItem[]
+  ): Promise<void> {
     try {
       this.logger.debug(`Updating feedback scores...`);
 
@@ -113,29 +110,33 @@ export default class RumbleService extends BaseService {
     }
   }
 
-  public async getSections(user: IUser) {
+  public async getSections(user: Users.IUser) {
     try {
       this.logger.debug(`Getting sections for user ${user.id}`);
 
-      let sections: ISection[];
-      if (user.roleId === Roles.teacher) {
+      let sections: Clever.sections.ISection[];
+      if (user.roleId === Roles.RoleEnum.teacher) {
         sections = await this.teacherModel.getSectionsById(user.id);
-      } else if (user.roleId === Roles.user) {
+      } else if (user.roleId === Roles.RoleEnum.user) {
         sections = await this.studentModel.getSectionsById(user.id);
       } else {
-        throw createError(401, 'Invalid user type!');
+        throw HTTPError.create(401, 'Invalid user type!');
       }
 
-      await this.getActiveRumblesForSections(sections as ISectionWithRumbles[]);
+      await this.getActiveRumblesForSections(
+        sections as Clever.sections.ISectionWithRumbles[]
+      );
 
-      return sections as ISectionWithRumbles[];
+      return sections as Clever.sections.ISectionWithRumbles[];
     } catch (err) {
       this.logger.error(err);
       throw err;
     }
   }
 
-  public async getActiveRumblesForSections(sections: ISectionWithRumbles[]) {
+  public async getActiveRumblesForSections(
+    sections: Clever.sections.ISectionWithRumbles[]
+  ) {
     try {
       for await (const section of sections) {
         const rumbleArray = await this.rumbleModel.getActiveRumblesBySection(
@@ -182,7 +183,7 @@ export default class RumbleService extends BaseService {
   public async getSubsByStudentAndSection(
     studentId: number,
     sectionId: number
-  ): Promise<ISubItem[]> {
+  ): Promise<Submissions.ISubItem[]> {
     try {
       this.logger.debug(
         `Attempting to retrieve codename for student with id ${studentId}`
@@ -214,13 +215,15 @@ export default class RumbleService extends BaseService {
 
   public async getStudentsWithSubForRumble(
     rumbleId: number
-  ): Promise<IStudentWithSubmissions[]> {
+  ): Promise<Clever.students.IStudentWithSubmissions[]> {
     try {
       this.logger.debug(
         `Attempting to retrieve students in rumble ${rumbleId}`
       );
 
-      const students = await this.rumbleModel.getStudentsByRumbleId(rumbleId);
+      const students = (await this.rumbleModel.getStudentsByRumbleId(
+        rumbleId
+      )) as Clever.students.IStudentWithSubmissions[];
 
       for await (const student of students) {
         const sub = await this.subModel.getSubByStudentAndRumbleId(
@@ -243,7 +246,7 @@ export default class RumbleService extends BaseService {
   public async getSubForStudentByRumble(
     rumbleId: number,
     studentId: number
-  ): Promise<ISubItem | undefined> {
+  ): Promise<Submissions.ISubItem | undefined> {
     try {
       const sub = await this.subModel.getSubByStudentAndRumbleId(
         studentId,
@@ -260,13 +263,16 @@ export default class RumbleService extends BaseService {
     }
   }
 
-  public async createSection(body: ISectionPostBody, teacherId: number) {
+  public async createSection(
+    body: Clever.sections.ISectionPostBody,
+    teacherId: number
+  ) {
     try {
       this.logger.debug(
         `Attempting to add section '${body.name}' for teacher with id ${teacherId}`
       );
 
-      let section: ISection | undefined;
+      let section: Clever.sections.ISection | undefined;
       await this.db.transaction(async () => {
         const joinCode = this.generateJoinCode(body.name);
         // Transactions mantain data integrity when creaing multiple rows
@@ -287,7 +293,7 @@ export default class RumbleService extends BaseService {
         section = res;
       });
       if (section) return section;
-      else throw createError(400, 'Could not create section');
+      else throw HTTPError.create(400, 'Could not create section');
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -298,7 +304,7 @@ export default class RumbleService extends BaseService {
     joinCode: string,
     sectionId: number,
     studentId: number
-  ): Promise<ISectionWithRumbles> {
+  ): Promise<Clever.sections.ISectionWithRumbles> {
     try {
       // Get the section with the given id
       const section = await this.sectionModel.get(
@@ -307,11 +313,11 @@ export default class RumbleService extends BaseService {
       );
       // Handle nonexistent section
       if (!section) {
-        throw createError(404, 'Invalid section ID');
+        throw HTTPError.create(404, 'Invalid section ID');
       }
       // Handle incorrect join code
       if (joinCode !== section.joinCode) {
-        throw createError(401, 'Join code is invalid');
+        throw HTTPError.create(401, 'Join code is invalid');
       }
 
       // Connect the student user to the section
@@ -333,19 +339,21 @@ export default class RumbleService extends BaseService {
     rumble,
     sectionIds,
   }: {
-    rumble: IRumblePostBody;
+    rumble: Rumbles.IRumblePostBody;
     sectionIds: number[];
-  }): Promise<IRumbleWithSectionInfo[]> {
+  }): Promise<Rumbles.IRumbleWithSectionInfo[]> {
     try {
-      const rumbles: IRumbleWithSectionInfo[] = [];
+      const rumbles: Rumbles.IRumbleWithSectionInfo[] = [];
       await this.db.transaction(async () => {
         for await (const sectionId of sectionIds) {
           const joinCode = this.generateJoinCode(
             `${rumble.numMinutes}-${rumble.promptId}`
           );
-          const endTime = (moment(rumble.start_time)
-            .add(rumble.numMinutes, 'm')
-            .toISOString() as unknown) as Date;
+          const endTime = DateTime.fromISO(rumble.start_time as string)
+            .plus({
+              minutes: rumble.numMinutes,
+            })
+            .toISO() as unknown;
 
           const [res] = await this.rumbleModel.add({
             joinCode,
@@ -359,7 +367,7 @@ export default class RumbleService extends BaseService {
             rumbleId: res.id,
             start_time: rumble.start_time,
             sectionId,
-            end_time: endTime,
+            end_time: endTime as Date,
           });
 
           const [{ name }] = await this.sectionModel.get({ id: sectionId });
@@ -368,12 +376,10 @@ export default class RumbleService extends BaseService {
             ...res,
             sectionName: name,
             sectionId,
-            end_time: endTime,
-            start_time: rumble.start_time,
+            end_time: endTime as Date,
+            start_time: rumble.start_time as Date,
           });
         }
-        // if (rumbles.length !== sections.length)
-        //   throw createError(409, 'Unable to create rumbles');
       });
       return rumbles;
     } catch (err) {
@@ -391,10 +397,18 @@ export default class RumbleService extends BaseService {
       );
 
       // Calculate the end time from the game length
-      const endTime = this.calculateEndTime(rumble.numMinutes);
+      const endTime = DateTime.utc()
+        .plus({
+          minutes: rumble.numMinutes,
+        })
+        .toISO() as unknown;
 
       // Update the end time of the given rumble
-      await this.rumbleSections.updateEndTime(endTime, sectionId, rumbleId);
+      await this.rumbleSections.updateEndTime(
+        endTime as Date,
+        sectionId,
+        rumbleId
+      );
 
       // Return the end time to the user
       return endTime;
@@ -410,13 +424,12 @@ export default class RumbleService extends BaseService {
       console.log('subs to be processed for feedback', subs);
 
       // Return early! Nothing to generate.
-      // TODO - should we throw an error for this??
-      if (subs.length === 0 || !subs) return;
+      if (subs.length < 2 || !subs)
+        HTTPError.create(400, 'Not enough submissions to start feedback phase');
 
       const matchups = this.dsService.generateFeedbackMatchups(subs);
 
       // Get the ID of the cross-reference that connects a section to a rumble
-      // TODO make sure this works
       const { id: rumbleSectionId } = await this.rumbleSections.get(
         { rumbleId },
         { first: true }
@@ -439,10 +452,7 @@ export default class RumbleService extends BaseService {
     try {
       this.logger.debug(`Generating join code with key: '${key}'`);
 
-      const joinCode = v5.generate({
-        namespace: env.UUID_NAMESPACE,
-        value: `${key}-${Date.now()}`,
-      }) as string;
+      const joinCode = v5(`${key}-${Date.now()}`, env.UUID_NAMESPACE);
 
       this.logger.debug(`Join code generated for key: '${key}'`);
 
@@ -452,10 +462,4 @@ export default class RumbleService extends BaseService {
       throw err;
     }
   }
-
-  private calculateEndTime(numMinutes: number): Date {
-    return (moment.utc().add(numMinutes, 'm') as unknown) as Date;
-  }
 }
-
-serviceCollection.addTransient(RumbleService);

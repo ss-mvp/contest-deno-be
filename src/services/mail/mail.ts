@@ -1,22 +1,18 @@
-import {
-  Handlebars,
-  Inject,
-  log,
-  SendEmailCommand,
-  Service,
-  serviceCollection,
-  SES,
-} from '../../deps';
-import hbsConfig from '../../hbsConfig';
-import env from '../config/env';
-import { IUser } from '../interfaces/users';
+import { SES } from 'aws-sdk';
+import { compile } from 'handlebars';
+import { Inject, Service } from 'typedi';
+import { Logger } from 'winston';
+import hbsConfig from '../../../hbsConfig';
 
 @Service()
 export default class MailService {
+  private hbs: typeof Handlebars;
   constructor(
     @Inject('mail') private mailer: SES,
-    @Inject('logger') private logger: log.Logger
-  ) {}
+    @Inject('logger') private logger: Logger
+  ) {
+    this.hbs = compile({}, {});
+  }
 
   public async sendValidationEmail(email: string, url: string) {
     try {
