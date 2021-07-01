@@ -49,10 +49,12 @@ export default (app: IRouter) => {
         }
       );
 
-      //Error: Parse Error: Invalid character in Content-Length
-      const headerLength = Array.isArray(userList) ? 'userList.length' : '0';
-      // I think headerLength should be in quotes, but then on line 53 it says that headerLength is never used
-      res.headers?.append('content-length', headerLength);
+      const headerLength = Array.isArray(userList)
+        ? userList.length
+        : userList === undefined
+        ? 0
+        : 1;
+      res.headers?.append('content-length', headerLength.toString());
 
       res.setStatus(204).end();
     } catch (err) {
