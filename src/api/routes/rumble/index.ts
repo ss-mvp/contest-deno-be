@@ -10,7 +10,7 @@ import teachers from './teachers';
 
 const router = Router();
 
-export default (app: Router) => {
+export default function rumbleRoutes__loader(app: Router) {
   const logger: Logger = Container.get('logger');
   logger.debug('Loading rumble routers...');
 
@@ -26,4 +26,4 @@ export default (app: Router) => {
   feedback(router);
 
   logger.debug('Rumble routers loaded.');
-};
+}

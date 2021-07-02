@@ -1,3 +1,25 @@
-export { default as commonRoutes } from './common';
-export { default as contestRoutes } from './contest';
-export { default as rumbleRoutes } from './rumble';
+import express from 'express';
+import Container from 'typedi';
+import { Logger } from 'winston';
+import commonRoutes__loader from './common';
+import contestRoutes__loader from './contest';
+import rumbleRoutes__loader from './rumble';
+
+export default function apiRoute__loader() {
+  // Get our configured logger instance from our Container layer
+  const logger: Logger = Container.get('logger');
+
+  // Initialize our Express server application
+  const app = express();
+
+  logger.debug('Express server created.');
+  logger.debug('Loading routes...');
+
+  commonRoutes__loader(app);
+  contestRoutes__loader(app);
+  rumbleRoutes__loader(app);
+
+  logger.debug('Routes loaded.');
+
+  return app;
+}

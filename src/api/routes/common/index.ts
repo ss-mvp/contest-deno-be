@@ -2,7 +2,7 @@ import { Router } from 'express';
 import authRoute__loader from './auth';
 import promptRoute__loader from './prompts';
 
-export default function commonRouteLoader(app: Router) {
+export default function commonRoutes__loader(app: Router) {
   console.log('Loading common routes...');
 
   authRoute__loader(app);
