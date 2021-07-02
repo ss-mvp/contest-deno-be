@@ -8,12 +8,7 @@ import {
   SSOLookups,
   Users,
 } from '../../interfaces';
-import {
-  CleverStudentModel,
-  CleverTeacherModel,
-  SSOLookupModel,
-  UserModel,
-} from '../../models';
+import { SSOLookupModel, UserModel } from '../../models';
 import { HTTPError } from '../../utils';
 import { AuthService } from '../auth';
 import BaseService from '../baseService';
@@ -27,9 +22,7 @@ export default class CleverService extends BaseService {
     private userModel: UserModel,
     private rumbleService: RumbleService,
     private authService: AuthService,
-    private ssoModel: SSOLookupModel,
-    private teacherModel: CleverTeacherModel,
-    private studentModel: CleverStudentModel
+    private ssoModel: SSOLookupModel
   ) {
     super();
   }
