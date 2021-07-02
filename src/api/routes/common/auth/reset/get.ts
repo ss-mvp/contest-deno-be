@@ -1,9 +1,10 @@
 /** URL Scope: /auth/reset */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import AuthService from '../../../../../services/auth/auth';
+import { AuthService } from '../../../../../services';
 
 interface GetResetQueryParams {
   email: string;
@@ -24,7 +25,11 @@ export default function authResetRoute__get(route: Router) {
     GetResetQueryParams // Query parameters
   >(
     '/',
-    // validate<GetResetQueryParams>({ email: [required, isEmail, match(emailRegex)] }, 'query'),
+    celebrate({
+      [Segments.QUERY]: Joi.object<GetResetQueryParams>({
+        email: Joi.string().email().required(),
+      }),
+    }),
     async (req, res) => {
       try {
         await authServiceInstance.getResetEmail(req.query.email);

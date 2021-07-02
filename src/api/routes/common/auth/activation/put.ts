@@ -1,10 +1,10 @@
-/** URL Scope: /auth */
+/** URL Scope: /auth/activation */
 
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth } from '../../../../../interfaces';
-import AuthService from '../../../../../services/auth/auth';
+import { AuthService } from '../../../../../services';
 import { authHandler } from '../../../../middlewares';
 
 export default function authActivationRoute__put(route: Router) {
@@ -15,7 +15,7 @@ export default function authActivationRoute__put(route: Router) {
   route.put<
     never, // URL parameters
     Auth.IAuthResponse, // Response body
-    Auth.WithHandler<unknown>, // Request body
+    Auth.WithHandler, // Request body
     never // Query parameters
   >('/', authHandler(), async (req, res) => {
     try {

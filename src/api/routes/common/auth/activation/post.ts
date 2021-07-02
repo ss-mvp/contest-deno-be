@@ -1,10 +1,11 @@
-/** URL Scope: /auth */
+/** URL Scope: /auth/activation */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth, Validations } from '../../../../../interfaces';
-import AuthService from '../../../../../services/auth/auth';
+import { AuthService } from '../../../../../services';
 import { authHandler } from '../../../../middlewares';
 
 export default function authActivationRoute__post(route: Router) {
@@ -20,10 +21,14 @@ export default function authActivationRoute__post(route: Router) {
   >(
     '/',
     authHandler(),
-    // validate({
-    //   newEmail: [required, isEmail, match(emailRegex)],
-    //   age: [required, isNumber],
-    // }),
+    celebrate({
+      [Segments.BODY]: Joi.object<
+        Auth.WithHandler<Validations.IGetNewValidationBody>
+      >({
+        newEmail: Joi.string().required().email(),
+        age: Joi.number().required(),
+      }),
+    }),
     async (req, res) => {
       try {
         await authServiceInstance.newValidationEmail(req.body);

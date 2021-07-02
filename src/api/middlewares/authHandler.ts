@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import env from '../../config/env';
+import { env } from '../../config';
 import { Auth, Roles } from '../../interfaces';
 import { UserModel } from '../../models';
 import { HTTPError } from '../../utils';
@@ -75,12 +75,8 @@ export default function authHandlerGenerator<
             throw HTTPError.create(401, 'Account must be validated');
           }
 
-          // Add the user info to the req body if all goes well
-          // But remove unecessary fields
+          // Add the user info to the req body if all goes well (minus password)
           Reflect.deleteProperty(user, 'password');
-          Reflect.deleteProperty(user, 'created_at');
-          Reflect.deleteProperty(user, 'updated_at');
-          Reflect.deleteProperty(user, 'isValidated');
           req.body.__user = user;
 
           next();

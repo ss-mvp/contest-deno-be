@@ -1,5 +1,6 @@
 /** URL Scope: /auth/o/clever */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
@@ -21,7 +22,11 @@ export default function cleverOAuthRoute__get(route: Router) {
     GetCleverQueryParams // Query parameters
   >(
     '/',
-    // validate<GetCleverQueryParams>({ code: [required, isString] }, 'query'),
+    celebrate({
+      [Segments.QUERY]: Joi.object<GetCleverQueryParams>({
+        code: Joi.string().required(),
+      }),
+    }),
     async function asdasd(req, res) {
       try {
         const cleverResponse = await cleverInstance.authorizeUser(

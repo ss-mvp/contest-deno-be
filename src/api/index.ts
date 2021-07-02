@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { commonRoutes, contestRoutes } from './routes';
+import { commonRoutes, contestRoutes, rumbleRoutes } from './routes';
 
 export default function appRoute__loader() {
   console.log('Loading routers...');
@@ -7,7 +7,7 @@ export default function appRoute__loader() {
 
   commonRoutes(app);
   contestRoutes(app);
-  // rumbleRoutes(app);
+  rumbleRoutes(app);
 
   console.log('Routers loaded.');
   return app;

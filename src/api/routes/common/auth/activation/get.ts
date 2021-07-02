@@ -1,4 +1,4 @@
-/** URL Scope: /auth */
+/** URL Scope: /auth/activation */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
@@ -7,11 +7,16 @@ import { Logger } from 'winston';
 import { env } from '../../../../../config';
 import { AuthService } from '../../../../../services';
 
+// TODO add some way to specify a redirect uri from the client
 interface GetActivationQueryParams {
   email: string;
   token: string;
 }
 
+/**
+ * On success, this route will redirect you to a page on the frontend
+ * where you will be logged in.
+ */
 export default function authActivationRoute__get(route: Router) {
   const logger: Logger = Container.get('logger');
   const authServiceInstance = Container.get(AuthService);

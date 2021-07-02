@@ -1,5 +1,6 @@
 /** URL Scope: /auth/o/clever */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
@@ -19,7 +20,6 @@ export default function cleverOAuthRoute__postMerge(route: Router) {
   const logger: Logger = Container.get('logger');
   const cleverInstance = Container.get(CleverService);
 
-  // POST /api/auth/o/clever/merge?cleverId=someid
   route.post<
     never, // URL parameters
     Auth.IAuthResponse, // Response body
@@ -27,11 +27,15 @@ export default function cleverOAuthRoute__postMerge(route: Router) {
     PostMergeQueryParams // Query parameters
   >(
     '/merge',
-    // validate<PostMergeRequestBody>({
-    //   codename: [required, isString],
-    //   password: [required, isString],
-    // }),
-    // validate<PostMergeQueryParams>({ cleverId: [required, isString] }, 'query'),
+    celebrate({
+      [Segments.BODY]: Joi.object<PostMergeRequestBody>({
+        codename: Joi.string().required(),
+        password: Joi.string().required(),
+      }),
+      [Segments.QUERY]: Joi.object<PostMergeQueryParams>({
+        cleverId: Joi.string().required(),
+      }),
+    }),
     async (req, res) => {
       try {
         const authResponse = await cleverInstance.loginAndMerge(
