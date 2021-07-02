@@ -16,18 +16,12 @@ export default class PromptModel extends BaseModel<
     try {
       const prompts = await this.db('prompt_queue')
         .innerJoin('prompts', 'prompts.id', 'prompt_queue.promptId')
-        .limit(7)
         .where('prompt_queue.starts_at', '>', DateTime.now().toISO())
-        .select('prompts.*', 'prompt_queue.starts_at');
-      // Return early if we already have the active prompt
-      if (prompts.some((p) => p.active)) return prompts;
-
-      const [currentPrompt] = await this.db('prompt_queue')
-        .innerJoin('prompts', 'prompts.id', 'prompt_queue.promptId')
-        .where('prompts.active', true)
+        .orWhere('prompts.active', true)
+        .limit(7)
         .select('prompts.*', 'prompt_queue.starts_at');
 
-      return [currentPrompt, ...prompts];
+      return prompts;
     } catch (err) {
       this.logger.error(err);
       throw err;

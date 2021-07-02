@@ -1,11 +1,11 @@
 import { Service } from 'typedi';
-import { Clever } from '../interfaces';
+import { Sections, Users } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
 export default class CleverSectionModel extends BaseModel<
-  Clever.sections.INewSection,
-  Clever.sections.ISection
+  Sections.INewSection,
+  Sections.ISection
 > {
   constructor() {
     super('clever_sections');
@@ -13,7 +13,7 @@ export default class CleverSectionModel extends BaseModel<
 
   public async getStudentsBySectionId(sectionId: number) {
     try {
-      const students = await this.db('clever_sections')
+      const students: Users.IUser[] = await this.db('clever_sections')
         .innerJoin(
           'clever_students',
           'clever_students.sectionId',

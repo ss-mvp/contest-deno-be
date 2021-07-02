@@ -5,6 +5,7 @@ import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import { env } from '../../config';
 import { Users } from '../../interfaces';
+
 @Service()
 export default class MailService {
   constructor(

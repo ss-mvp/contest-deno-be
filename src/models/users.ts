@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { SSOLookups, Users } from '../interfaces';
+import { Roles, SSOLookups, Users } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -8,7 +8,9 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
     super('users');
   }
 
-  public async getUserByResetEmail(resetEmail: string) {
+  public async getUserByValidationEmail(
+    resetEmail: string
+  ): Promise<Users.IValidationByUser> {
     this.logger.debug(`Retrieving user account from reset email ${resetEmail}`);
 
     const user = await this.db('users')
@@ -34,7 +36,7 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
     const role = await this.db('users')
       .innerJoin('roles', 'roles.id', 'users.roleId')
       .where('id', userId)
-      .select('roles.id', 'roles.role')
+      .select<Roles.IRole>('roles.id', 'roles.role')
       .first();
 
     return role;
@@ -47,7 +49,7 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
       .innerJoin('sso_lookup', 'users.id', 'sso_lookup.userId')
       .where('sso_lookup.providerId', SSOLookups.LookupEnum.Clever)
       .andWhere('sso_lookup.accessToken', cleverId)
-      .select('users.*')
+      .select<Users.IUser>('users.*')
       .first();
 
     return user;

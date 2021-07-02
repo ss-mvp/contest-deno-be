@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Clever, Rumbles, Users } from '../interfaces';
+import { Rumbles, Sections, Users } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -11,7 +11,7 @@ export default class RumbleModel extends BaseModel<
     super('rumbles');
   }
 
-  public async getActiveRumblesBySection(section: Clever.sections.ISection) {
+  public async getActiveRumblesBySection(section: Sections.ISection) {
     try {
       const rumbles = await this.db
         .table('rumbles')

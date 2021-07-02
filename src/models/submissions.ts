@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { Service } from 'typedi';
-import { Clash, Sources, Submissions } from '../interfaces';
+import { Clash, Submissions } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -22,18 +22,11 @@ export default class SubmissionModel extends BaseModel<
       );
 
       const subs = await this.db('submissions')
-        .innerJoin('prompts', 'prompts.id', 'submissions.promptId')
-        .innerJoin('rumbles', 'rumbles.promptId', 'prompts.id')
+        .innerJoin('rumbles', 'rumbles.id', 'submissions.rumbleId')
         .innerJoin('rumble_sections', 'rumble_sections.rumbleId', 'rumbles.id')
-        .innerJoin(
-          'clever_sections',
-          'clever_sections.id',
-          'rumble_sections.sectionId'
-        )
-        .where('submissions.userId', studentId)
-        .andWhere('clever_sections.id', sectionId)
-        .andWhere('submissions.sourceId', Sources.SubSrcEnum.Rumble)
-        .select('submissions.*');
+        .where('rumble_sections.sectionId', sectionId)
+        .andWhere('submissions.userId', studentId)
+        .select<Submissions.ISubmission[]>('submissions.*');
 
       return subs;
     } catch (err) {
@@ -48,10 +41,7 @@ export default class SubmissionModel extends BaseModel<
   ): Promise<Submissions.ISubmission | undefined> {
     try {
       const submission = await this.db('submissions')
-        .where({
-          rumbleId,
-          userId: studentId,
-        })
+        .where({ rumbleId, userId: studentId })
         .first();
 
       return submission;
@@ -72,11 +62,11 @@ export default class SubmissionModel extends BaseModel<
           'submissions.id',
           'rumble_feedback.submissionId'
         )
-        .innerJoin('prompts', 'prompts.id', 'submissions.promptId')
-        .innerJoin('rumbles', 'rumbles.promptId', 'prompts.id')
-        .where('rumble_feedback.voterId', studentId)
-        .andWhere('rumbles.id', rumbleId)
+        .innerJoin('rumbles', 'rumbles.id', 'submissions.rumbleId')
+        .where('rumbles.id', rumbleId)
+        .andWhere('rumble_feedback.voterId', studentId)
         .select('submissions.*');
+
       return subs;
     } catch (err) {
       this.logger.error(err);
@@ -110,12 +100,9 @@ export default class SubmissionModel extends BaseModel<
       fromDateInISO = fromDate.toISO();
     }
     const subs = await this.db('submissions')
-      .innerJoin<Clash.ILeaderboardItem>(
-        'users',
-        'users.id',
-        'submissions.userId'
-      )
-      .avg<{ score: number }>('submissions.score')
+      .innerJoin('users', 'users.id', 'submissions.userId')
+      // This void fixes a linting error and does nothing else
+      .avg<void>('submissions.score')
       .groupBy('users.id')
       .select('users.id', 'users.codename')
       .orderBy('score', 'desc')

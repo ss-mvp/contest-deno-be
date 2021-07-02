@@ -1,5 +1,13 @@
 import { Service } from 'typedi';
-import { Auth, Clever, Enum, Roles, SSOLookups, Users } from '../../interfaces';
+import {
+  Auth,
+  Clever,
+  Enum,
+  Roles,
+  Sections,
+  SSOLookups,
+  Users,
+} from '../../interfaces';
 import {
   CleverStudentModel,
   CleverTeacherModel,
@@ -170,7 +178,7 @@ export default class CleverService extends BaseService {
     user: Users.IUser
   ): Promise<{
     enumData: Enum.IEnumData;
-    sections: Clever.sections.ISection[];
+    sections: Sections.ISection[];
   }> {
     try {
       const enumData = await this.getEnumData();

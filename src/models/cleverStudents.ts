@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Clever } from '../interfaces';
+import { Clever, Sections } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -11,13 +11,17 @@ export default class CleverStudentModel extends BaseModel<
     super('clever_students');
   }
 
+  /**
+   * Get all of the sections for a student by passing in the student ID.
+   * @param studentId the unique id of the student (from the users table)
+   */
   public async getSectionsById(studentId: number) {
     try {
       this.logger.debug(
         `Attempting to get sections for student with ID: ${studentId}`
       );
 
-      const sections = await this.db('clever_sections')
+      const sections: Sections.ISection[] = await this.db('clever_sections')
         .innerJoin(
           'clever_students',
           'clever_sections.id',

@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Clever } from '../interfaces';
+import { Clever, Sections } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -25,7 +25,7 @@ export default class CleverTeacherModel extends BaseModel<
         )
         .innerJoin('users', 'clever_teachers.userId', 'users.id')
         .where('users.id', teacherId)
-        .select('clever_sections.*');
+        .select<Sections.ISection[]>('clever_sections.*');
 
       return sections;
     } catch (err) {

@@ -4,13 +4,10 @@ import { Logger } from 'winston';
 import { API, DS, Sources, Submissions, Users } from '../interfaces';
 
 export default class DSModel {
-  // protected dsDB: Knex;
   constructor(
     @Inject('logger') private logger: Logger,
     @Inject('ds') protected dsDB: Knex
-  ) {
-    // this.dsDB = Container.get('ds');
-  }
+  ) {}
 
   public async addTranscription({
     uploadResponse,
@@ -82,7 +79,7 @@ export default class DSModel {
   private addTranscriptionRow(
     tsc: INewDSTranscriptionRow,
     knexClient?: Knex
-  ): Promise<unknown> {
+  ): Promise<void> {
     const client = knexClient ?? this.dsDB;
     return client('transcriptions').insert(tsc);
   }

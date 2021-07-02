@@ -7,6 +7,7 @@ import {
   Feedback,
   Roles,
   Rumbles,
+  Sections,
   Submissions,
   Users,
 } from '../../interfaces';
@@ -114,7 +115,7 @@ export default class RumbleService extends BaseService {
     try {
       this.logger.debug(`Getting sections for user ${user.id}`);
 
-      let sections: Clever.sections.ISection[];
+      let sections: Sections.ISection[];
       if (user.roleId === Roles.RoleEnum.teacher) {
         sections = await this.teacherModel.getSectionsById(user.id);
       } else if (user.roleId === Roles.RoleEnum.user) {
@@ -124,10 +125,10 @@ export default class RumbleService extends BaseService {
       }
 
       await this.getActiveRumblesForSections(
-        sections as Clever.sections.ISectionWithRumbles[]
+        sections as Sections.ISectionWithRumbles[]
       );
 
-      return sections as Clever.sections.ISectionWithRumbles[];
+      return sections as Sections.ISectionWithRumbles[];
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -135,7 +136,7 @@ export default class RumbleService extends BaseService {
   }
 
   public async getActiveRumblesForSections(
-    sections: Clever.sections.ISectionWithRumbles[]
+    sections: Sections.ISectionWithRumbles[]
   ) {
     try {
       for await (const section of sections) {
@@ -161,15 +162,24 @@ export default class RumbleService extends BaseService {
         `Attempting to retrieve students from section ${sectionId}`
       );
 
-      const students = await this.sectionModel.getStudentsBySectionId(
+      const studentData = await this.sectionModel.getStudentsBySectionId(
         sectionId
       );
 
+      const students = studentData.map<Clever.students.IStudentWithSubmissions>(
+        (user) => {
+          // Add an empty submissions object to every student
+          return { ...user, submissions: [] };
+        }
+      );
+
       for await (const student of students) {
+        // Now we can get the ACTUAL array of submissions
         const subs = await this.getSubsByStudentAndSection(
           student.id,
           sectionId
         );
+        // And point our student's submissions property at it
         student.submissions = subs;
       }
 
@@ -264,7 +274,7 @@ export default class RumbleService extends BaseService {
   }
 
   public async createSection(
-    body: Clever.sections.ISectionPostBody,
+    body: Sections.ISectionPostBody,
     teacherId: number
   ) {
     try {
@@ -272,7 +282,7 @@ export default class RumbleService extends BaseService {
         `Attempting to add section '${body.name}' for teacher with id ${teacherId}`
       );
 
-      let section: Clever.sections.ISection | undefined;
+      let section: Sections.ISection | undefined;
       await this.db.transaction(async () => {
         const joinCode = this.generateJoinCode(body.name);
         // Transactions mantain data integrity when creaing multiple rows
@@ -304,7 +314,7 @@ export default class RumbleService extends BaseService {
     joinCode: string,
     sectionId: number,
     studentId: number
-  ): Promise<Clever.sections.ISectionWithRumbles> {
+  ): Promise<Sections.ISectionWithRumbles> {
     try {
       // Get the section with the given id
       const section = await this.sectionModel.get(

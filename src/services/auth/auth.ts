@@ -106,13 +106,16 @@ export default class AuthService extends BaseService {
       throw err;
     }
   }
+
   public async validate(
     email: string,
     token: string
   ): Promise<Auth.IAuthResponse> {
     try {
       // Attempt to validate the user
-      const userValidation = await this.userModel.getUserByResetEmail(email);
+      const userValidation = await this.userModel.getUserByValidationEmail(
+        email
+      );
       if (!userValidation) throw HTTPError.create(404, 'User not found');
       if (userValidation.isValidated) {
         throw HTTPError.create(409, 'User has already been validated');
