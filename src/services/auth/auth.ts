@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { DateTime } from 'luxon';
 import { Service } from 'typedi';
-import { Auth, Roles, Users, Validations } from '../../interfaces';
+import { API, Auth, Roles, Users, Validations } from '../../interfaces';
 import { ResetModel, UserModel, ValidationModel } from '../../models';
 import { HTTPError } from '../../utils';
 import BaseService from '../baseService';
@@ -152,14 +152,14 @@ export default class AuthService extends BaseService {
     }
   }
   public async newValidationEmail(
-    data: Validations.IGetNewValidationBody
+    data: API.WithAuth<Validations.IGetNewValidationBody>
   ): Promise<void> {
     try {
       let sendTo: string;
       let isParent = false;
       if (!data.age) throw HTTPError.create(400, 'No age received');
       if (data.age < 13) {
-        if (data.newEmail === data.user.email) {
+        if (data.newEmail === data.__user.email) {
           throw HTTPError.create(
             400,
             'Underage users must send to parent email'
@@ -177,7 +177,7 @@ export default class AuthService extends BaseService {
       }
       // checks time since last email sent
       const validation = await this.validationModel.getRecentByUserId(
-        data.user.id
+        data.__user.id
       );
       if (!validation) throw HTTPError.create(404, 'No validation found');
       const timeSinceLastRequest = Date.now() - validation.created_at.getTime();
@@ -191,7 +191,7 @@ export default class AuthService extends BaseService {
       await this.sendValidationEmail({
         sendTo,
         isParent,
-        user: data.user,
+        user: data.__user,
       });
     } catch (err) {
       this.logger.error(err);
