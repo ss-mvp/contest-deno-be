@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
+import { create } from 'express-handlebars';
+import ExpressHandlebars from 'express-handlebars/lib/express-handlebars';
+import Handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
-import hbs from 'nodemailer-express-handlebars';
 import SESTransport from 'nodemailer/lib/ses-transport';
 import { env } from '../config';
 
@@ -24,7 +26,6 @@ export async function nodeMailer__loader(
 
   try {
     // Add handlebars to the transporter so that we can use our templates
-    transporter.use('compile', hbs(env.HBS_CONFIG));
 
     // Verify that the transporter was initialized properly
     const success = await transporter.verify();
@@ -41,4 +42,22 @@ export async function nodeMailer__loader(
 
   // Return the mailer for injection
   return transporter;
+}
+
+/**
+ * Reads in our Handlebars configuration from the environment and creates
+ * a configured render engine to be injected into our Container layer.
+ *
+ * @returns a Handlebars render engine to use in our mailers
+ */
+export async function handlebars__loader(): Promise<ExpressHandlebars> {
+  // Configure and create the render engine
+  const hbs = create({
+    // Use our version of Handlerbars to render
+    handlebars: Handlebars,
+    ...env.HBS_CONFIG,
+  });
+
+  // Return engine for injection
+  return hbs;
 }

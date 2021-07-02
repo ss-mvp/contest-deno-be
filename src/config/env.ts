@@ -86,10 +86,7 @@ export default {
     },
     region: process.env['S3_REGION'] || '',
   } as AWS.ConfigurationOptions,
-  SES_CONFIG: {
-    EMAIL: process.env['SES_EMAIL'] || '',
-    NAME: 'Story Squad',
-  },
+  SES_SOURCE: `Story Squad <${process.env['SES_EMAIL'] || ''}>`,
   S3_BUCKET: process.env[envPrefix() + 'S3_BUCKET'] || '',
   JWT: {
     SECRET: process.env['JWT_SECRET'] || 'somefakesecret',
@@ -110,20 +107,16 @@ export default {
 
   // Shouldn't need to set these in env, just being consistent and making it easy if you want to move stuff
   HBS_CONFIG: {
-    viewEngine: {
-      extName: HBS_FILE_EXT,
-      // Will default to a /partials folder inside of your main views/templates folder
-      partialsDir:
-        process.env['HBS_PARTIAL_PATH_DIR'] ||
-        join(HBS_TEMPLATE_DIR, '/partials'),
-      // Will default to a /layouts folder inside of your main views/templates folder
-      layoutsDir:
-        process.env['HBS_LAYOUT_PATH_DIR'] ||
-        join(HBS_TEMPLATE_DIR, '/layouts'),
-      // Defaults to 'main'
-      defaultLayout: process.env['HBS_DEFAULT_LAYOUT'] || 'main',
-    },
+    extname: HBS_FILE_EXT,
+    // Will default to a /partials folder inside of your main views/templates folder
+    partialsDir:
+      process.env['HBS_PARTIAL_PATH_DIR'] ||
+      join(HBS_TEMPLATE_DIR, '/partials'),
+    // Will default to a /layouts folder inside of your main views/templates folder
+    layoutsDir:
+      process.env['HBS_LAYOUT_PATH_DIR'] || join(HBS_TEMPLATE_DIR, '/layouts'),
+    // Defaults to 'main'
+    defaultLayout: process.env['HBS_DEFAULT_LAYOUT'] || 'main',
     viewPath: HBS_TEMPLATE_DIR,
-    extName: HBS_FILE_EXT,
   },
 };

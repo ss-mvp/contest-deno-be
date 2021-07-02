@@ -1,7 +1,7 @@
 import Container from 'typedi';
 import { s3__loader, ses__loader } from './aws';
 import { logger__loader } from './logger';
-import { nodeMailer__loader } from './mail';
+import { handlebars__loader, nodeMailer__loader } from './mail';
 import { dsDB__loader, mainDB__loader } from './postgres';
 
 /**
@@ -29,15 +29,15 @@ export default async function dependencyInjector__loader() {
     const pgDS = await dsDB__loader();
     Container.set('ds', pgDS);
 
+    // Load configured Handlerbars render engine
+    const hbs = await handlebars__loader();
+    Container.set('hbs', hbs);
+
     // Sequentially load mail service tools as nodemailer can wrap an existing SES connection
     const ses = await ses__loader(); // --> SES client returned (and NOT put on Container)
     const nm = await nodeMailer__loader(ses); // <-- SES client passed into nodemailer loader
     Container.set('mail', nm); // We only need access to nodemailer from our app, as it wraps SES
   } catch (err) {
-    /**
-     * If anything goes wrong during server initialization, unless otherwise documented,
-     * the deploy should be considered compromised!
-     */
     console.error(
       'If anything goes wrong during server initialization, unless otherwise documented, \
       the deploy should be considered compromised!',
