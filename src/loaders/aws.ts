@@ -4,6 +4,12 @@ import { env } from '../config';
 // Configure our AWS client with our credentials
 AWS.config.update(env.AWS_CONFIG);
 
+/**
+ * An async loader function that creates an SES client, tests
+ * that it's connected properly, then returns it.
+ *
+ * If `NODE_ENV === 'testing'` then a mocked client will be returned.
+ */
 export async function ses__loader() {
   console.log('Connecting to SES...');
 
@@ -42,6 +48,12 @@ export async function ses__loader() {
   return ses;
 }
 
+/**
+ * An async loader function that creates an S3 client, tests
+ * that it's connected properly, then returns it.
+ *
+ * If `NODE_ENV === 'testing'` then a mocked client will be returned.
+ */
 export async function s3__loader() {
   console.log('Connecting to S3...');
 
