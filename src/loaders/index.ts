@@ -10,7 +10,10 @@ export default async function dependencyAndMiddlewareLoader({
 }) {
   console.log('Running loaders...');
 
+  // Handle the dependancy injection first
   await dependencyInjector__loader();
+
+  // Then we load the server
   expressMiddleware__loader(expressApp);
   errorHandler__routes(expressApp);
 

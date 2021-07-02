@@ -51,8 +51,10 @@ export default class BucketService {
         Bucket: env.S3_BUCKET,
         Key: name,
         IfMatch: etag,
+        ResponseContentType: 'arrayBuffer',
       })
       .promise();
+    console.log('s3res', response);
 
     if (response) {
       this.logger.debug(`Retrieved ${name} from S3 successfully`);

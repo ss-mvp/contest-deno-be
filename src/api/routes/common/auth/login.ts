@@ -1,10 +1,11 @@
 /** URL Scope: /auth */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth, Roles } from '../../../../interfaces';
-import AuthService from '../../../../services/auth/auth';
+import { AuthService } from '../../../../services';
 import { HTTPError } from '../../../../utils';
 
 interface AuthPostLoginBody {
@@ -26,13 +27,15 @@ export default function authRoute__login(route: Router) {
     AuthPostLoginQueryParams // Query parameters
   >(
     '/login',
-    // validate<AuthPostLoginBody>({
-    //   codename: [required, isString],
-    //   password: [required, isString],
-    // }),
+    celebrate({
+      [Segments.BODY]: Joi.object<AuthPostLoginBody>({
+        codename: Joi.string().required(),
+        password: Joi.string().required(),
+      }),
+    }),
     async (req, res) => {
       try {
-        const response = await authServiceInstance.SignIn(
+        const response = await authServiceInstance.signIn(
           req.body.codename,
           req.body.password
         );

@@ -27,7 +27,7 @@ export default function authResetRoute__get(route: Router) {
     // validate<GetResetQueryParams>({ email: [required, isEmail, match(emailRegex)] }, 'query'),
     async (req, res) => {
       try {
-        await authServiceInstance.GetResetEmail(req.query.email);
+        await authServiceInstance.getResetEmail(req.query.email);
 
         res.status(200).json({ message: 'Password reset email sent!' });
       } catch (err) {

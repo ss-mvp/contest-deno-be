@@ -19,7 +19,7 @@ export default function authActivationRoute__put(route: Router) {
     never // Query parameters
   >('/', authHandler(), async (req, res) => {
     try {
-      await authServiceInstance.ResendValidationEmail(req.body.__user);
+      await authServiceInstance.resendValidationEmail(req.body.__user);
       res.status(204).end();
     } catch (err) {
       logger.error(err);

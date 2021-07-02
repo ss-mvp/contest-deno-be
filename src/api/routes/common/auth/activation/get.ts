@@ -1,10 +1,11 @@
 /** URL Scope: /auth */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { env } from '../../../../../config';
-import AuthService from '../../../../../services/auth/auth';
+import { AuthService } from '../../../../../services';
 
 interface GetActivationQueryParams {
   email: string;
@@ -22,13 +23,12 @@ export default function authActivationRoute__get(route: Router) {
     GetActivationQueryParams // Query parameters
   >(
     '/',
-    // validate<GetActivationQueryParams>(
-    //   {
-    //     token: [required, isString],
-    //     email: [required, isEmail, match(emailRegex)],
-    //   },
-    //   'query'
-    // ),
+    celebrate({
+      [Segments.QUERY]: Joi.object<GetActivationQueryParams>({
+        email: Joi.string().required().email(),
+        token: Joi.string().required(),
+      }),
+    }),
     async (req, res) => {
       try {
         const { token } = await authServiceInstance.validate(

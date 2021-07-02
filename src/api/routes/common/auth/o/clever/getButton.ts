@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import CleverService from '../../../../../../services/cleverService';
+import { CleverService } from '../../../../../../services';
 
 interface GetCleverButtonResponse {
   url: string;

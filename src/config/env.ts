@@ -1,16 +1,13 @@
 import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
 import { Algorithm } from 'jsonwebtoken';
+import { join } from 'path';
 import { LoggerOptions } from 'winston';
 import { Clever } from '../interfaces';
 
 export type envTypes = 'development' | 'production' | 'testing' | 'ci';
 const NODE_ENV = (process.env.NODE_ENV as envTypes) || 'development';
-dotenv.config({
-  // Enable debugging in dev and test envs
-  debug: ['development', 'testing'].includes(NODE_ENV),
-  path: '../../.env',
-});
+dotenv.config();
 const PORT = process.env['PORT'] || '8000';
 
 /**
@@ -36,10 +33,14 @@ const REACT_APP_URL = process.env['REACT_APP_URL'] || 'http://localhost:3000';
 const DS_API_URL = process.env['DS_API_URL'] || '';
 const DS_API_TOKEN = process.env['DS_API_TOKEN'] || '';
 
+// HBS Config
+const HBS_TEMPLATE_DIR = process.env['HBS_TEMPLATE_DIR'] || '/templates/email';
+const HBS_FILE_EXT = process.env['HBS_FILE_EXT'] || '.hbs';
+
 export default {
   NODE_ENV,
   REACT_APP_URL,
-  PORT: parseInt(PORT, 10),
+  PORT: +PORT,
   UUID_NAMESPACE: process.env['UUID_NAMESPACE'] || '',
   SERVER_URL: process.env['SERVER_URL'] || 'http://localhost:' + PORT,
   DB_URL: process.env[envPrefix() + 'DB_URL'],
@@ -57,7 +58,7 @@ export default {
   DS_DB_CONFIG: {
     database: process.env[envPrefix() + 'DS_DB_NAME'] || '',
     hostname: process.env[envPrefix() + 'DS_DB_HOST'] || '',
-    port: parseInt(process.env[envPrefix() + 'DS_DB_PORT'] || '0', 10),
+    port: +(process.env[envPrefix() + 'DS_DB_PORT'] || 0),
     username: process.env[envPrefix() + 'DS_DB_USER'] || '',
     password: process.env[envPrefix() + 'DS_DB_PASS'] || '',
   },
@@ -69,12 +70,12 @@ export default {
   },
 
   // Time in days, defaults to 30 if not set in .env
-  AUTH_TOKEN_EXP_TIME: parseInt(process.env['AUTH_TOKEN_EXP_TIME'] || '30', 10),
+  AUTH_TOKEN_EXP_TIME: +(process.env['AUTH_TOKEN_EXP_TIME'] || 30),
 
   DB_CONFIG: {
     database: process.env[envPrefix() + 'DB_NAME'] || '',
     hostname: process.env[envPrefix() + 'DB_HOST'] || '',
-    port: parseInt(process.env[envPrefix() + 'DB_PORT'] || '0', 10),
+    port: +(process.env[envPrefix() + 'DB_PORT'] || 0),
     username: process.env[envPrefix() + 'DB_USER'] || '',
     password: process.env[envPrefix() + 'DB_PASS'] || '',
   },
@@ -85,8 +86,10 @@ export default {
     },
     region: process.env['S3_REGION'] || '',
   } as AWS.ConfigurationOptions,
-  SES_EMAIL: `"Story Squad" <${process.env['SES_EMAIL'] || ''}>`,
-  SES_CONFIG: {},
+  SES_CONFIG: {
+    EMAIL: process.env['SES_EMAIL'] || '',
+    NAME: 'Story Squad',
+  },
   S3_BUCKET: process.env[envPrefix() + 'S3_BUCKET'] || '',
   JWT: {
     SECRET: process.env['JWT_SECRET'] || 'somefakesecret',
@@ -104,4 +107,23 @@ export default {
         ? 'debug'
         : 'info',
   } as LoggerOptions,
+
+  // Shouldn't need to set these in env, just being consistent and making it easy if you want to move stuff
+  HBS_CONFIG: {
+    viewEngine: {
+      extName: HBS_FILE_EXT,
+      // Will default to a /partials folder inside of your main views/templates folder
+      partialsDir:
+        process.env['HBS_PARTIAL_PATH_DIR'] ||
+        join(HBS_TEMPLATE_DIR, '/partials'),
+      // Will default to a /layouts folder inside of your main views/templates folder
+      layoutsDir:
+        process.env['HBS_LAYOUT_PATH_DIR'] ||
+        join(HBS_TEMPLATE_DIR, '/layouts'),
+      // Defaults to 'main'
+      defaultLayout: process.env['HBS_DEFAULT_LAYOUT'] || 'main',
+    },
+    viewPath: HBS_TEMPLATE_DIR,
+    extName: HBS_FILE_EXT,
+  },
 };

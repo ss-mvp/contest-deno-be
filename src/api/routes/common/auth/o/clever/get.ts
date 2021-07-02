@@ -3,8 +3,8 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { Auth } from '../../../../../../interfaces';
-import CleverService from '../../../../../../services/cleverService';
+import { Clever } from '../../../../../../interfaces';
+import { CleverService } from '../../../../../../services';
 
 interface GetCleverQueryParams {
   code: string;
@@ -16,7 +16,7 @@ export default function cleverOAuthRoute__get(route: Router) {
 
   route.get<
     never, // URL parameters
-    Auth.Clever.responses.IResponse, // Response body
+    Clever.auth.IResponse, // Response body
     never, // Request body
     GetCleverQueryParams // Query parameters
   >(

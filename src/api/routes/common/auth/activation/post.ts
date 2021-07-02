@@ -26,7 +26,7 @@ export default function authActivationRoute__post(route: Router) {
     // }),
     async (req, res) => {
       try {
-        await authServiceInstance.SendNewValidationEmail(req.body);
+        await authServiceInstance.newValidationEmail(req.body);
         res.status(204).end();
       } catch (err) {
         logger.error(err);

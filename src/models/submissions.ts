@@ -32,7 +32,7 @@ export default class SubmissionModel extends BaseModel<
         )
         .where('submissions.userId', studentId)
         .andWhere('clever_sections.id', sectionId)
-        .andWhere('submissions.sourceId', Sources.SourceEnum.Rumble)
+        .andWhere('submissions.sourceId', Sources.SubSrcEnum.Rumble)
         .select('submissions.*');
 
       return subs;

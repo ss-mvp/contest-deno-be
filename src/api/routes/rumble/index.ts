@@ -1,4 +1,6 @@
-import { IRouter, Router } from '../../../../deps';
+import { Router } from 'express';
+import Container from 'typedi';
+import { Logger } from 'winston';
 import data from './data';
 import feedback from './feedback';
 import rumbles from './rumbles';
@@ -6,17 +8,22 @@ import sections from './sections';
 import students from './students';
 import teachers from './teachers';
 
-export default (app: IRouter) => {
-  console.log('Loading rumble routers...');
-  const rumbleRouter = Router();
-  app.use('/rumble', rumbleRouter);
+const router = Router();
 
-  teachers(rumbleRouter);
-  students(rumbleRouter);
-  sections(rumbleRouter);
-  rumbles(rumbleRouter);
-  data(rumbleRouter);
-  feedback(rumbleRouter);
+export default (app: Router) => {
+  const logger: Logger = Container.get('logger');
+  logger.debug('Loading rumble routers...');
 
-  console.log('Rumble routers loaded.');
+  // Add the /rumble routes onto the application
+  app.use('/rumble', router);
+
+  // Load the rumble routes at /rumble
+  teachers(router);
+  students(router);
+  sections(router);
+  rumbles(router);
+  data(router);
+  feedback(router);
+
+  logger.debug('Rumble routers loaded.');
 };

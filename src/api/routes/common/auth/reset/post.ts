@@ -1,8 +1,10 @@
 /** URL Scope: /auth */
 
+import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
+import { constraints } from '../../../../../config';
 import { Auth } from '../../../../../interfaces';
 import AuthService from '../../../../../services/auth/auth';
 
@@ -18,14 +20,16 @@ export default function authResetRoute__post(route: Router) {
     never // Query parameters
   >(
     '/',
-    // validate<Auth.resets.IResetPostBody>({
-    //   email: [required, isEmail, match(emailRegex)],
-    //   password: [required, isString, match(passwordRegex)],
-    //   code: [required, isString, match(uuidV5Regex)],
-    // }),
+    celebrate({
+      [Segments.BODY]: Joi.object<Auth.resets.IResetPostBody>({
+        email: Joi.string().required().email(),
+        password: Joi.string().required().regex(constraints.passwordRegex),
+        code: Joi.string().required().regex(constraints.uuidV5Regex),
+      }),
+    }),
     async (req, res) => {
       try {
-        await authServiceInstance.ResetPasswordWithCode(
+        await authServiceInstance.resetPasswordWithCode(
           req.body.email,
           req.body.password,
           req.body.code

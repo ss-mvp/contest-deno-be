@@ -1,6 +1,5 @@
 import { Service } from 'typedi';
-import { DS } from '../../interfaces';
-import { DSTranscriptionSources } from '../../interfaces/DS/db';
+import { API, Clash, DS, Sources, Submissions, Users } from '../../interfaces';
 import {
   DSModel,
   PromptModel,
@@ -9,6 +8,7 @@ import {
   UserModel,
 } from '../../models';
 import { HTTPError } from '../../utils';
+import BaseService from '../baseService';
 import { BucketService } from '../bucket';
 import { DSService } from '../ds';
 
@@ -71,12 +71,11 @@ export default class SubmissionService extends BaseService {
       subs.map((s) => this.retrieveSubItem(s))
     );
 
-    const top3 = ((await this.db
+    const top3 = await this.db
       .table('top3')
       .innerJoin('submissions', 'submissions.id', 'top3.submissionId')
       .where('submissions.promptId', promptId)
-      .select('submissions.*')
-      .execute()) as unknown[]) as ISubmission[];
+      .select('submissions.*');
 
     return { subs: processedSubs, hasVoted: top3.length > 0 };
   }
@@ -96,13 +95,12 @@ export default class SubmissionService extends BaseService {
 
   public async getTop3Subs() {
     // Pull top 3 subs from the table
-    const top3 = ((await this.db
+    const top3 = await this.db
       .table('top3')
       .innerJoin('submissions', 'submissions.id', 'top3.submissionId')
-      .order('top3.created_at', 'DESC')
+      .orderBy('top3.created_at', 'DESC')
       .limit(3)
-      .select('submissions.*')
-      .execute()) as unknown) as ISubmission[];
+      .select('submissions.*');
 
     // Process them and read in image data from S3 and return them
     const subs = await Promise.all(top3.map((t) => this.retrieveSubItem(t)));
@@ -111,7 +109,7 @@ export default class SubmissionService extends BaseService {
 
   public async setTop3(ids: number[]) {
     try {
-      const formattedTop3: INewTop3[] = ids.map((id) => ({
+      const formattedTop3: Clash.top3.INewTop3[] = ids.map((id) => ({
         submissionId: id,
       }));
       const top3 = await this.top3Model.add(formattedTop3);
@@ -124,13 +122,12 @@ export default class SubmissionService extends BaseService {
 
   public async getRecentWinner() {
     // Pull recent winner from the table
-    const [winner] = ((await this.db
+    const [winner] = await this.db
       .table('winners')
       .innerJoin('submissions', 'submissions.id', 'winners.submissionId')
-      .order('winners.created_at', 'DESC')
+      .orderBy('winners.created_at', 'DESC')
       .select('submissions.*')
-      .limit(1)
-      .execute()) as unknown) as ISubmission[];
+      .limit(1);
 
     // Process winner into a sub item and return it
     if (winner) {
@@ -145,17 +142,17 @@ export default class SubmissionService extends BaseService {
     promptId,
     uploadResponse,
     user,
-    sourceId = Sources.FDSC, // Default to FDSC
+    sourceId = Sources.SubSrcEnum.FDSC, // Default to FDSC
     rumbleId,
     transcription,
-    transcriptionSourceId = DS.db.DSTranscriptionSources.DS,
+    transcriptionSourceId = Sources.DsTrscSrcEnum.DS,
   }: {
-    uploadResponse: IDSAPIPageSubmission;
+    uploadResponse: API.middleware.upload.IResponseWithChecksum;
     promptId: number;
-    user: IUser;
-    sourceId: Sources & number;
+    user: Users.IUser;
+    sourceId: Sources.SubSrcEnum & number;
     rumbleId?: number;
-    transcriptionSourceId: DSTranscriptionSources & number;
+    transcriptionSourceId: Sources.DsTrscSrcEnum & number;
     transcription?: string;
   }) {
     try {
@@ -219,12 +216,11 @@ export default class SubmissionService extends BaseService {
 
   public async getFlagsBySubId(submissionId: number) {
     try {
-      const flags = ((await this.db
+      const flags = await this.db
         .table('submission_flags')
         .innerJoin('enum_flags', 'enum_flags.id', 'submission_flags.flagId')
         .select('enum_flags.flag')
-        .where('submission_flags.submissionId', submissionId)
-        .execute()) as unknown) as { flag: string }[];
+        .where('submission_flags.submissionId', submissionId);
 
       const parsedFlags = flags.map((flag) => flag.flag);
       return parsedFlags;
@@ -248,8 +244,7 @@ export default class SubmissionService extends BaseService {
       const flags = await this.db
         .table('submission_flags')
         .insert(flagItems)
-        .returning('*')
-        .execute();
+        .returning('*');
       return flags;
     } catch (err) {
       this.logger.error(err);
@@ -263,8 +258,7 @@ export default class SubmissionService extends BaseService {
         .table('submission_flags')
         .where('submissionId', submissionId)
         .where('flagId', flagId)
-        .delete()
-        .execute();
+        .delete();
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -272,9 +266,9 @@ export default class SubmissionService extends BaseService {
   }
 
   public async retrieveSubItem(
-    sub: ISubmission,
-    user?: IUser
-  ): Promise<ISubItem> {
+    sub: Submissions.ISubmission,
+    user?: Users.IUser
+  ): Promise<Submissions.ISubItem> {
     try {
       // Generate img src tag
       const src = await this.getImgSrc(sub);
@@ -314,22 +308,22 @@ export default class SubmissionService extends BaseService {
   }
 
   private formatNewSub(
-    { etag, s3Label }: IUploadResponse,
+    { ETag, s3Label }: API.middleware.upload.IResponse,
     {
       Confidence: confidence,
       Rotation: rotation,
       SquadScore: score,
-    }: IDSAPITextSubmissionResponse,
+    }: DS.api.IDSAPITextSubmissionResponse,
     promptId: number,
     userId: number,
-    sourceId: Sources & number,
+    sourceId: Sources.SubSrcEnum & number,
     rumbleId?: number
-  ): INewSubmission {
+  ): Submissions.INewSubmission {
     return {
       confidence: Math.round(confidence),
       score: Math.round(score),
       rotation: Math.round(rotation),
-      etag,
+      etag: ETag,
       s3Label,
       userId,
       promptId,
@@ -338,11 +332,15 @@ export default class SubmissionService extends BaseService {
     };
   }
 
-  public async getImgSrc(sub: ISubmission) {
+  public async getImgSrc(sub: Submissions.ISubmission) {
     try {
       const fromS3 = await this.bucketService.get(sub.s3Label, sub.etag);
       const bufferString = btoa(
-        fromS3.body.reduce((data, byte) => data + String.fromCharCode(byte), '')
+        fromS3.Body?.toString() || ''
+        // fromS3.Body?.reduce(
+        //   (data, byte) => data + String.fromCharCode(byte),
+        //   ''
+        // )
       );
       return `data:application/octet-stream;base64,${bufferString}`;
     } catch (err) {
@@ -351,5 +349,3 @@ export default class SubmissionService extends BaseService {
     }
   }
 }
-
-serviceCollection.addTransient(SubmissionService);

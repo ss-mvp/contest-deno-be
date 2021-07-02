@@ -9,7 +9,7 @@ import {
 import { HTTPError } from '../../utils';
 import { AuthService } from '../auth';
 import BaseService from '../baseService';
-import RumbleService from '../rumble';
+import { RumbleService } from '../rumble';
 import CleverClient from './client';
 
 @Service()

@@ -3,12 +3,11 @@ import { env, knexfile } from '../config';
 
 export async function mainDB__loader() {
   console.log('Connecting to DB...');
-
   try {
     const db = knex(knexfile[env.NODE_ENV]);
 
     console.log('Testing DB connection...');
-    await db.from('users').select();
+    await db('users').first();
 
     console.log('DB connected!');
 
@@ -26,7 +25,7 @@ export async function dsDB__loader() {
     const db = knex(knexfile['ds']);
 
     console.log('Testing DS DB connection...');
-    await db.from('submissions').select();
+    await db('submissions').first();
 
     console.log('DS DB connected!');
 

@@ -5,5 +5,6 @@ export { CleverService } from './clever';
 export { ContestService } from './contest';
 export { DSService } from './ds';
 export { FeedbackService } from './feedback';
+export { MailService } from './mail';
 export { RumbleService } from './rumble';
 export { SubmissionService } from './submission';

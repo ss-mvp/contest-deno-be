@@ -4,7 +4,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Auth } from '../../../../../../interfaces';
-import CleverService from '../../../../../../services/cleverService';
+import { CleverService } from '../../../../../../services';
 
 interface PostMergeQueryParams {
   cleverId: string;

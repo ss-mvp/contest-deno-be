@@ -5,7 +5,7 @@ import { Auth, Roles, Users, Validations } from '../../interfaces';
 import { ResetModel, UserModel, ValidationModel } from '../../models';
 import { HTTPError } from '../../utils';
 import BaseService from '../baseService';
-import MailService from '../mailer';
+import { MailService } from '../mail';
 import {
   generateResetCode,
   generateToken,
@@ -195,7 +195,7 @@ export default class AuthService extends BaseService {
       throw err;
     }
   }
-  public async resendValidationEmail(user: Users.ICleanUser): Promise<void> {
+  public async resendValidationEmail(user: Users.IUser): Promise<void> {
     try {
       const validation = await this.validationModel.getRecentByUserId(user.id);
       if (!validation) {

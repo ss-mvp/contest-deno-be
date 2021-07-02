@@ -98,7 +98,7 @@ interface INewDSSubmissionRow {
   rotation?: number;
   moderationFlag?: boolean;
   originSubmissionId?: number;
-  originId?: Sources.SourceEnum & number;
+  originId?: Sources.DsTrscSrcEnum & number;
 }
 enum DSTranscriptionSources {
   'DS' = 1,

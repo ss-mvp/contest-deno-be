@@ -1,20 +1,26 @@
 import AWS from 'aws-sdk';
-import Bluebird from 'bluebird';
 import { env } from '../config';
 
 AWS.config.update(env.AWS_CONFIG);
-AWS.config.setPromisesDependency(Bluebird);
 
 export async function ses__loader() {
-  console.log('Loading mailer...');
+  console.log('Connecting to SES...');
 
   let ses;
   if (env.NODE_ENV === 'testing') {
     ses = new TestSES();
-    console.log('Test mailer loaded!');
+    console.log('Test SES client connected!');
   } else {
-    ses = new AWS.SES(env.SES_CONFIG);
-    console.log('Mailer loaded!');
+    ses = new AWS.SES({});
+    try {
+      const success = await ses
+        .verifyDomainIdentity({ Domain: 'storysquad.app' })
+        .promise();
+      if (success.$response.error) throw success.$response.error;
+    } catch (err) {
+      console.warn('Could not connect to SES');
+      console.warn(err);
+    }
   }
 
   return ses;
@@ -29,7 +35,15 @@ export async function s3__loader() {
     console.log('Test S3 connected!');
   } else {
     s3 = new AWS.S3();
-    console.log('S3 connected!');
+
+    try {
+      const buckets = await s3.listBuckets().promise();
+      if (buckets.$response.error) throw buckets.$response.error;
+      console.log('S3 connected!');
+    } catch (err) {
+      console.warn('Could not connect to S3');
+      console.warn(err);
+    }
   }
   return s3;
 }

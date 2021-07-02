@@ -3,7 +3,6 @@ import { Express, json, urlencoded } from 'express';
 import { DateTime } from 'luxon';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import appRoute__loader from '../api';
 
 export default function expressMiddleware__loader(app: Express) {
   const logger: Logger = Container.get('logger');
@@ -30,5 +29,5 @@ export default function expressMiddleware__loader(app: Express) {
   app.use(urlencoded({ extended: false }));
 
   // App Routes
-  app.use('/api', appRoute__loader());
+  // app.use('/api', appRoute__loader());
 }

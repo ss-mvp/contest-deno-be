@@ -6,8 +6,6 @@ import { Logger } from 'winston';
 import { env } from '../../config';
 import { Users } from '../../interfaces';
 
-const logger: Logger = Container.get('logger');
-
 /**
  * The helpers are functions that were able to be moved off of the class as they
  * do not rely on any of its methods or properties.
@@ -15,6 +13,7 @@ const logger: Logger = Container.get('logger');
 
 /** */
 export function generateToken(user: Omit<Users.IUser, 'password'>) {
+  const logger: Logger = Container.get('logger');
   logger.debug(`Generating JWT for user (ID: ${user.id})`);
   const exp = DateTime.utc().plus({ days: env.AUTH_TOKEN_EXP_TIME });
   logger.debug(`Signing JWT for user (ID: ${user.id})`);
@@ -31,6 +30,7 @@ export function generateToken(user: Omit<Users.IUser, 'password'>) {
 }
 
 export function generateValidationURL(codename: string, email: string) {
+  const logger: Logger = Container.get('logger');
   try {
     logger.debug(
       `Generating email validation token for user (EMAIL: ${email})`
@@ -46,6 +46,7 @@ export function generateValidationURL(codename: string, email: string) {
 }
 
 export function generateResetCode(user: Users.IUser) {
+  const logger: Logger = Container.get('logger');
   try {
     logger.debug(
       `Generating a new password reset code for user (ID: ${user.id})`
