@@ -1,79 +1,68 @@
+import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
+import fileType from 'file-type';
+import fs from 'fs';
+import multiparty, { File } from 'multiparty';
 import Container from 'typedi';
 import { Logger } from 'winston';
+import { API } from '../../interfaces';
 import { BucketService } from '../../services';
+import { HTTPError } from '../../utils';
 
-export default function uploadGenerator(...fileNames: string[]) {
-  return async function uploadMiddleware(
+/**
+ * Adds fields to the request body for the different files uploaded
+ * @param fileNames a list of string keys to search the form data for
+ * @returns Express middleware that handles file uploads to S3
+ */
+export default function fileUploadMiddleware__generator(
+  ...fileNames: string[]
+) {
+  return async function fileUploadMiddleware(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
+    // Get services from our Container layer
     const logger: Logger = Container.get('logger');
+
     try {
-      const bucketServiceInstance = Container.get(BucketService);
-      console.log('upload handler', req.body);
+      // Use our promisified wrapper around the form parser for linting and readability
+      const { fields, files } = await parseForm(req);
 
-      // Loop over each FormData field with file data, one file name at a time
-      // for await (const fname of fileNames) {
-      // Get the list of files to allow optional muiltiple upload
-      // const fileArray = req.body[fname] as File[];
-      //   logger.debug(
-      //     `Attempting to upload ${fileArray.length} files for field: ${fname}`
-      //   );
+      // Add the parsed fields into the body
+      Object.entries(fields).forEach(([key, value]) => {
+        req.body[key] = value;
+      });
 
-      //   // Check to ensure that the body was formatted correctly, if there was multipart file data in the
-      //   // request body, it should have been converted into an array of files. If the field for the file
-      //   // name we're searching for was not set, or if it's set to anything other than an array, there was
-      //   // an issue with upload formatting and we throw an error early
-      //   if (!fileArray || !Array.isArray(fileArray))
-      //     throw HTTPError.create(400, `Could not find files in field ${fname}`);
+      // Get an array of filenames and filter to keep only the ones specified in generator params
+      const fileKeys = Object.keys(files).filter((fname) =>
+        fileNames.includes(fname)
+      );
 
-      //   // Generate a list of fileUpload promises for every file in the given fileArray
-      //   const promiseList = fileArray.map(async (fileData) => {
-      //     const content = await fileData.stream().getReader().read();
-      //     return bucketServiceInstance.upload(
-      //       content.value,
-      //       extension(fileData.contentType)
-      //     );
-      //   });
-      //   // Generate checksums for eac h file in the given fileArray
-      //   const checksumList = fileArray.map(({ content, name }) => ({
-      //     Checksum: generateChecksum(content),
-      //     filekey: name,
-      //   }));
-      //   console.log(
-      //     checksumList.reduce(
-      //       (prev, { Checksum }, i) => `${prev} [${i}] cksm: ${Checksum} :::::`,
-      //       ':::::'
-      //     )
-      //   );
+      // Check each field, and upload however many files were in each input
+      for await (const fname of fileKeys) {
+        // Get the list of files to allow optional muiltiple upload
+        const fileArray = files[fname];
+        logger.debug(
+          `Attempting to upload ${fileArray.length} files for field: ${fname}`
+        );
 
-      //   // Resolve those promises together and replace the form data in the body with the file names
-      //   const resolved = await Promise.all(promiseList);
-      //   console.log(
-      //     resolved.reduce(
-      //       (prev, { s3Label, etag }, i) =>
-      //         `${prev} [${i}] label: ${s3Label}, etag: ${etag} :::::`,
-      //       ':::::'
-      //     )
-      //   );
+        if (!fileArray)
+          throw HTTPError.create(400, `Could not find files in field ${fname}`);
 
-      //   // Overwrite the previous fields in the body
-      //   const newReqBodyEntry = resolved.map<IDSAPIPageSubmission>((r, i) => ({
-      //     // Add the processed request
-      //     ...r,
-      //     // And then add the checksum info for DS
-      //     ...checksumList[i],
-      //   }));
-      //   req.body[fname] = newReqBodyEntry;
-      //   console.log('updated body field', newReqBodyEntry);
+        // Generate and resolve list of fileUpload promises for every file in the given fileArray
+        const promiseList = fileArray.map(uploadFile);
+        const resolved = await Promise.all(promiseList); // These have checksums already!
 
-      //   logger.debug(
-      //     `Successfully uploaded ${fileArray.length} files for field: ${fname}`,
-      //     req.body[fname]
-      //   );
-      // }
+        // Add the upload responses (with checksums) back into the body
+        req.body[fname] = resolved;
+        console.log('updated body field', resolved);
+
+        logger.debug(
+          `Successfully uploaded ${fileArray.length} files for field: ${fname}`,
+          req.body[fname]
+        );
+      }
 
       next();
     } catch (err) {
@@ -81,20 +70,59 @@ export default function uploadGenerator(...fileNames: string[]) {
       throw err;
     }
   };
+}
 
-  // const generateChecksum = (
-  //   file: Uint8Array | string,
-  //   encoding?: {
-  //     input?: 'utf8' | 'hex' | 'base64';
-  //     output?: 'utf8' | 'hex' | 'base64';
-  //   }
-  // ): string => {
-  //   // Default to utf8 input and hex output
-  //   const hash = sha512(
-  //     file,
-  //     encoding?.input ?? 'utf8',
-  //     encoding?.output ?? 'hex'
-  //   ).toString();
-  //   return hash;
-  // };
+function generateChecksum(
+  file: Uint8Array | string,
+  algorithm = 'sha512',
+  encoding: crypto.BinaryToTextEncoding = 'hex'
+): string {
+  // Default to utf8 input and hex output
+  const hash = crypto.createHash(algorithm).update(file).digest(encoding);
+  return hash;
+}
+
+/**
+ * Promisify the form parser for better code readability
+ */
+async function parseForm(req: Parameters<multiparty.Form['parse']>[0]) {
+  // Create a new promise to wrap the callback
+  const [fields, files] = await new Promise<
+    [Record<string, string[]>, Record<string, File[]>]
+  >((resolve, reject) => {
+    // Initialize a new form object
+    const form = new multiparty.Form();
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        const logger: Logger = Container.get('logger');
+        logger.error('Error parsing form', err);
+        reject(err);
+      } else {
+        resolve([fields, files]);
+      }
+    });
+  });
+  return { fields, files };
+}
+
+async function uploadFile(
+  file: File
+): Promise<API.middleware.upload.IResponseWithChecksum> {
+  const bucketServiceInstance = Container.get(BucketService);
+  const buffer = fs.readFileSync(file.path);
+  const ext = await fileType.fromBuffer(buffer);
+  const checksum = generateChecksum(buffer);
+  const res = await bucketServiceInstance.upload(buffer, ext?.ext);
+
+  if (!res.s3Label) console.log('no s3 label for', res.Key, { etag: res.ETag });
+
+  return {
+    Bucket: res.Bucket,
+    Checksum: checksum,
+    ETag: res.ETag,
+    Key: res.Key,
+    Location: res.Location,
+    filekey: res.Key,
+    s3Label: res.s3Label || res.Key,
+  };
 }
