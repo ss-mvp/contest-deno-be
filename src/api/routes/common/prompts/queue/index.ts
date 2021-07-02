@@ -1,3 +1,5 @@
+/** URL Scope: /prompts */
+
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
