@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import { env } from '../config';
 
-// Configure our AWS client with our credentials
+// Globally configure our AWS client with our credentials
 AWS.config.update(env.AWS_CONFIG);
 
 /**
@@ -10,7 +10,7 @@ AWS.config.update(env.AWS_CONFIG);
  *
  * If `NODE_ENV === 'testing'` then a mocked client will be returned.
  */
-export async function ses__loader() {
+export async function ses__loader(): Promise<AWS.SES> {
   console.log('Connecting to SES...');
 
   // Initialize a variable to store our client for return
@@ -18,7 +18,8 @@ export async function ses__loader() {
 
   // If we're running tests, use a mock SES class
   if (env.NODE_ENV === 'testing') {
-    ses = new TestSES();
+    // Cast the mocked client as a proper S3 client
+    ses = new TestSES() as AWS.SES;
     console.log('Test SES client connected!');
   } else {
     // Otherwise, let's create a standard SES client
@@ -54,7 +55,7 @@ export async function ses__loader() {
  *
  * If `NODE_ENV === 'testing'` then a mocked client will be returned.
  */
-export async function s3__loader() {
+export async function s3__loader(): Promise<AWS.S3> {
   console.log('Connecting to S3...');
 
   // Initialize a variable to store our client for return
@@ -62,7 +63,7 @@ export async function s3__loader() {
 
   // If we're running tests, use a mock S3 class
   if (env.NODE_ENV === 'testing') {
-    s3 = new TestS3();
+    s3 = new TestS3() as AWS.S3;
     console.log('Test S3 connected!');
   } else {
     // Otherwise, let's create a standard S3 connection
