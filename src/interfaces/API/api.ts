@@ -1,6 +1,7 @@
-import { Users } from '..';
+import { IUser } from '../users';
+import { upload } from './middleware';
 
-export type WithPaging<
+export type GetParams<
   OtherQueryParams = { __never: never },
   DataType = { id: number }
 > = OtherQueryParams & {
@@ -9,6 +10,7 @@ export type WithPaging<
   orderBy?: keyof DataType;
   order?: 'asc' | 'desc' | 'ASC' | 'DESC';
   first?: true | 'true';
+  ids?: string;
 };
 
 /**
@@ -18,9 +20,12 @@ export type WithPaging<
  * We're adding the never property as a fallback to fix linting
  */
 export type WithAuth<T = { __never: never }> = T & {
-  __user: Users.IUser;
+  __user: IUser;
 };
 
 export type WithId<T = { __never: never }> = T & {
   id: number;
 };
+
+export type WithUpload<FileNames extends string, T = { __never: never }> = T &
+  Record<FileNames, upload.IResponseWithChecksum[]>;

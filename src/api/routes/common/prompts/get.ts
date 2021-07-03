@@ -15,7 +15,7 @@ export default function promptRoute__get(route: Router) {
     never, // URL parameters
     Prompts.IPrompt | Prompts.IPrompt[], // Response body
     never, // Request body
-    API.WithPaging // Query parameters
+    API.GetParams // Query parameters
   >(
     '/',
     authHandler({ roles: [Roles.RoleEnum.teacher, Roles.RoleEnum.admin] }),

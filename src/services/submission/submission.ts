@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { API, Clash, DS, Sources, Submissions, Users } from '../../interfaces';
+import { API, DS, Flags, Sources, Submissions, Users } from '../../interfaces';
 import {
   DSModel,
   PromptModel,
@@ -7,6 +7,7 @@ import {
   Top3Model,
   UserModel,
 } from '../../models';
+import { IGetQuery } from '../../models/baseModel';
 import { HTTPError } from '../../utils';
 import BaseService from '../baseService';
 import { BucketService } from '../bucket';
@@ -24,118 +25,6 @@ export default class SubmissionService extends BaseService {
     private dsModel: DSModel
   ) {
     super();
-  }
-
-  public async getUserSubs(
-    userId: number,
-    config: { limit: number; offset: number }
-  ) {
-    const subs = await this.submissionModel.get(
-      { userId },
-      {
-        limit: config.limit,
-        offset: config.offset,
-        orderBy: 'created_at',
-        order: 'DESC',
-      }
-    );
-
-    // Pull codename for use in the retrieve subs, this reduces queries to db
-    const user = await this.userModel.get({ id: userId }, { first: true });
-
-    if (!user) throw HTTPError.create(404, 'User not found');
-
-    // Query the S3 bucket/database for submission info
-    const subItems = await Promise.all(
-      subs.map((s) => this.retrieveSubItem(s, user))
-    );
-
-    return subItems;
-  }
-
-  public async getTopTen() {
-    const { id: promptId } = await this.promptModel.get(
-      { active: true },
-      { first: true }
-    );
-
-    const subs = await this.submissionModel.get(
-      { promptId },
-      {
-        limit: 10,
-        orderBy: 'score',
-        order: 'DESC',
-      }
-    );
-    const processedSubs = await Promise.all(
-      subs.map((s) => this.retrieveSubItem(s))
-    );
-
-    const top3 = await this.db
-      .table('top3')
-      .innerJoin('submissions', 'submissions.id', 'top3.submissionId')
-      .where('submissions.promptId', promptId)
-      .select('submissions.*');
-
-    return { subs: processedSubs, hasVoted: top3.length > 0 };
-  }
-
-  public async getById(id: number) {
-    try {
-      const sub = await this.submissionModel.get({ id }, { first: true });
-      if (!sub) throw HTTPError.create(404, 'Submission not found');
-
-      const subItem = await this.retrieveSubItem(sub);
-      return subItem;
-    } catch (err) {
-      this.logger.error(err);
-      throw err;
-    }
-  }
-
-  public async getTop3Subs() {
-    // Pull top 3 subs from the table
-    const top3 = await this.db
-      .table('top3')
-      .innerJoin('submissions', 'submissions.id', 'top3.submissionId')
-      .orderBy('top3.created_at', 'DESC')
-      .limit(3)
-      .select('submissions.*');
-
-    // Process them and read in image data from S3 and return them
-    const subs = await Promise.all(top3.map((t) => this.retrieveSubItem(t)));
-    return subs;
-  }
-
-  public async setTop3(ids: number[]) {
-    try {
-      const formattedTop3: Clash.top3.INewTop3[] = ids.map((id) => ({
-        submissionId: id,
-      }));
-      const top3 = await this.top3Model.add(formattedTop3);
-      return top3;
-    } catch (err) {
-      this.logger.error(err);
-      throw err;
-    }
-  }
-
-  public async getRecentWinner() {
-    // Pull recent winner from the table
-    const [winner] = await this.db
-      .table('winners')
-      .innerJoin('submissions', 'submissions.id', 'winners.submissionId')
-      .orderBy('winners.created_at', 'DESC')
-      .select('submissions.*')
-      .limit(1);
-
-    // Process winner into a sub item and return it
-    if (winner) {
-      const sub = await this.retrieveSubItem(winner);
-      return sub;
-    } else {
-      return undefined;
-    }
   }
 
   public async processSubmission({
@@ -214,37 +103,77 @@ export default class SubmissionService extends BaseService {
     }
   }
 
-  public async getFlagsBySubId(submissionId: number) {
-    try {
-      const flags = await this.db
-        .table('submission_flags')
-        .innerJoin('enum_flags', 'enum_flags.id', 'submission_flags.flagId')
-        .select('enum_flags.flag')
-        .where('submission_flags.submissionId', submissionId);
+  /**
+   * Gets a list of a user's recent submissions.
+   *
+   * @param userId the id of the user to pull submissions for
+   * @param paging a configuration to help paginate your responses
+   * @returns a list of submission items
+   */
+  public async getUserSubs(
+    userId: number,
+    paging: { limit?: number; offset?: number }
+  ) {
+    // Get the submissions for the user
+    const subs = await this.submissionModel.getRecentForUser(userId, paging);
 
-      const parsedFlags = flags.map((flag) => flag.flag);
-      return parsedFlags;
+    // Pull codename for use in the retrieve subs, this reduces queries to db
+    const user = await this.userModel.get({ id: userId }, { first: true });
+    if (!user) throw HTTPError.create(404, 'User not found');
+
+    // Query the S3 bucket/database for submission info
+    const subItems = await Promise.all(
+      subs.map((s) => this.retrieveSubItem(s, user))
+    );
+
+    return subItems;
+  }
+
+  public async getById(id: number) {
+    try {
+      const sub = await this.submissionModel.get({ id }, { first: true });
+      if (!sub) throw HTTPError.create(404, 'Submission not found');
+
+      const subItem = await this.retrieveSubItem(sub);
+      return subItem;
     } catch (err) {
       this.logger.error(err);
       throw err;
     }
   }
 
-  public async flagSubmission(
-    submissionId: number,
-    flagIds: number[],
-    creatorId?: number
+  /**
+   * Runs the get query on the submission model and parses the results
+   * into submission items to return to the frontend
+   */
+  public async get<T extends boolean = boolean>(
+    getOptions?: IGetQuery<T, keyof Submissions.ISubmission>
   ) {
     try {
-      const flagItems = flagIds.map((flagId) => ({
-        flagId,
-        submissionId: submissionId,
-        creatorId,
-      }));
-      const flags = await this.db
-        .table('submission_flags')
-        .insert(flagItems)
-        .returning('*');
+      const subs = await this.submissionModel.get(undefined, getOptions);
+
+      const processedSubs: Submissions.ISubItem[] = [];
+
+      if (Array.isArray(subs)) {
+        const subItems = await Promise.all(
+          subs.map((sub) => this.retrieveSubItem(sub))
+        );
+        processedSubs.push(...subItems);
+      } else {
+        const subItem = await this.retrieveSubItem(subs);
+        processedSubs.push(subItem);
+      }
+
+      return processedSubs;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  public async getFlagsBySubId(submissionId: number) {
+    try {
+      const flags = await this.submissionModel.getFlagsBySubId(submissionId);
       return flags;
     } catch (err) {
       this.logger.error(err);
@@ -252,13 +181,27 @@ export default class SubmissionService extends BaseService {
     }
   }
 
-  public async removeFlag(submissionId: number, flagId: number) {
+  public async flagSubmission({
+    flagIds,
+    submissionId,
+    creatorId,
+  }: {
+    submissionId: number;
+    flagIds: number[];
+    creatorId?: number;
+  }) {
     try {
-      await this.db
-        .table('submission_flags')
-        .where('submissionId', submissionId)
-        .where('flagId', flagId)
-        .delete();
+      /** parse our array of ids into proper flag objects*/
+      const newFlags = flagIds.map<Flags.INewSubFlagXref>((flagId) => ({
+        flagId,
+        submissionId,
+        creatorId,
+      }));
+      // Add the objects to the table
+      const flagItems = await this.submissionModel.addFlags(newFlags);
+      // Add the flag names to the array of xrefs
+      const flags = flagItems.map(this.addFlagName);
+      return flags;
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -332,11 +275,17 @@ export default class SubmissionService extends BaseService {
     };
   }
 
+  private addFlagName(flag: Flags.ISubFlagXref): Flags.IFlagItem {
+    return Object.assign(flag, { flag: Flags.FlagEnum[flag.flagId] });
+  }
+
   public async getImgSrc(sub: Submissions.ISubmission) {
     try {
+      // TODO figure this stuff out
       const fromS3 = await this.bucketService.get(sub.s3Label, sub.etag);
       const bufferString = btoa(
         fromS3.Body?.toString() || ''
+        // ! what even is this I need to fix it
         // fromS3.Body?.reduce(
         //   (data, byte) => data + String.fromCharCode(byte),
         //   ''

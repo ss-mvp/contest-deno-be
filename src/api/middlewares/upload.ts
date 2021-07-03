@@ -14,12 +14,15 @@ import { HTTPError } from '../../utils';
  * @param fileNames a list of string keys to search the form data for
  * @returns Express middleware that handles file uploads to S3
  */
-export default function fileUploadMiddleware__generator(
-  ...fileNames: string[]
-) {
-  return async function fileUploadMiddleware(
-    req: Request,
-    res: Response,
+export default function fileUploadMiddleware__generator<
+  Param = Record<string, unknown>,
+  Res = Record<string, unknown>,
+  Req = Record<string, unknown>,
+  Query = Record<string, unknown>
+>(...fileNames: string[]) {
+  return async function authHandlerMiddleware(
+    req: Request<Param, Res, Req, Query>,
+    res: Response<Res>,
     next: NextFunction
   ) {
     // Get services from our Container layer
@@ -30,9 +33,7 @@ export default function fileUploadMiddleware__generator(
       const { fields, files } = await parseForm(req);
 
       // Add the parsed fields into the body
-      Object.entries(fields).forEach(([key, value]) => {
-        req.body[key] = value;
-      });
+      req.body = Object.assign(req.body, fields);
 
       // Get an array of filenames and filter to keep only the ones specified in generator params
       const fileKeys = Object.keys(files).filter((fname) =>
@@ -55,12 +56,12 @@ export default function fileUploadMiddleware__generator(
         const resolved = await Promise.all(promiseList); // These have checksums already!
 
         // Add the upload responses (with checksums) back into the body
-        req.body[fname] = resolved;
+        req.body = Object.assign(req.body, { [fname]: resolved });
         console.log('updated body field', resolved);
 
         logger.debug(
           `Successfully uploaded ${fileArray.length} files for field: ${fname}`,
-          req.body[fname]
+          resolved
         );
       }
 

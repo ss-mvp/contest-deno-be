@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Clash } from '../interfaces';
+import { Clash, Submissions } from '../interfaces';
 import BaseModel from './baseModel';
 
 @Service()
@@ -9,5 +9,14 @@ export default class Top3Model extends BaseModel<
 > {
   constructor() {
     super('top3');
+  }
+
+  public async getSubs(): Promise<Submissions.ISubmission[]> {
+    const top3Subs = await this.db('top3')
+      .innerJoin('submissions', 'submissions.id', 'top3.submissionId')
+      .orderBy('top3.created_at', 'DESC')
+      .limit(3)
+      .select('submissions.*');
+    return top3Subs;
   }
 }

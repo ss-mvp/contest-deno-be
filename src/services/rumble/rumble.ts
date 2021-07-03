@@ -80,7 +80,6 @@ export default class RumbleService extends BaseService {
       if (!rumble) return undefined;
 
       const processedRumble = await this.rumbleModel.getRumbleInfo(rumble);
-      console.log({ processedRumble });
 
       this.logger.debug('Got rumble with id', rumbleId);
       return processedRumble;
@@ -124,7 +123,7 @@ export default class RumbleService extends BaseService {
         throw HTTPError.create(401, 'Invalid user type!');
       }
 
-      await this.getActiveRumblesForSections(
+      await this.addActiveRumblesToSections(
         sections as Sections.ISectionWithRumbles[]
       );
 
@@ -135,7 +134,7 @@ export default class RumbleService extends BaseService {
     }
   }
 
-  public async getActiveRumblesForSections(
+  public async addActiveRumblesToSections(
     sections: Sections.ISectionWithRumbles[]
   ) {
     try {
@@ -166,21 +165,16 @@ export default class RumbleService extends BaseService {
         sectionId
       );
 
-      const students = studentData.map<Clever.students.IStudentWithSubmissions>(
-        (user) => {
-          // Add an empty submissions object to every student
-          return { ...user, submissions: [] };
-        }
-      );
+      const students: Clever.students.IStudentWithSubmissions[] = [];
 
-      for await (const student of students) {
+      for await (const student of studentData) {
         // Now we can get the ACTUAL array of submissions
-        const subs = await this.getSubsByStudentAndSection(
+        const submissions = await this.getSubsByStudentAndSection(
           student.id,
           sectionId
         );
-        // And point our student's submissions property at it
-        student.submissions = subs;
+        // And push the student into the response array with their submissions
+        students.push(Object.assign(student, { submissions }));
       }
 
       return students;
@@ -211,10 +205,10 @@ export default class RumbleService extends BaseService {
       this.logger.debug(
         `Attempting to process submission data for student with id ${studentId}`
       );
-      const subPromises = basicSubs.map((s) =>
-        this.subService.retrieveSubItem(s, user)
+      // Get full sub item for all of the student's subs
+      const subItems = Promise.all(
+        basicSubs.map((s) => this.subService.retrieveSubItem(s, user)) // They're all for the same student, so we can pass in user!
       );
-      const subItems = Promise.all(subPromises);
 
       return subItems;
     } catch (err) {
