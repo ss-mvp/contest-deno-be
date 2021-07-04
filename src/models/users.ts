@@ -9,13 +9,15 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
   }
 
   public async getUserByValidationEmail(
-    resetEmail: string
-  ): Promise<Users.IValidationByUser> {
-    this.logger.debug(`Retrieving user account from reset email ${resetEmail}`);
+    validationEmail: string
+  ): Promise<Users.IValidationByUser | undefined> {
+    this.logger.debug(
+      `Retrieving user account from validation email ${validationEmail}`
+    );
 
     const user = await this.db('users')
       .innerJoin('validations', 'users.id', 'validations.userId')
-      .where('validations.email', resetEmail)
+      .where('validations.email', validationEmail)
       .orderBy('validations.id', 'DESC')
       .select(
         'validations.email as validationEmail',
@@ -26,7 +28,6 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
       )
       .first();
 
-    this.logger.debug('User retrieved');
     return user;
   }
 

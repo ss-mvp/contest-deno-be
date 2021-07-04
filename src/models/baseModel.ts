@@ -28,15 +28,17 @@ export default class BaseModel<
   public async add(body: NewItem | NewItem[]): Promise<FullItem[]>;
   public async add<B extends boolean>(
     body: NewItem | NewItem[],
-    first?: B
+    opts?: { first?: B } & ICustomKnexInstance
   ): Promise<B extends true ? FullItem : FullItem[]>;
   public async add(
     body: NewItem | NewItem[],
-    first?: boolean
+    opts?: { first?: boolean } & ICustomKnexInstance
   ): Promise<FullItem | FullItem[]> {
     this.logger.debug(`Attempting to add field to table ${this.tableName}`);
+    const db = opts?.knex || this.db;
+    const first = opts?.first ?? false;
 
-    const response = await this.db(this.tableName).insert(body).returning('*');
+    const response = await db(this.tableName).insert(body).returning('*');
 
     this.logger.debug(`Successfully added row to table ${this.tableName}`);
     return first ? response[0] : response;
@@ -63,8 +65,9 @@ export default class BaseModel<
     config?: IGetQuery
   ): Promise<FullItem | FullItem[]> {
     this.logger.debug(`Attempting to retrieve rows from ${this.tableName}`);
+    const db = config?.knex || this.db;
 
-    const response = await this.db(this.tableName)
+    const response = await db(this.tableName)
       .select('*')
       .modify((QB) => {
         if (filter) QB.where(filter);
@@ -106,11 +109,12 @@ export default class BaseModel<
 
   public async update(
     id: number,
-    changes?: Partial<FullItem>
+    { knex, ...changes }: Partial<FullItem> & ICustomKnexInstance
   ): Promise<FullItem> {
     this.logger.debug(`Attempting to retrieve one row from ${this.tableName}`);
+    const db = knex || this.db;
 
-    const [response] = await this.db(this.tableName)
+    const [response] = await db(this.tableName)
       .where({ id })
       .update(changes, '*');
 
@@ -118,10 +122,14 @@ export default class BaseModel<
     return response;
   }
 
-  public async delete(id: number): Promise<void> {
+  public async delete(
+    id: number,
+    options?: ICustomKnexInstance
+  ): Promise<void> {
     this.logger.debug(`Attempting to delete row ${id} from ${this.tableName}`);
+    const db = options?.knex || this.db;
 
-    await this.db(this.tableName).where({ id }).del();
+    await db(this.tableName).where({ id }).del();
 
     this.logger.debug(`Successfully deleted row ${id} from ${this.tableName}`);
   }
@@ -131,11 +139,15 @@ export interface IGetQuery<
   IsFirst = boolean,
   DataProperties = string,
   IdType = number
-> {
+> extends ICustomKnexInstance {
   first?: IsFirst;
   limit?: number;
   offset?: number;
   orderBy?: DataProperties;
   order?: 'asc' | 'desc' | 'ASC' | 'DESC';
   ids?: IdType[];
+}
+
+export interface ICustomKnexInstance {
+  knex?: Knex;
 }

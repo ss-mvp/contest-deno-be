@@ -34,7 +34,9 @@ const DS_API_URL = process.env['DS_API_URL'] || '';
 const DS_API_TOKEN = process.env['DS_API_TOKEN'] || '';
 
 // HBS Config
-const HBS_TEMPLATE_DIR = process.env['HBS_TEMPLATE_DIR'] || '/templates/email';
+const HBS_TEMPLATE_DIR = join(
+  process.env['HBS_TEMPLATE_DIR'] || '.\\templates\\email'
+);
 const HBS_FILE_EXT = process.env['HBS_FILE_EXT'] || '.hbs';
 
 export default {

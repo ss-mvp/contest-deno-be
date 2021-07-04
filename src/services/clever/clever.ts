@@ -121,7 +121,7 @@ export default class CleverService extends BaseService {
             isValidated: true,
             roleId,
           },
-          true
+          { first: true }
         );
         await this.ssoModel.add({
           accessToken: cleverId,

@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import Knex from 'knex';
 import { DateTime } from 'luxon';
 import { Service } from 'typedi';
 import { API, Auth, Roles, Users, Validations } from '../../interfaces';
@@ -67,7 +68,7 @@ export default class AuthService extends BaseService {
           roleId: Roles.RoleEnum['user'],
         });
         // send validation email
-        this.sendValidationEmail({
+        await this.sendValidationEmail({
           sendTo,
           isParent,
           user,
@@ -181,18 +182,24 @@ export default class AuthService extends BaseService {
         data.__user.id
       );
       if (!validation) throw HTTPError.create(404, 'No validation found');
-      const timeSinceLastRequest = Date.now() - validation.created_at.getTime();
-      if (timeSinceLastRequest < 600000) {
-        throw HTTPError.create(429, 'Cannot send another email so soon');
-      } else {
-        // Able to generate another code, so delete the old one
-        await this.resetModel.update(validation.id, { completed: true });
-      }
-      // send validation email
-      await this.sendValidationEmail({
-        sendTo,
-        isParent,
-        user: data.__user,
+      await this.db.transaction(async (trx) => {
+        const timeSinceLastRequest =
+          Date.now() - validation.created_at.getTime();
+        if (timeSinceLastRequest < 600000) {
+          throw HTTPError.create(429, 'Cannot send another email so soon');
+        } else {
+          // Able to generate another code, so delete the old one
+          await this.resetModel.update(validation.id, {
+            completed: true,
+            knex: trx,
+          });
+        }
+        // send validation email
+        await this.sendValidationEmail({
+          sendTo,
+          isParent,
+          user: data.__user,
+        });
       });
     } catch (err) {
       this.logger.error(err);
@@ -280,20 +287,24 @@ export default class AuthService extends BaseService {
     sendTo: string;
     isParent: boolean;
     user: Users.ICleanUser | Users.IUser;
+    knex?: Knex;
   }) {
     // Generate Validation for user
     const { url, code } = generateValidationURL(
       args.user.codename,
       args.sendTo
     );
-    await this.validationModel.add({
-      code,
-      userId: args.user.id,
-      email: args.sendTo,
-      validatorId: args.isParent
-        ? Validations.ValidatorEnum.parent
-        : Validations.ValidatorEnum.user,
-    });
+    await this.validationModel.add(
+      {
+        code,
+        userId: args.user.id,
+        email: args.sendTo,
+        validatorId: args.isParent
+          ? Validations.ValidatorEnum.parent
+          : Validations.ValidatorEnum.user,
+      },
+      { knex: args.knex }
+    );
     if (!args.isParent) {
       await this.mailer.sendValidationEmail(args.sendTo, url);
     } else {

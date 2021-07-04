@@ -64,7 +64,9 @@ export default class SubmissionService extends BaseService {
       this.logger.debug('formatted sub successfully:', newSub);
 
       this.logger.debug('adding new sub', newSub);
-      const submission = await this.submissionModel.add(newSub, true);
+      const submission = await this.submissionModel.add(newSub, {
+        first: true,
+      });
       if (!submission) throw HTTPError.create(409, 'Could not add to database');
       this.logger.debug('new submission created', submission);
 
