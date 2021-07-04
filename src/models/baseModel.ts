@@ -26,6 +26,10 @@ export default class BaseModel<
 
   // Overloading function call for better linting and usability :)
   public async add(body: NewItem | NewItem[]): Promise<FullItem[]>;
+  public async add<B extends undefined>(
+    body: NewItem | NewItem[],
+    opts?: { first?: B } & ICustomKnexInstance
+  ): Promise<FullItem[]>;
   public async add<B extends boolean>(
     body: NewItem | NewItem[],
     opts?: { first?: B } & ICustomKnexInstance
