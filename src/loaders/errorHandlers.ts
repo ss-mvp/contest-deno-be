@@ -15,49 +15,76 @@ export default function errorHandler__routes(app: Express) {
   });
 
   // Handle errors from the Celebrate validation middleware
-  app.use(
-    (err: CelebrateError, req: Request, res: Response, next: NextFunction) => {
-      // If it's not a celebrate error, pass it to the next middleware
-      if (!isCelebrateError(err)) return next(err);
-      console.log('error handled');
+  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    // If it's not a celebrate error, pass it to the next middleware
+    if (!isCelebrateError(err)) return next(err);
 
-      // Otherwise, handle the celebrate error here
-      const response = {
-        message: 'Invalid request data',
-        errors: {} as Record<string, string[]>,
-      };
-      err.details.forEach((error, name) => {
-        if (!response.errors[name]) response.errors[name] = [];
-        if (!response.errors[name].includes(error.message)) {
-          response.errors[name].push(error.message);
-        }
-        err.details.forEach((det) => {
-          if (!response.errors[name].includes(det.message)) {
-            response.errors[name].push(det.message);
-          }
-          det.details.forEach((inDet) => {
-            if (!response.errors[name].includes(inDet.message)) {
-              response.errors[name].push(inDet.message);
-            }
-          });
-        });
-      });
-
-      res.status(400).json(response);
+    // Otherwise, handle the celebrate error here
+    const response = {
+      message: 'Invalid request data',
+      errors: {} as Record<string, Record<'errors' | 'fields', string[]>>,
+    };
+    function isJoiErr(e: unknown): e is CelebrateError {
+      return !!(e as { isJoi: boolean }).isJoi || isCelebrateError(e);
     }
-  );
+    function parseError(error: Error, name: string) {
+      if (!isJoiErr(error)) return;
+      if (!response.errors[name])
+        response.errors[name] = { errors: [], fields: [] };
+      error.details.forEach((detail) => {
+        if (!response.errors[name].errors.includes(detail.message)) {
+          response.errors[name].errors.push(detail.message);
+        }
+        /** A function to help with the bad typings from Joi/Celebrate */
+        function hasLabel(det: unknown): det is { context: { label: string } } {
+          const detAs = det as { context: { label: string } };
+          return detAs.context && typeof detAs.context.label === 'string';
+        }
+        if (
+          hasLabel(detail) &&
+          !response.errors[name].fields.includes(detail.context.label)
+        ) {
+          response.errors[name].fields.push(detail.context.label);
+        }
+      });
+    }
+    err.details.forEach(parseError);
+
+    res.status(400).json(response);
+  });
 
   // Parsing DB Errors/Catching Unhandled Errors
   app.use(
     (err: IHTTPError, req: Request, res: Response, next: NextFunction) => {
+      function getErrorField(dbError: string) {
+        const DB_ERR_REGEX = /[\\"]+.+[a-zA-Z]+_(.*?)_[a-zA-Z]+["\\]+/gm;
+        return DB_ERR_REGEX.exec(dbError)?.[1];
+      }
       logger.debug(`${err.status} ${err.message}`);
       // Test for various error cases that we're manually catching at the end here
       if (err.message.includes('violates unique constraint')) {
-        return next(HTTPError.create(409, 'Could not create duplicate'));
+        const error = err.message.split(' - ')[1];
+        return next(
+          HTTPError.create(409, {
+            message: 'Could not create duplicate',
+            error,
+            field: getErrorField(error),
+          })
+        );
       } else if (err.message.includes('violates foreign key constraint')) {
-        return next(HTTPError.create(409, 'Invalid foreign key'));
+        return next(
+          HTTPError.create(409, {
+            message: 'Invalid foreign key',
+            error: err.message,
+          })
+        );
       } else if (err.message.includes('invalid input syntax')) {
-        return next(HTTPError.create(400, 'Invalid data provided'));
+        return next(
+          HTTPError.create(400, {
+            message: 'Invalid data provided',
+            error: err.message,
+          })
+        );
       } else if (!err.status || err.status === 500) {
         logger.warn(`${err.message} - NEEDS CUSTOM ERROR HANDLING`);
       }
@@ -71,8 +98,9 @@ export default function errorHandler__routes(app: Express) {
     (err: IHTTPError, req: Request, res: Response, next: NextFunction) => {
       const status = err.status || 500;
       const message = err.message || 'Something went wrong.';
-      logger.debug(`[ERR${status}] - { error: '${message}' }`);
-      res.status(status).json({ message });
+      const response = err.response || { message };
+      logger.debug(`[${status}]`, response);
+      res.status(status).json(response);
     }
   );
 }

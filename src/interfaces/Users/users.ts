@@ -55,7 +55,7 @@ export const UserSchema = (() => {
       codename: Joi.string()[maybeRequired]().regex(constraints.codenameRegex),
       password: Joi.string()[maybeRequired]().regex(constraints.passwordRegex),
       roleId: Joi.number()
-        [maybeRequired]()
+        .optional()
         // Don't let users sign up as an admin from this endpoint
         .disallow(Roles.RoleEnum.admin)
         // If unset, default to signup as a standard user for compatibility

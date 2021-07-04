@@ -31,7 +31,7 @@ export default function authRoute__login(route: Router) {
       [Segments.BODY]: Joi.object<AuthPostLoginBody>({
         codename: Joi.string().required(),
         password: Joi.string().required(),
-      }),
+      }).options({ abortEarly: false }),
     }),
     async (req, res, next) => {
       try {
