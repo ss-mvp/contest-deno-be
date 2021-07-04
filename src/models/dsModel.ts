@@ -1,8 +1,9 @@
 import Knex from 'knex';
-import { Inject } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import { API, DS, Sources, Submissions, Users } from '../interfaces';
 
+@Service()
 export default class DSModel {
   constructor(
     @Inject('logger') private logger: Logger,
