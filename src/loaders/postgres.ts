@@ -1,4 +1,5 @@
 import { default as Knex, default as knex } from 'knex';
+import { types } from 'pg';
 import { env, knexfile } from '../config';
 
 /**
@@ -11,6 +12,10 @@ export async function mainDB__loader() {
 
   // Initialize our DS database connection
   const db = knex(knexfile[env.NODE_ENV]);
+
+  // This prevents the starts_at Date type column to be returned as
+  // a string 'yyyy-mm-dd' as it is stored, instead of as a Date
+  types.setTypeParser(types.TypeId.DATE, (val) => val);
 
   try {
     console.log('Testing DB connection...');
@@ -28,7 +33,7 @@ export async function mainDB__loader() {
      */
     console.log('Error connecting to Main DB');
     console.log(env.DB_CONFIG);
-    console.log(err.message, err);
+    console.log(err);
   }
 
   // Return the client for injection
@@ -62,7 +67,7 @@ export async function dsDB__loader(): Promise<Knex> {
      */
     console.log('Error connecting to DS DB');
     console.log(env.DS_DB_CONFIG);
-    console.log(err.message, err);
+    console.log(err);
   }
 
   // Return the client for injection
