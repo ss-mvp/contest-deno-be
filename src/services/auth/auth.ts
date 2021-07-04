@@ -57,22 +57,28 @@ export default class AuthService extends BaseService {
       }
       let response: Auth.IAuthResponse | undefined;
       // Start a transaction for data integrity
-      await this.db.transaction(async () => {
+      await this.db.transaction(async (trx) => {
         // Further sanitize data
         Reflect.deleteProperty(body, 'parentEmail');
         // Create a new user object
         const hashedPassword = await this.hashPassword(body.password);
-        const [user] = await this.userModel.add({
-          ...body,
-          password: hashedPassword,
-          roleId: Roles.RoleEnum['user'],
-        });
+        const [user] = await this.userModel.add(
+          {
+            ...body,
+            password: hashedPassword,
+            roleId: Roles.RoleEnum['user'],
+          },
+          { knex: trx }
+        );
         // send validation email
-        await this.sendValidationEmail({
-          sendTo,
-          isParent,
-          user,
-        });
+        await this.sendValidationEmail(
+          {
+            sendTo,
+            isParent,
+            user,
+          },
+          { knex: trx }
+        );
         // Remove password hash from response body
         Reflect.deleteProperty(user, 'password');
         const token = generateToken(user);
@@ -283,12 +289,14 @@ export default class AuthService extends BaseService {
     }
   }
 
-  private async sendValidationEmail(args: {
-    sendTo: string;
-    isParent: boolean;
-    user: Users.ICleanUser | Users.IUser;
-    knex?: Knex;
-  }) {
+  private async sendValidationEmail(
+    args: {
+      sendTo: string;
+      isParent: boolean;
+      user: Users.ICleanUser | Users.IUser;
+    },
+    options?: { knex: Knex }
+  ) {
     // Generate Validation for user
     const { url, code } = generateValidationURL(
       args.user.codename,
@@ -303,7 +311,7 @@ export default class AuthService extends BaseService {
           ? Validations.ValidatorEnum.parent
           : Validations.ValidatorEnum.user,
       },
-      { knex: args.knex }
+      { knex: options?.knex }
     );
     if (!args.isParent) {
       await this.mailer.sendValidationEmail(args.sendTo, url);
