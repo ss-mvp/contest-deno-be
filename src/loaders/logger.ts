@@ -1,4 +1,4 @@
-import { createLogger, transports } from 'winston';
+import { createLogger, format, transports } from 'winston';
 import { env } from '../config';
 
 /**
@@ -16,6 +16,9 @@ export function logger__loader() {
     ...env.LOGGER_CONFIG,
     // Have the logger output to the console
     transports: [new transports.Console()],
+    format: format.printf(
+      ({ message, level }) => `[${level.toUpperCase()}] ${message}`
+    ),
   });
 
   console.log('Logger initialized!');
