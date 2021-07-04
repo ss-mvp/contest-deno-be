@@ -43,7 +43,7 @@ export default async function dependencyInjector__loader() {
       the deploy should be considered compromised!',
       "If you're seeing this, you encountered an error on launch!"
     );
-    console.log('message:', err.message, 'error:', err);
+    console.log('message:', 'error:', err);
     throw err;
   }
 }
