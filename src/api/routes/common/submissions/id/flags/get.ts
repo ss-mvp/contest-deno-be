@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { API, Flags, Roles } from '../../../../../../interfaces';
+import { API, Roles } from '../../../../../../interfaces';
 import { SubmissionService } from '../../../../../../services';
 import { authHandler } from '../../../../../middlewares';
 
@@ -14,9 +14,10 @@ export default function submissionFlagRoute__get(route: Router) {
   const logger: Logger = Container.get('logger');
   const subServiceInstance = Container.get(SubmissionService);
 
+  // TODO check the return type of this
   route.get<
     API.WithId, // URL parameters
-    Flags.IFlag[], // Response body
+    string[], // Response body
     never, // Request body
     never // Query parameters
   >(
