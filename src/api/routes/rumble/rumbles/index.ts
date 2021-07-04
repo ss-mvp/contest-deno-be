@@ -16,5 +16,5 @@ export default function rumblesRoute__loader(app: Router) {
   // Add sub routers to the /:id router
   rumbleIdRoute__loader(route);
 
-  logger.debug('Rumble  routes loaded.');
+  logger.debug('Rumble routes loaded.');
 }

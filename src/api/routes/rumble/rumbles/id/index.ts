@@ -27,5 +27,5 @@ export default function rumbleIdRoute__loader(app: Router) {
   rumbleIdRoute__getFeedback(route);
   rumbleIdRoute__putStartFeedback(route);
 
-  logger.debug('Rumbles route loaded.');
+  logger.debug('Rumble :id route loaded.');
 }

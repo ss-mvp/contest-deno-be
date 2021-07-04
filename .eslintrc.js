@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {

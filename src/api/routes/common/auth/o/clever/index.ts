@@ -22,5 +22,5 @@ export default function cleverOAuthRoute__loader(app: Router) {
   cleverOAuthRoute__postSignup(route);
   cleverOAuthRoute__postMerge(route);
 
-  logger.debug('OAuth router loaded.');
+  logger.debug('Clever router loaded.');
 }

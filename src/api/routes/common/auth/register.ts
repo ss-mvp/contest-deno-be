@@ -57,6 +57,4 @@ export default function authRoute__register(route: Router) {
       }
     }
   );
-
-  logger.debug('Auth router loaded.');
 }

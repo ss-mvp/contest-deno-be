@@ -1,6 +1,7 @@
 import { default as Knex, default as knex } from 'knex';
 import { types } from 'pg';
-import { env, knexfile } from '../config';
+import knexfile from '../../knexfile';
+import { env } from '../config';
 
 /**
  * An async loader function that creates a connection to the

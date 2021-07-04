@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 module.exports = {
   semi: true,
   singleQuote: true,
