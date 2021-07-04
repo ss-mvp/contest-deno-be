@@ -10,10 +10,10 @@ import {
   validateArray,
   validateObject,
 } from '../../../../deps';
-import { Roles } from '../../../interfaces/Enum/roles';
-import { INewSection } from '../../../interfaces/Sections/sections';
-import RumbleService from '../../../services/rumble';
-import authHandler from '../../middlewares/authHandler';
+import { Roles } from '../../../../interfaces/Enum/roles';
+import { INewSection } from '../../../../interfaces/Sections/sections';
+import RumbleService from '../../../../services/rumble';
+import authHandler from '../../../middlewares/authHandler';
 import validate from '../../middlewares/validate';
 
 const route = Router();

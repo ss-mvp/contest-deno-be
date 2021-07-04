@@ -20,5 +20,5 @@ export default function rumbleFeedbackRoute__loader(app: Router) {
   rumbleFeedbackRoute__put(route);
   rumbleFeedbackRoute__getComplete(route);
 
-  logger.debug('Rumble feedback routes loaded.');
+  logger.debug('Rumble feedback route loaded.');
 }

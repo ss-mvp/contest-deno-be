@@ -5,9 +5,9 @@ import {
   Router,
   serviceCollection,
 } from '../../../../deps';
-import { Roles } from '../../../interfaces/Enum/roles';
-import RumbleService from '../../../services/rumble';
-import authHandler from '../../middlewares/authHandler';
+import { Roles } from '../../../../interfaces/Enum/roles';
+import RumbleService from '../../../../services/rumble';
+import authHandler from '../../../middlewares/authHandler';
 import validate from '../../middlewares/validate';
 
 const route = Router();
