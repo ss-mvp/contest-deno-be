@@ -4,5 +4,5 @@ export interface IQueueItem extends INewQueueItem {
 
 export interface INewQueueItem {
   promptId: number;
-  starts_at: Date;
+  starts_at: string;
 }

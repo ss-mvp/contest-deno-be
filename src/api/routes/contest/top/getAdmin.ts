@@ -4,7 +4,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { Roles, Submissions } from '../../../../interfaces';
-import { ContestService } from '../../../../services';
+import { ClashService } from '../../../../services';
 import { authHandler } from '../../../middlewares';
 
 interface GetAdminResponseBody {
@@ -14,7 +14,7 @@ interface GetAdminResponseBody {
 
 export default function contestTopRoute__getAdmin(route: Router) {
   const logger: Logger = Container.get('logger');
-  const clashServiceInstance = Container.get(ContestService);
+  const clashServiceInstance = Container.get(ClashService);
 
   route.get<
     never, // URL parameters

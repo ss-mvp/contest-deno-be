@@ -10,12 +10,13 @@ import { env, knexfile } from '../config';
 export async function mainDB__loader() {
   console.log('Connecting to DB...');
 
-  // Initialize our DS database connection
-  const db = knex(knexfile[env.NODE_ENV]);
-
   // This prevents the starts_at Date type column to be returned as
   // a string 'yyyy-mm-dd' as it is stored, instead of as a Date
+  // This is why starts_at can be a string in the interface
   types.setTypeParser(types.TypeId.DATE, (val) => val);
+
+  // Initialize our DS database connection
+  const db = knex(knexfile[env.NODE_ENV]);
 
   try {
     console.log('Testing DB connection...');

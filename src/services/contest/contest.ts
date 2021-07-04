@@ -11,7 +11,7 @@ import BaseService from '../baseService';
 import { SubmissionService } from '../submission';
 
 @Service()
-export default class ContestService extends BaseService {
+export default class ClashService extends BaseService {
   constructor(
     private voteModel: VoteModel,
     private subModel: SubmissionModel,
@@ -22,15 +22,27 @@ export default class ContestService extends BaseService {
     super();
   }
 
-  public async submitVote(subIds: number[], userId?: number) {
+  public async submitVote(
+    subIds: number[] | Clash.votes.INewVote,
+    userId?: number
+  ) {
     try {
-      const voteItem: Clash.votes.INewVote = {
-        firstPlaceId: subIds[0],
-        secondPlaceId: subIds[1],
-        thirdPlaceId: subIds[2],
-        userId,
-      };
+      let voteItem: Clash.votes.INewVote;
+
+      if (Array.isArray(subIds)) {
+        voteItem = {
+          firstPlaceId: subIds[0],
+          secondPlaceId: subIds[1],
+          thirdPlaceId: subIds[2],
+          userId,
+        };
+      } else {
+        voteItem = subIds;
+      }
       await this.voteModel.add(voteItem);
+
+      const nextPrompt = await this.promptModel.getNext();
+      return nextPrompt;
     } catch (err) {
       this.logger.error(err);
       throw err;

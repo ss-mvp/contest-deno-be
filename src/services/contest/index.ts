@@ -1,1 +1,1 @@
-export { default as ContestService } from './contest';
+export { default as ClashService } from './contest';

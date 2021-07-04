@@ -15,13 +15,13 @@ export default class AdminService extends BaseService {
 
   public async updateActivePrompt() {
     try {
-      const startsAt = DateTime.utc().toFormat('yyyy-mm-dd') as unknown;
+      const startsAt = DateTime.utc().toFormat('yyyy-mm-dd');
       const currentPrompt = await this.promptModel.get(
         { active: true },
         { first: true }
       );
       const { promptId: newId } = await this.promptQueue.get(
-        { starts_at: startsAt as Date },
+        { starts_at: startsAt },
         { first: true }
       );
       if (currentPrompt.id === newId) {
