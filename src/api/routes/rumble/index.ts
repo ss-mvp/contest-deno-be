@@ -2,11 +2,12 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import rumbleFeedbackRoute__loader from './feedback';
-import rumbleRoute__get from './get';
+import classroomRumbleRoute__get from './get';
+import rumblesRoute__loader from './rumbles';
 
 const route = Router();
 
-export default function rumbleRoutes__loader(app: Router) {
+export default function classroomRumbleRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');
   logger.debug('Loading rumble routers...');
 
@@ -15,9 +16,10 @@ export default function rumbleRoutes__loader(app: Router) {
 
   // Add on the sub routes
   rumbleFeedbackRoute__loader(route);
+  rumblesRoute__loader(route);
 
   // Add routes to the router
-  rumbleRoute__get(route);
+  classroomRumbleRoute__get(route);
 
   logger.debug('Rumble routers loaded.');
 }

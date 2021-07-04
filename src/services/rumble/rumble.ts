@@ -405,16 +405,16 @@ export default class RumbleService extends BaseService {
         .plus({
           minutes: rumble.numMinutes,
         })
-        .toISO() as unknown;
+        .toISO();
 
       // Update the end time of the given rumble
       await this.rumbleSections.updateEndTime(
-        endTime as Date,
+        (endTime as unknown) as Date,
         sectionId,
         rumbleId
       );
 
-      // Return the end time to the user
+      // Return the end time to the user as an ISO string
       return endTime;
     } catch (err) {
       this.logger.error(err);

@@ -3,7 +3,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import commonRoutes__loader from './common';
 import contestRoutes__loader from './contest';
-import rumbleRoutes__loader from './rumble';
+import classroomRumbleRoute__loader from './rumble';
 
 export default function apiRoute__loader() {
   // Get our configured logger instance from our Container layer
@@ -17,7 +17,7 @@ export default function apiRoute__loader() {
 
   commonRoutes__loader(app);
   contestRoutes__loader(app);
-  rumbleRoutes__loader(app);
+  classroomRumbleRoute__loader(app);
 
   logger.debug('Routes loaded.');
 

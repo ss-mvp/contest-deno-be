@@ -16,7 +16,7 @@ interface GetRumbleInitResponse {
  * users, if there is any data a user needs immediately on sign
  * in this is where we should be giving it to them.
  */
-export default function rumbleRoute__get(route: Router) {
+export default function classroomRumbleRoute__get(route: Router) {
   const logger: Logger = Container.get('logger');
   const cleverServiceInstance = Container.get(CleverService);
 

@@ -23,7 +23,9 @@ export type WithAuth<T = { __never: never }> = T & {
   __user: IUser;
 };
 
-export type WithId<T = { __never: never }> = T & {
+export type WithId<
+  T extends string | unknown = { __never: never }
+> = (T extends string ? Record<T, number> : T) & {
   id: number;
 };
 
