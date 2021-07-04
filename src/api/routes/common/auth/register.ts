@@ -19,7 +19,7 @@ export default function authRoute__register(route: Router) {
   >(
     '/register',
     celebrate({
-      [Segments.BODY]: Users.UserSchema.new(),
+      [Segments.BODY]: Users.Schema.new(),
     }),
     async (req, res, next) => {
       try {

@@ -25,7 +25,7 @@ export default function userRoute__put(route: Router) {
     '/:id',
     authHandler({ roles: [Roles.RoleEnum.admin] }),
     celebrate({
-      [Segments.BODY]: Users.UserSchema.partial(),
+      [Segments.BODY]: Users.Schema.partial(),
     }),
     async (req, res, next) => {
       try {

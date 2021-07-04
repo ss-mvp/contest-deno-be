@@ -78,6 +78,7 @@ export default class AuthService extends BaseService {
         response = { user, token };
         this.logger.debug(`User (ID: ${user.id}) successfully registered`);
       });
+      // TODO figure out if and when this happens and assign a better error
       if (response === undefined) throw HTTPError.create(500);
       return response;
     } catch (err) {
@@ -95,7 +96,7 @@ export default class AuthService extends BaseService {
       if (!user) throw HTTPError.create(404, 'User not found');
       this.logger.debug(`Verifying password for user (CODENAME: ${codename})`);
       const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword) throw HTTPError.create(401, 'Invalid password');
+      if (!validPassword) throw HTTPError.create(401, 'Incorrect password');
       this.logger.debug(`Password verified`);
       // Remove password hash from response body
       Reflect.deleteProperty(user, 'password');

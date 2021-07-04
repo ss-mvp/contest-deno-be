@@ -25,7 +25,7 @@ export default function userRoute__post(route: Router) {
     authHandler({ roles: [Roles.RoleEnum.admin] }),
     celebrate({
       // TODO test this schema generator
-      [Segments.BODY]: Users.UserSchema.new(),
+      [Segments.BODY]: Users.Schema.new(),
     }),
     async (req, res, next) => {
       try {
