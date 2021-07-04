@@ -3,6 +3,8 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
+import rumbleStudentsRoute__getSections from './getSections';
+import rumbleStudentsRoute__getStudentSubs from './getStudentSubs';
 
 const route = Router();
 
@@ -13,6 +15,8 @@ export default function rumbleStudentsRoute__loader(app: Router) {
   app.use('/students', route);
 
   // Add routes to the router
+  rumbleStudentsRoute__getSections(route);
+  rumbleStudentsRoute__getStudentSubs(route);
 
   logger.debug('Rumble students route loaded.');
 }
