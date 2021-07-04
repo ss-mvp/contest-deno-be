@@ -1,4 +1,4 @@
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { Auth, Clever, Enum, Roles, SSOLookups, Users } from '../../interfaces';
 import { SSOLookupModel, UserModel } from '../../models';
 import { HTTPError } from '../../utils';
@@ -10,7 +10,7 @@ import CleverClient from './client';
 @Service()
 export default class CleverService extends BaseService {
   constructor(
-    private clever: CleverClient,
+    @Inject('clever') private clever: CleverClient,
     private userModel: UserModel,
     private rumbleService: RumbleService,
     private authService: AuthService,

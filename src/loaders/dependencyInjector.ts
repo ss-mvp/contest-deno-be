@@ -1,5 +1,6 @@
 import Container from 'typedi';
 import { s3__loader, ses__loader } from './aws';
+import clever__loader from './clever';
 import { logger__loader } from './logger';
 import { handlebars__loader, nodeMailer__loader } from './mail';
 import { dsDB__loader, mainDB__loader } from './postgres';
@@ -18,6 +19,10 @@ export default async function dependencyInjector__loader() {
     // Load logger first always
     const log = logger__loader(); // The loader function returns a client...
     Container.set('logger', log); // We add that client to our container
+
+    // Configure and inject Clever client...
+    const clever = clever__loader();
+    Container.set('clever', clever);
 
     // S3 loader is simple with no dependencies...
     const s3 = await s3__loader();
