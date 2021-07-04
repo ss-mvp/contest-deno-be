@@ -9,6 +9,7 @@ const route = Router();
 
 export default function contestRoutes__loader(app: Router) {
   const logger: Logger = Container.get('logger');
+  logger.debug('Loading contest routers...');
 
   // Add the contest router to the app at /contest
   app.use('/contest', route);

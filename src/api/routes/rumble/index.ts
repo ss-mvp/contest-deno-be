@@ -1,29 +1,23 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import data from './data';
-import feedback from './feedback';
-import rumbles from './rumbles';
-import sections from './sections';
-import students from './students';
-import teachers from './teachers';
+import rumbleFeedbackRoute__loader from './feedback';
+import rumbleRoute__get from './get';
 
-const router = Router();
+const route = Router();
 
 export default function rumbleRoutes__loader(app: Router) {
   const logger: Logger = Container.get('logger');
   logger.debug('Loading rumble routers...');
 
-  // Add the /rumble routes onto the application
-  app.use('/rumble', router);
+  // Add the rumble router at /rumble
+  app.use('/rumble', route);
 
-  // Load the rumble routes at /rumble
-  teachers(router);
-  students(router);
-  sections(router);
-  rumbles(router);
-  data(router);
-  feedback(router);
+  // Add on the sub routes
+  rumbleFeedbackRoute__loader(route);
+
+  // Add routes to the router
+  rumbleRoute__get(route);
 
   logger.debug('Rumble routers loaded.');
 }

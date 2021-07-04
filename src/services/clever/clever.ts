@@ -1,13 +1,5 @@
 import { Service } from 'typedi';
-import {
-  Auth,
-  Clever,
-  Enum,
-  Roles,
-  Sections,
-  SSOLookups,
-  Users,
-} from '../../interfaces';
+import { Auth, Clever, Enum, Roles, SSOLookups, Users } from '../../interfaces';
 import { SSOLookupModel, UserModel } from '../../models';
 import { HTTPError } from '../../utils';
 import { AuthService } from '../auth';
@@ -167,12 +159,7 @@ export default class CleverService extends BaseService {
     }
   }
 
-  public async getUserInfo(
-    user: Users.IUser
-  ): Promise<{
-    enumData: Enum.IEnumData;
-    sections: Sections.ISection[];
-  }> {
+  public async getUserInfo(user: Users.IUser) {
     try {
       const enumData = await this.getEnumData();
       const sections = await this.rumbleService.getSections(user);
