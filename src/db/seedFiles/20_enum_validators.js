@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const validators = [{ validator: 'user' }, { validator: 'parent' }];
 
 async function seed_validators_enum(knex) {

@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 exports.up = function (knex) {
   return knex.schema.table('submissions', (t) => {
     t.integer('rumbleId')

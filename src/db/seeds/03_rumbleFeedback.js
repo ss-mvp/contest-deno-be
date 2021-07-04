@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const { seed_rumble_feedback } = require('../seedFiles/18_rumble_feedback');
 
 exports.seed = async function (knex) {

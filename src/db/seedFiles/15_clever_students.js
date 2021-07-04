@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const students = [
   { userId: 6, sectionId: 1 },
   { userId: 7, sectionId: 1 },

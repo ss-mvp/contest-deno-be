@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const grades = [
   { id: '1', grade: '1st' },
   { id: '2', grade: '2nd' },

@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const feedback = [
   // Rumble 1 seeds
   { voterId: 6, submissionId: 8, score1: 5, score2: 4, score3: 3 },

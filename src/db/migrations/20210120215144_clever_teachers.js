@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 exports.up = function (knex) {
   return knex.schema.createTable('clever_teachers', (t) => {
     t.increments('id');

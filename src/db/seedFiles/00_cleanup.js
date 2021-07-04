@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const cleaner = require('knex-cleaner');
 
 function cleanTables(knex) {

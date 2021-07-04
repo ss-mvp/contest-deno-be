@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 exports.up = function (knex) {
   return knex.schema.createTable('rumble_sections', (t) => {
     t.increments('id');

@@ -1,5 +1,4 @@
-// deno-lint-ignore-file
-const moment = require('moment');
+const DateTime = require('luxon').DateTime;
 
 const testSubs = [
   // Rumble 1 seeds
@@ -12,7 +11,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
     rumbleId: 1,
   },
   {
@@ -24,7 +23,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
     rumbleId: 1,
   },
   {
@@ -36,7 +35,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
     rumbleId: 1,
   },
   {
@@ -48,7 +47,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
     rumbleId: 1,
   },
 
@@ -62,7 +61,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
     rumbleId: 2,
   },
   {
@@ -74,7 +73,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
     rumbleId: 2,
   },
   {
@@ -86,7 +85,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
     rumbleId: 2,
   },
   {
@@ -98,7 +97,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
     rumbleId: 2,
   },
 ];

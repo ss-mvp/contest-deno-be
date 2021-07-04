@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 exports.up = function (knex) {
   return knex.schema.table('rumble_sections', (t) => {
     t.dateTime('start_time');

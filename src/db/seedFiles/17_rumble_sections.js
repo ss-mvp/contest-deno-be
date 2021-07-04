@@ -1,17 +1,16 @@
-// deno-lint-ignore-file
-const moment = require('moment');
+const DateTime = require('luxon').DateTime;
 
 const rumbleSections = [
   {
     rumbleId: 1,
     sectionId: 1,
-    end_time: moment.utc().subtract(24, 'h'),
+    end_time: DateTime.utc().minus({ day: 1 }),
     phase: 'COMPLETE',
   },
   {
     rumbleId: 2,
     sectionId: 1,
-    end_time: moment.utc().subtract(1, 'h'),
+    end_time: DateTime.utc().minus({ hour: 1 }),
     phase: 'FEEDBACK',
   },
   { rumbleId: 3, sectionId: 1 },

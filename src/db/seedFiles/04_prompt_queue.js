@@ -1,22 +1,21 @@
-// deno-lint-ignore-file
-const moment = require('moment');
+const DateTime = require('luxon').DateTime;
 
 const testPromptQueue = [
   {
     promptId: 1,
-    starts_at: moment.utc().subtract(2, 'd'),
+    starts_at: DateTime.utc().minus({ day: 2 }),
   },
   {
     promptId: 2,
-    starts_at: moment.utc().subtract(1, 'd'),
+    starts_at: DateTime.utc().minus({ day: 1 }),
   },
   {
     promptId: 3,
-    starts_at: moment.utc(),
+    starts_at: DateTime.utc(),
   },
   {
     promptId: 4,
-    starts_at: moment.utc().add(1, 'd'),
+    starts_at: DateTime.utc().plus({ day: 1 }),
   },
 ];
 

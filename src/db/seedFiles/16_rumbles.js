@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const rumbles = [
   { joinCode: 'somejoinCode', numMinutes: 30, promptId: 1 },
   { joinCode: 'somejoinCode123', numMinutes: 50, promptId: 2 },

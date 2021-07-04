@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 exports.up = function (knex) {
   return knex.schema.createTable('transcriptions', (t) => {
     t.increments('id');

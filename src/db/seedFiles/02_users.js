@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const seedUsers = [
   {
     codename: 'A Codename',
