@@ -37,7 +37,7 @@ export default function cleverOAuthRoute__postSignup(route: Router) {
         userType: Joi.string().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const cleverResponse = await cleverInstance.registerCleverUser(
           req.body,
@@ -47,7 +47,7 @@ export default function cleverOAuthRoute__postSignup(route: Router) {
         res.status(201).json(cleverResponse);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

@@ -19,13 +19,13 @@ export default function rumbleIdRoute__get(route: Router) {
     Rumbles.IRumbleWithSectionInfo, // Response body
     never, // Request body
     never // Query parameters
-  >('/', authHandler(), async (req, res) => {
+  >('/', authHandler(), async (req, res, next) => {
     try {
       const rumble = await rumbleServiceInstance.getById(req.params.id);
       res.status(200).json(rumble);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

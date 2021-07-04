@@ -19,13 +19,13 @@ export default function rumbleIdRoute__putStartFeedback(route: Router) {
     never, // Response body
     never, // Request body
     never // Query parameters
-  >('/feedback/start', authHandler(), async (req, res) => {
+  >('/feedback/start', authHandler(), async (req, res, next) => {
     try {
       await rumbleServiceInstance.startFeedback(req.params.id);
       res.status(204).end();
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

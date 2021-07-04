@@ -16,13 +16,13 @@ export default function submissionIdRoute__get(route: Router) {
     Submissions.ISubItem, // Response body
     never, // Request body
     never // Query parameters
-  >('/', authHandler(), async (req, res) => {
+  >('/', authHandler(), async (req, res, next) => {
     try {
       const subs = await subServiceInstance.getById(req.params.id);
       res.status(200).json(subs);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

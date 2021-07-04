@@ -12,8 +12,8 @@ export default (function HTTPErrorInit() {
       }
     });
 
-    const res: IHTTPError = new Error(errorMessage);
-    res.status = errorStatus;
+    const res: IHTTPError = new Error(errorMessage || 'Something went wrong');
+    res.status = errorStatus || 500;
     res.type = 'httpError';
     return res;
   }

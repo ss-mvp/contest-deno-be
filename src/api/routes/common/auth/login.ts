@@ -33,7 +33,7 @@ export default function authRoute__login(route: Router) {
         password: Joi.string().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const response = await authServiceInstance.signIn(
           req.body.codename,
@@ -48,7 +48,7 @@ export default function authRoute__login(route: Router) {
         res.status(201).json(response);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

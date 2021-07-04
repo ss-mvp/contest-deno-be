@@ -36,7 +36,7 @@ export default function cleverOAuthRoute__postMerge(route: Router) {
         cleverId: Joi.string().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const authResponse = await cleverInstance.loginAndMerge(
           req.body.codename,
@@ -46,7 +46,7 @@ export default function cleverOAuthRoute__postMerge(route: Router) {
         res.status(201).json(authResponse);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

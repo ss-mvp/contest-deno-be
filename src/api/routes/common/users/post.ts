@@ -27,14 +27,14 @@ export default function userRoute__post(route: Router) {
       // TODO test this schema generator
       [Segments.BODY]: Users.UserSchema.new(),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         // Clear the user from auth handler off before insert
         const [user] = await userModelInstance.add(req.body);
         res.status(200).json(user);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

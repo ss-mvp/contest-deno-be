@@ -17,13 +17,13 @@ export default function authActivationRoute__put(route: Router) {
     Auth.IAuthResponse, // Response body
     Auth.WithHandler, // Request body
     never // Query parameters
-  >('/', authHandler(), async (req, res) => {
+  >('/', authHandler(), async (req, res, next) => {
     try {
       await authServiceInstance.resendValidationEmail(req.body.__user);
       res.status(204).end();
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

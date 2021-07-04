@@ -38,7 +38,7 @@ export default function submissionFlagRoute__post(route: Router) {
         flags: Joi.array().items(Joi.number()),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const flags = await subServiceInstance.flagSubmission({
           flagIds: req.body.flags,
@@ -50,7 +50,7 @@ export default function submissionFlagRoute__post(route: Router) {
           .json({ flags, message: 'Successfully flagged submission' });
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

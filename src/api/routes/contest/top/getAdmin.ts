@@ -24,13 +24,13 @@ export default function contestTopRoute__getAdmin(route: Router) {
   >(
     '/admin',
     authHandler({ roles: [Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const subs = await clashServiceInstance.getTopTen();
         res.status(200).json(subs);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

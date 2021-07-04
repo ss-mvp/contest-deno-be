@@ -38,7 +38,7 @@ export default function rumbleTeachersRoute__postRumbles(route: Router) {
         sectionIds: Joi.array().min(1).items(Joi.number().min(1)),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const rumble = await rumbleServiceInstance.createGameInstances({
           rumble: req.body.rumble,
@@ -47,7 +47,7 @@ export default function rumbleTeachersRoute__postRumbles(route: Router) {
         res.status(201).json(rumble);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

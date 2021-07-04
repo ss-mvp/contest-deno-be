@@ -24,7 +24,7 @@ export default function rumbleSectionRoute__getStudent(route: Router) {
   >(
     '/:id/students',
     authHandler({ roles: [Roles.RoleEnum.teacher, Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const students = await rumbleServiceInstance.getStudentsInSection(
           req.params.id
@@ -32,7 +32,7 @@ export default function rumbleSectionRoute__getStudent(route: Router) {
         res.status(200).json(students);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

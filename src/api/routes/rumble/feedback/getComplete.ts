@@ -33,7 +33,7 @@ export default function rumbleFeedbackRoute__getComplete(route: Router) {
         studentId: Joi.number().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const hasVoted = await feedbackServiceInstance.checkIfFeedbackWasSubmitted(
           {
@@ -45,7 +45,7 @@ export default function rumbleFeedbackRoute__getComplete(route: Router) {
         res.status(200).json(hasVoted);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

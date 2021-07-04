@@ -22,7 +22,7 @@ export default function rumbleIdRoute__getStudents(route: Router) {
   >(
     '/',
     authHandler({ roles: [Roles.RoleEnum.admin, Roles.RoleEnum.teacher] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const students = await rumbleServiceInstance.getStudentsWithSubForRumble(
           req.params.id
@@ -30,7 +30,7 @@ export default function rumbleIdRoute__getStudents(route: Router) {
         res.status(200).json(students);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

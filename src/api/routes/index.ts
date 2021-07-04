@@ -8,7 +8,6 @@ import classroomRumbleRoute__loader from './rumble';
 export default function apiRoute__loader() {
   // Get our configured logger instance from our Container layer
   const logger: Logger = Container.get('logger');
-
   // Initialize our Express server application
   const app = express();
 

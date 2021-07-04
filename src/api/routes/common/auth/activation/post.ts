@@ -29,13 +29,13 @@ export default function authActivationRoute__post(route: Router) {
         age: Joi.number().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         await authServiceInstance.newValidationEmail(req.body);
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

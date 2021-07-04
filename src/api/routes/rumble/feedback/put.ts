@@ -34,13 +34,13 @@ export default function rumbleFeedbackRoute__put(route: Router) {
           })
         ),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         await rumbleServiceInstance.addScoresToFeedback(req.body);
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

@@ -15,13 +15,13 @@ export default function contestTopRoute__get(route: Router) {
     Submissions.ISubItem[], // Response body
     never, // Request body
     never // Query parameters
-  >('/', async (req, res) => {
+  >('/', async (req, res, next) => {
     try {
       const subs = await clashServiceInstance.getTop3Subs();
       res.status(200).json(subs);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

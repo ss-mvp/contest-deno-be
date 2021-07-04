@@ -20,7 +20,7 @@ export default function userRoute__getById(route: Router) {
   >(
     '/:id',
     authHandler({ roles: [Roles.RoleEnum.admin, Roles.RoleEnum.teacher] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const user = await userModelInstance.get(
           { id: req.params.id },
@@ -30,7 +30,7 @@ export default function userRoute__getById(route: Router) {
         res.status(200).json(user);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

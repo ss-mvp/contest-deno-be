@@ -31,7 +31,10 @@ export const UserSchema = (() => {
     const newUser = type === 'new';
     const whole = type === 'whole';
 
-    const maybeRequired = (partial ? false : whole) ? 'required' : 'optional';
+    const maybeRequired = (() => {
+      if (partial) return 'optional';
+      else return 'required';
+    })();
 
     return Joi.object<IUser | INewUser | Partial<IUser>>({
       // `full` only fields
@@ -45,21 +48,22 @@ export const UserSchema = (() => {
       }),
 
       // Common fields
-      codename: Joi.string()
-        [maybeRequired]()
-        .min(1)
-        .max(20)
-        .regex(constraints.codenameRegex),
       dob: Joi.date()[maybeRequired](),
-      email: Joi.string()[maybeRequired]().email(),
       firstname: Joi.string()[maybeRequired](),
       lastname: Joi.string()[maybeRequired](),
+      email: Joi.string()[maybeRequired]().email(),
+      codename: Joi.string()[maybeRequired]().regex(constraints.codenameRegex),
       password: Joi.string()[maybeRequired]().regex(constraints.passwordRegex),
-      roleId: Joi.number().valid(Roles.RoleEnum),
+      roleId: Joi.number()
+        [maybeRequired]()
+        // Don't let users sign up as an admin from this endpoint
+        .disallow(Roles.RoleEnum.admin)
+        // If unset, default to signup as a standard user for compatibility
+        .default(Roles.RoleEnum.user),
 
       // Always optional fields
       isValidated: Joi.boolean().optional(),
-    });
+    }).options({ abortEarly: false });
   }
   function newSchema() {
     return create('new');

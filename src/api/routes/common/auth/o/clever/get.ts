@@ -27,7 +27,7 @@ export default function cleverOAuthRoute__get(route: Router) {
         code: Joi.string().required(),
       }),
     }),
-    async function asdasd(req, res) {
+    async function asdasd(req, res, next) {
       try {
         const cleverResponse = await cleverInstance.authorizeUser(
           req.query.code
@@ -35,7 +35,7 @@ export default function cleverOAuthRoute__get(route: Router) {
         res.status(200).json(cleverResponse);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

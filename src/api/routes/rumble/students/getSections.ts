@@ -23,7 +23,7 @@ export default function rumbleStudentsRoute__getSections(route: Router) {
   >(
     '/:id/sections',
     authHandler({ roles: [Roles.RoleEnum.user, Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const sections = await rumbleServiceInstance.getSections(
           req.body.__user
@@ -31,7 +31,7 @@ export default function rumbleStudentsRoute__getSections(route: Router) {
         res.status(200).json(sections);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

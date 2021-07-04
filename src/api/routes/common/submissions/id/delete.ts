@@ -16,13 +16,17 @@ export default function submissionIdRoute__delete(route: Router) {
     never, // Response body
     never, // Request body
     never // Query parameters
-  >('/', authHandler({ roles: [Roles.RoleEnum.admin] }), async (req, res) => {
-    try {
-      await subModelInstance.delete(req.params.id);
-      res.status(204).end();
-    } catch (err) {
-      logger.error(err);
-      throw err;
+  >(
+    '/',
+    authHandler({ roles: [Roles.RoleEnum.admin] }),
+    async (req, res, next) => {
+      try {
+        await subModelInstance.delete(req.params.id);
+        res.status(204).end();
+      } catch (err) {
+        logger.error(err);
+        next(err);
+      }
     }
-  });
+  );
 }

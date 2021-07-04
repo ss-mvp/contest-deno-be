@@ -33,7 +33,7 @@ export default function contestVotesRoute__post(route: Router) {
         votes: Joi.array().required().length(3).items(Joi.number().min(1)),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const nextPrompt = await clashServiceInstance.submitVote(
           req.body.votes,
@@ -45,7 +45,7 @@ export default function contestVotesRoute__post(route: Router) {
         });
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

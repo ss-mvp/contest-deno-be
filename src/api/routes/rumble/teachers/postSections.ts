@@ -28,7 +28,7 @@ export default function rumbleTeachersRoute__postSections(route: Router) {
         name: Joi.string().required().min(1),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         Reflect.deleteProperty(req.body, '__user');
         const newSection = await rumbleServiceInstance.createSection(
@@ -38,7 +38,7 @@ export default function rumbleTeachersRoute__postSections(route: Router) {
         res.status(201).json(newSection);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

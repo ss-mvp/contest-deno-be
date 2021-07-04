@@ -19,7 +19,7 @@ export default function userRoute__getSubmissions(route: Router) {
     Submissions.ISubItem[], // Response body
     never, // Request body
     Pick<API.GetParams, 'limit' | 'offset'> // Query parameters
-  >('/:id/submissions', authHandler(), async (req, res) => {
+  >('/:id/submissions', authHandler(), async (req, res, next) => {
     try {
       const subs = await subServiceInstance.getUserSubs(req.params.id, {
         limit: req.query.limit || 6,
@@ -28,7 +28,7 @@ export default function userRoute__getSubmissions(route: Router) {
       res.status(200).json(subs);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

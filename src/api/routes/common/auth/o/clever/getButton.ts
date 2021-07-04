@@ -18,13 +18,13 @@ export default function cleverOAuthRoute__getButton(route: Router) {
     GetCleverButtonResponse, // Response body
     never, // Request body
     never // Query parameters
-  >('/button', (req, res) => {
+  >('/button', (req, res, next) => {
     try {
       const loginButtonURI = cleverInstance.getLoginButtonURI();
       res.status(200).json({ url: loginButtonURI });
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

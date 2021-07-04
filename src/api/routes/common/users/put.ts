@@ -27,7 +27,7 @@ export default function userRoute__put(route: Router) {
     celebrate({
       [Segments.BODY]: Users.UserSchema.partial(),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         Reflect.deleteProperty(req.body, '__user');
         await userModelInstance.update(
@@ -37,7 +37,7 @@ export default function userRoute__put(route: Router) {
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

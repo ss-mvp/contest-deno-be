@@ -27,7 +27,7 @@ export default function authResetRoute__post(route: Router) {
         code: Joi.string().required().regex(constraints.uuidV5Regex),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         await authServiceInstance.resetPasswordWithCode(
           req.body.email,
@@ -38,7 +38,7 @@ export default function authResetRoute__post(route: Router) {
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

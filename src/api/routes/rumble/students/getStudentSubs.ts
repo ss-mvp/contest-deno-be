@@ -32,7 +32,7 @@ export default function rumbleStudentsRoute__getStudentSubs(route: Router) {
         sectionId: Joi.number().required().min(1),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const submissions = await rumbleServiceInstance.getSubsByStudentAndSection(
           req.params.id,
@@ -41,7 +41,7 @@ export default function rumbleStudentsRoute__getStudentSubs(route: Router) {
         res.status(200).json(submissions);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

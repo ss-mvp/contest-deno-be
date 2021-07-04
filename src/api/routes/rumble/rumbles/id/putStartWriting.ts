@@ -22,7 +22,7 @@ export default function rumbleIdRoute__putStartWriting(route: Router) {
   >(
     '/section/:sectionId/start',
     authHandler({ roles: [Roles.RoleEnum.admin, Roles.RoleEnum.teacher] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const endTime = await rumbleServiceInstance.startRumble(
           req.params.sectionId,
@@ -31,7 +31,7 @@ export default function rumbleIdRoute__putStartWriting(route: Router) {
         res.status(201).json(endTime);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

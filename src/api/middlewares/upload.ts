@@ -68,7 +68,7 @@ export default function fileUploadMiddleware__generator<
       next();
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   };
 }

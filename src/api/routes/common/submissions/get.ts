@@ -23,7 +23,7 @@ export default function submissionRoute__get(route: Router) {
     Submissions.ISubItem | Submissions.ISubItem[], // Response body
     never, // Request body
     API.GetParams<GetSubmissionQuery> // Query parameters
-  >('/', authHandler(), async (req, res) => {
+  >('/', authHandler(), async (req, res, next) => {
     try {
       // Parse the get query parameters from our request object for our function
       const getOptions = parseGetQuery(req.query);
@@ -33,7 +33,7 @@ export default function submissionRoute__get(route: Router) {
       res.status(200).json(subs);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

@@ -19,7 +19,7 @@ export default function submissionIdRoute__getFeedback(route: Router) {
     Feedback.IFeedbackItem[], // Response body
     never, // Request body
     never // Query parameters
-  >('/feedback', authHandler(), async (req, res) => {
+  >('/feedback', authHandler(), async (req, res, next) => {
     try {
       const feedbackScores = await feedbackModelInstance.get({
         submissionId: req.params.id,
@@ -27,7 +27,7 @@ export default function submissionIdRoute__getFeedback(route: Router) {
       res.status(200).json(feedbackScores);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

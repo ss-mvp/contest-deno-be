@@ -30,14 +30,14 @@ export default function authResetRoute__get(route: Router) {
         email: Joi.string().email().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         await authServiceInstance.getResetEmail(req.query.email);
 
         res.status(200).json({ message: 'Password reset email sent!' });
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

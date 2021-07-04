@@ -34,7 +34,7 @@ export default function authActivationRoute__get(route: Router) {
         token: Joi.string().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const { token } = await authServiceInstance.validate(
           req.query.email,
@@ -45,7 +45,7 @@ export default function authActivationRoute__get(route: Router) {
         res.redirect(302, redirectURL);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

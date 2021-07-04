@@ -25,7 +25,7 @@ export default function rumbleIdRoute__getFeedback(route: Router) {
     Submissions.ISubItem[], // Response body
     never, // Request body
     GetFeedbackAssignmentsQuery // Querp parameters
-  >('/:rumbleId/feedback', authHandler(), async (req, res) => {
+  >('/:rumbleId/feedback', authHandler(), async (req, res, next) => {
     try {
       const submissions = await rumbleServiceInstance.getSubsForFeedback(
         req.query.studentId,
@@ -34,7 +34,7 @@ export default function rumbleIdRoute__getFeedback(route: Router) {
       res.status(200).json(submissions);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

@@ -19,7 +19,7 @@ export default function rumbleIdRoute__getSubForStudent(route: Router) {
     Submissions.ISubItem, // Response body
     never, // Request body
     never // Query parameters
-  >('/students/:studentId', authHandler(), async (req, res) => {
+  >('/students/:studentId', authHandler(), async (req, res, next) => {
     try {
       const sub = await rumbleServiceInstance.getSubForStudentByRumble(
         req.params.id,
@@ -28,7 +28,7 @@ export default function rumbleIdRoute__getSubForStudent(route: Router) {
       res.status(200).json(sub);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

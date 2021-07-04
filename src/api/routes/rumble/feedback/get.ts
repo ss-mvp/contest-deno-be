@@ -34,7 +34,7 @@ export default function rumbleFeedbackRoute__get(route: Router) {
         studentId: Joi.number().required(),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const feedback = await feedbackModelInstance.getFeedbackByRumbleAndVoterIds(
           {
@@ -45,7 +45,7 @@ export default function rumbleFeedbackRoute__get(route: Router) {
         res.status(200).json(feedback);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

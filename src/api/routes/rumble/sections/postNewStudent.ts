@@ -32,7 +32,7 @@ export default function rumbleSectionRoute__postNewStudent(route: Router) {
       }),
     }),
     authHandler({ roles: [Roles.RoleEnum.teacher, Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const section = await rumbleServiceInstance.addChildToSection(
           req.body.joinCode,
@@ -43,7 +43,7 @@ export default function rumbleSectionRoute__postNewStudent(route: Router) {
         res.status(201).json(section);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

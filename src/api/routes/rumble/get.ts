@@ -25,13 +25,13 @@ export default function classroomRumbleRoute__get(route: Router) {
     GetRumbleInitResponse, // Response body
     API.WithAuth, // Request body
     never // Query parameters
-  >('/', async (req, res) => {
+  >('/', async (req, res, next) => {
     try {
       const data = await cleverServiceInstance.getUserInfo(req.body.__user);
       res.status(200).json(data);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

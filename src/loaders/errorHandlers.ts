@@ -1,3 +1,4 @@
+import { CelebrateError, isCelebrateError } from 'celebrate';
 import { Express, NextFunction, Request, Response } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
@@ -13,6 +14,39 @@ export default function errorHandler__routes(app: Express) {
     next(HTTPError.create(404, 'Route not found'));
   });
 
+  // Handle errors from the Celebrate validation middleware
+  app.use(
+    (err: CelebrateError, req: Request, res: Response, next: NextFunction) => {
+      // If it's not a celebrate error, pass it to the next middleware
+      if (!isCelebrateError(err)) return next(err);
+      console.log('error handled');
+
+      // Otherwise, handle the celebrate error here
+      const response = {
+        message: 'Invalid request data',
+        errors: {} as Record<string, string[]>,
+      };
+      err.details.forEach((error, name) => {
+        if (!response.errors[name]) response.errors[name] = [];
+        if (!response.errors[name].includes(error.message)) {
+          response.errors[name].push(error.message);
+        }
+        err.details.forEach((det) => {
+          if (!response.errors[name].includes(det.message)) {
+            response.errors[name].push(det.message);
+          }
+          det.details.forEach((inDet) => {
+            if (!response.errors[name].includes(inDet.message)) {
+              response.errors[name].push(inDet.message);
+            }
+          });
+        });
+      });
+
+      res.status(400).json(response);
+    }
+  );
+
   // Parsing DB Errors/Catching Unhandled Errors
   app.use(
     (err: IHTTPError, req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +59,7 @@ export default function errorHandler__routes(app: Express) {
       } else if (err.message.includes('invalid input syntax')) {
         return next(HTTPError.create(400, 'Invalid data provided'));
       } else if (!err.status || err.status === 500) {
-        logger.warning(`${err.message} - NEEDS CUSTOM ERROR HANDLING`);
+        logger.warn(`${err.message} - NEEDS CUSTOM ERROR HANDLING`);
       }
       next(err);
     }
@@ -35,10 +69,10 @@ export default function errorHandler__routes(app: Express) {
   app.use(
     // eslint-disable-next-line
     (err: IHTTPError, req: Request, res: Response, next: NextFunction) => {
-      logger.debug(`${err.status} - { error: '${err.message}' }`);
-      res
-        .status(err.status || 500)
-        .json({ message: err.message || 'Something went wrong.' });
+      const status = err.status || 500;
+      const message = err.message || 'Something went wrong.';
+      logger.debug(`[ERR${status}] - { error: '${message}' }`);
+      res.status(status).json({ message });
     }
   );
 }

@@ -26,7 +26,7 @@ export default function submissionRoute__post(route: Router) {
     Submissions.ISubItem, // Response body
     API.WithAuth<PostSubmissionBody>, // Request body
     PostSubmissionQuery // Query parameters
-  >('/', authHandler(), upload('story'), async (req, res) => {
+  >('/', authHandler(), upload('story'), async (req, res, next) => {
     try {
       logger.info('submission request', req.body, req.params, req.query);
       const submission = await subServiceInstance.processSubmission({
@@ -45,7 +45,7 @@ export default function submissionRoute__post(route: Router) {
       res.status(201).json(submission);
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
   });
 }

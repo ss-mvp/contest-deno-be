@@ -22,14 +22,14 @@ export default function userRoute__delete(route: Router) {
   >(
     '/:id',
     authHandler({ roles: [Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         Reflect.deleteProperty(req.body, '__user');
         await userModelInstance.delete(req.params.id);
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

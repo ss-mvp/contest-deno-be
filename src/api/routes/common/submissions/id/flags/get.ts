@@ -23,13 +23,13 @@ export default function submissionFlagRoute__get(route: Router) {
   >(
     '/',
     authHandler({ roles: [Roles.RoleEnum.teacher, Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const flags = await subServiceInstance.getFlagsBySubId(req.params.id);
         res.status(200).json(flags);
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

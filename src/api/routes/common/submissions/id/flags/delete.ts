@@ -27,13 +27,13 @@ export default function submissionFlagRoute__deleteById(route: Router) {
   >(
     '/:flagId',
     authHandler({ roles: [Roles.RoleEnum.admin] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         await subModelInstance.removeFlags(req.params.id, req.params.flagId);
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

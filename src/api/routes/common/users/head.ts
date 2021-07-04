@@ -24,7 +24,7 @@ export default function userRoute__head(route: Router) {
   >(
     '/',
     authHandler({ roles: [Roles.RoleEnum.admin, Roles.RoleEnum.teacher] }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
         const queryOpts = parseGetQuery(req.query);
         const userList = await userModelInstance.get(undefined, queryOpts);
@@ -42,7 +42,7 @@ export default function userRoute__head(route: Router) {
         res.status(204).end();
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );

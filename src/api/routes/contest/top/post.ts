@@ -5,7 +5,7 @@ import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import { API, Clash, Roles } from '../../../../interfaces';
-import { SubmissionService } from '../../../../services';
+import { ClashService } from '../../../../services';
 import { authHandler } from '../../../middlewares';
 
 interface ContestPostTopBody {
@@ -19,7 +19,7 @@ interface ContestPostResponseBody {
 
 export default function contestTopRoute__post(route: Router) {
   const logger: Logger = Container.get('logger');
-  const subServiceInstance = Container.get(SubmissionService);
+  const clashServiceInstance = Container.get(ClashService);
 
   route.post<
     never, // URL parameters
@@ -34,13 +34,13 @@ export default function contestTopRoute__post(route: Router) {
         ids: Joi.array().length(3).items(Joi.number().min(1)),
       }),
     }),
-    async (req, res) => {
+    async (req, res, next) => {
       try {
-        const top3 = await subServiceInstance.setTop3(req.body.ids);
+        const top3 = await clashServiceInstance.setTop3(req.body.ids);
         res.status(201).json({ top3, message: 'Top 3 successfully set!' });
       } catch (err) {
         logger.error(err);
-        throw err;
+        next(err);
       }
     }
   );
