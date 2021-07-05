@@ -4,6 +4,8 @@ import ExpressHandlebars from 'express-handlebars/lib/express-handlebars';
 import Handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
 import SESTransport from 'nodemailer/lib/ses-transport';
+import Container from 'typedi';
+import { Logger } from 'winston';
 import { env } from '../config';
 
 /**
@@ -17,31 +19,29 @@ export async function nodeMailer__loader(
   ses: AWS.SES
 ): Promise<nodemailer.Transporter<SESTransport.SentMessageInfo>> {
   console.log('Loading mailer...');
-
   // Create a nodemailer transporter client
-  // This client will use our SES client to dispatch email requests
-  const transporter = nodemailer.createTransport({
-    SES: ses,
-  });
-
   try {
-    // Add handlebars to the transporter so that we can use our templates
+    // This client will use our SES client to dispatch email requests
+    const transporter = nodemailer.createTransport({
+      SES: ses,
+    });
 
-    // Verify that the transporter was initialized properly
-    const success = await transporter.verify();
-
-    // If the verification failed, throw an error
-    if (!success) throw new Error('Could not verify transporter');
+    transporter.on('error', function (err) {
+      const logger: Logger = Container.get('logger');
+      logger.error('Error on transporter.');
+      logger.error(err);
+    });
 
     // Otherwise, connection was successful and we can inject the mailer
     console.log('Mailer loaded!');
+
+    // Return the mailer for injection
+    return transporter;
   } catch (err) {
     console.log('Could not load nodemailer');
     console.log(err);
+    throw err;
   }
-
-  // Return the mailer for injection
-  return transporter;
 }
 
 /**
@@ -53,9 +53,9 @@ export async function nodeMailer__loader(
 export async function handlebars__loader(): Promise<ExpressHandlebars> {
   // Configure and create the render engine
   const hbs = create({
-    // Use our version of Handlerbars to render
-    handlebars: Handlebars,
     ...env.HBS_CONFIG,
+    ...env.HBS_VIEW_ENGINE_CONFIG,
+    handlebars: Handlebars,
   });
 
   // Return engine for injection

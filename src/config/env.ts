@@ -34,9 +34,7 @@ const DS_API_URL = process.env['DS_API_URL'] || '';
 const DS_API_TOKEN = process.env['DS_API_TOKEN'] || '';
 
 // HBS Config
-const HBS_TEMPLATE_DIR = join(
-  process.env['HBS_TEMPLATE_DIR'] || '.\\templates\\email'
-);
+const HBS_TEMPLATE_DIR = process.env['HBS_TEMPLATE_DIR'] || 'templates/email';
 const HBS_FILE_EXT = process.env['HBS_FILE_EXT'] || '.hbs';
 
 export default {
@@ -107,18 +105,20 @@ export default {
         : 'info',
   } as LoggerOptions,
 
-  // Shouldn't need to set these in env, just being consistent and making it easy if you want to move stuff
+  // Handlebars Render Engine Configuration
   HBS_CONFIG: {
+    viewPath: HBS_TEMPLATE_DIR,
+    extName: HBS_FILE_EXT,
     extname: HBS_FILE_EXT,
-    // Will default to a /partials folder inside of your main views/templates folder
+  },
+  HBS_VIEW_ENGINE_CONFIG: {
+    // Will default to a /partials folder inside of your main templates folder
     partialsDir:
-      process.env['HBS_PARTIAL_PATH_DIR'] ||
-      join(HBS_TEMPLATE_DIR, '/partials'),
+      process.env['HBS_PARTIAL_PATH_DIR'] || join(HBS_TEMPLATE_DIR, 'partials'),
     // Will default to a /layouts folder inside of your main views/templates folder
     layoutsDir:
-      process.env['HBS_LAYOUT_PATH_DIR'] || join(HBS_TEMPLATE_DIR, '/layouts'),
+      process.env['HBS_LAYOUT_PATH_DIR'] || join(HBS_TEMPLATE_DIR, 'layouts'),
     // Defaults to 'main'
     defaultLayout: process.env['HBS_DEFAULT_LAYOUT'] || 'main',
-    viewPath: HBS_TEMPLATE_DIR,
   },
 };

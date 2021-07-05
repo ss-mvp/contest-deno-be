@@ -1,6 +1,7 @@
 import ExpressHandlebars from 'express-handlebars/lib/express-handlebars';
 import { Transporter } from 'nodemailer';
 import SESTransport from 'nodemailer/lib/ses-transport';
+import { join } from 'path';
 import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import { env } from '../../config';
@@ -100,13 +101,17 @@ export default class MailService {
    * @returns the rendered email content on success
    */
   private async __render(
-    viewPath: string,
+    templateName: string,
     options: Record<string, unknown>
   ): Promise<string> {
     // Promis-ify our handlebars render function and await the results
     const content = await new Promise<string | undefined>((resolve, reject) => {
       // Using the Promise constructor, we can Promisify this old-school callback function
-      this.hbs.renderView(viewPath, options, (err, content) => {
+      const templatePath =
+        join(env.HBS_CONFIG.viewPath + '/' + templateName) +
+        env.HBS_CONFIG.extName;
+
+      this.hbs.renderView(templatePath, options, (err, content) => {
         // Promise rejects if an error occurs
         if (err) reject(err);
         // Otherwise it resolves to our email content
@@ -115,7 +120,11 @@ export default class MailService {
     });
 
     if (!content) {
-      this.logger.crit('Could not render email template:', viewPath, options);
+      this.logger.crit(
+        'Could not render email template:',
+        templateName,
+        options
+      );
       throw new Error('Could not render email template');
     }
 
