@@ -41,9 +41,17 @@ export default {
   NODE_ENV,
   REACT_APP_URL,
   PORT: +PORT,
-  UUID_NAMESPACE: process.env['UUID_NAMESPACE'] || '',
   SERVER_URL: process.env['SERVER_URL'] || 'http://localhost:' + PORT,
   DB_URL: process.env[envPrefix() + 'DB_URL'],
+
+  // Potentially Handy Levers
+
+  /** Lockout for new validation email in minutes, defaults to 10 */
+  VALIDATION_EMAIL_LOCKOUT: +(process.env['VALIDATION_EMAIL_LOCKOUT'] || 10),
+  /** UUID library namespace for uid generation (should be a valid uuid) */
+  UUID_NAMESPACE: process.env['UUID_NAMESPACE'] || '',
+  /** Time in days, defaults to 30 if not set in .env */
+  AUTH_TOKEN_EXP_TIME: +(process.env['AUTH_TOKEN_EXP_TIME'] || 30),
 
   // DS API Client Configuration
   DS_API_URL,
@@ -69,9 +77,6 @@ export default {
     port: process.env['REDIS_PORT'],
   },
 
-  // Time in days, defaults to 30 if not set in .env
-  AUTH_TOKEN_EXP_TIME: +(process.env['AUTH_TOKEN_EXP_TIME'] || 30),
-
   DB_CONFIG: {
     database: process.env[envPrefix() + 'DB_NAME'] || '',
     hostname: process.env[envPrefix() + 'DB_HOST'] || '',
@@ -79,6 +84,8 @@ export default {
     username: process.env[envPrefix() + 'DB_USER'] || '',
     password: process.env[envPrefix() + 'DB_PASS'] || '',
   },
+
+  // AWS Configuration
   AWS_CONFIG: {
     credentials: {
       accessKeyId: process.env['AWS_ACCESS_KEY_ID'] || '',
@@ -88,10 +95,12 @@ export default {
   } as AWS.ConfigurationOptions,
   SES_SOURCE: `Story Squad <${process.env['SES_EMAIL'] || ''}>`,
   S3_BUCKET: process.env[envPrefix() + 'S3_BUCKET'] || '',
+
   JWT: {
     SECRET: process.env['JWT_SECRET'] || 'somefakesecret',
     ALGO: (process.env['JWT_ALGORITHM'] || 'HS512') as Algorithm,
   },
+
   CLEVER_CONFIG: {
     clientId: process.env['CLEVER_CLIENT_ID'] || '',
     clientSecret: process.env['CLEVER_CLIENT_SECRET'] || '',

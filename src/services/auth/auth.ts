@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import Knex from 'knex';
 import { DateTime } from 'luxon';
 import { Service } from 'typedi';
+import { env } from '../../config';
 import { API, Auth, Roles, Users, Validations } from '../../interfaces';
 import { ResetModel, UserModel, ValidationModel } from '../../models';
 import { HTTPError } from '../../utils';
@@ -187,18 +188,28 @@ export default class AuthService extends BaseService {
       const validation = await this.validationModel.getRecentByUserId(
         data.__user.id
       );
-      if (!validation) throw HTTPError.create(404, 'No validation found');
+      const createdAt =
+        validation?.created_at.getTime() || // If somehow the user never got validation
+        DateTime.now()
+          // Fall back to a time that allows them to get an email, 20 minutes past the lockout window
+          .minus({ minutes: env.VALIDATION_EMAIL_LOCKOUT + 20 })
+          .toMillis();
+      const timeSinceLastRequest = Date.now() - createdAt;
+
       await this.db.transaction(async (trx) => {
-        const timeSinceLastRequest =
-          Date.now() - validation.created_at.getTime();
-        if (timeSinceLastRequest < 600000) {
-          throw HTTPError.create(429, 'Cannot send another email so soon');
-        } else {
-          // Able to generate another code, so delete the old one
-          await this.resetModel.update(validation.id, {
-            completed: true,
-            knex: trx,
-          });
+        if (validation) {
+          // Convert lockout minutes to MS for comparison
+          const lockoutInMS = env.VALIDATION_EMAIL_LOCKOUT * 60 * 1000;
+          if (timeSinceLastRequest < lockoutInMS) {
+            // Too soon to send another email, user is still in the lockout window
+            throw HTTPError.create(429, 'Cannot send another email so soon');
+          } else {
+            // Able to generate another code, so delete the old one
+            await this.resetModel.update(validation.id, {
+              completed: true,
+              knex: trx,
+            });
+          }
         }
         // send validation email
         await this.sendValidationEmail({
