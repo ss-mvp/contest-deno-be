@@ -48,6 +48,8 @@ export default {
 
   /** Lockout for new validation email in minutes, defaults to 10 */
   VALIDATION_EMAIL_LOCKOUT: +(process.env['VALIDATION_EMAIL_LOCKOUT'] || 10),
+  /** Lockout for password reset emails in minutes, defaults to 10 */
+  RESET_EMAIL_LOCKOUT: +(process.env['RESET_EMAIL_LOCKOUT'] || 10),
   /** UUID library namespace for uid generation (should be a valid uuid) */
   UUID_NAMESPACE: process.env['UUID_NAMESPACE'] || '',
   /** Time in days, defaults to 30 if not set in .env */

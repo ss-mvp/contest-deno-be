@@ -1,4 +1,4 @@
-/** URL Scope: /contest */
+/** URL Scope: /clash */
 
 import { Router } from 'express';
 import Container from 'typedi';
@@ -7,7 +7,7 @@ import contestVotesRoute__post from './post';
 
 const router = Router();
 
-export default function contestVotesRoute__loader(app: Router) {
+export default function clashVotesRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');
 
   // Add the routes at the /votes endpoint

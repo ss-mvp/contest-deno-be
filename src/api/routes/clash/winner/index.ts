@@ -1,4 +1,4 @@
-/** URL Scope: /contest */
+/** URL Scope: /clash */
 
 import { Router } from 'express';
 import Container from 'typedi';
@@ -7,7 +7,7 @@ import contestWinnerRoute__get from './get';
 
 const route = Router();
 
-export default function contestWinnerRoute__loader(app: Router) {
+export default function clashWinnerRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');
 
   // Add the router to the app at /winners

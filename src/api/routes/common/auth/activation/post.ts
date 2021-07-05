@@ -25,7 +25,7 @@ export default function authActivationRoute__post(route: Router) {
         Auth.WithHandler<Validations.IGetNewValidationBody>
       >({
         newEmail: Joi.string().required().email(),
-        age: Joi.number().required(),
+        age: Joi.number().optional(),
       })
         .keys({ __user: Joi.any() }) // Lets us ignore the user object added by authHandler
         .options({ abortEarly: false }),

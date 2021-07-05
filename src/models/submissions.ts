@@ -121,7 +121,7 @@ export default class SubmissionModel extends BaseModel<
     const subs = await this.db('submissions')
       .innerJoin('users', 'users.id', 'submissions.userId')
       // This void fixes a linting error and does nothing else
-      .avg<void>('submissions.score')
+      .avg<void>('submissions.score as score')
       .groupBy('users.id')
       .select('users.id', 'users.codename')
       .orderBy('score', 'desc')

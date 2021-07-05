@@ -166,8 +166,15 @@ export default class AuthService extends BaseService {
     try {
       let sendTo: string;
       let isParent = false;
-      if (!data.age) throw HTTPError.create(400, 'No age received');
-      if (data.age < 13) {
+      console.log(data.__user);
+      // IF you don't send an age, then it will read the age from your user on the body
+      const age =
+        data.age ||
+        DateTime.fromFormat(data.__user.dob, 'yyyy-MM-dd').diffNow('years')
+          .years;
+
+      if (!age) throw HTTPError.create(400, 'No age received');
+      if (age < 13) {
         if (data.newEmail === data.__user.email) {
           throw HTTPError.create(
             400,
@@ -188,19 +195,10 @@ export default class AuthService extends BaseService {
       const validation = await this.validationModel.getRecentByUserId(
         data.__user.id
       );
-      const createdAt =
-        validation?.created_at.getTime() || // If somehow the user never got validation
-        DateTime.now()
-          // Fall back to a time that allows them to get an email, 20 minutes past the lockout window
-          .minus({ minutes: env.VALIDATION_EMAIL_LOCKOUT + 20 })
-          .toMillis();
-      const timeSinceLastRequest = Date.now() - createdAt;
 
       await this.db.transaction(async (trx) => {
         if (validation) {
-          // Convert lockout minutes to MS for comparison
-          const lockoutInMS = env.VALIDATION_EMAIL_LOCKOUT * 60 * 1000;
-          if (timeSinceLastRequest < lockoutInMS) {
+          if (!this.canSendNewEmail(validation)) {
             // Too soon to send another email, user is still in the lockout window
             throw HTTPError.create(429, 'Cannot send another email so soon');
           } else {
@@ -225,10 +223,16 @@ export default class AuthService extends BaseService {
   }
   public async resendValidationEmail(user: Users.IUser): Promise<void> {
     try {
+      // Get our validation
       const validation = await this.validationModel.getRecentByUserId(user.id);
-      if (!validation) {
-        throw HTTPError.create(404, 'No validation found');
-      }
+
+      // Handle our error cases
+      if (!validation) throw HTTPError.create(404, 'No validation found');
+      if (!this.canSendNewEmail(validation))
+        // Too soon to send another email, user is still in th lockout window
+        throw HTTPError.create(429, 'Cannot send another email so soon');
+
+      // Otherwise, send the new email
       await this.sendValidationEmail({
         sendTo: validation.email,
         isParent: validation.validatorId === Validations.ValidatorEnum.parent,
@@ -249,9 +253,7 @@ export default class AuthService extends BaseService {
       );
       await this.db.transaction(async () => {
         if (resetItem) {
-          const timeSinceLastRequest =
-            Date.now() - resetItem.created_at.getTime();
-          if (timeSinceLastRequest < 600000) {
+          if (!this.canSendNewEmail(resetItem)) {
             throw HTTPError.create(429, 'Cannot send another email so soon');
           } else {
             // Able to generate another code, so delete the old one
@@ -342,4 +344,24 @@ export default class AuthService extends BaseService {
     return hashedPassword;
   }
   public generateToken = generateToken;
+
+  // Use this to consistently restrict the sending of multiple emails too rapidly
+  public canSendNewEmail(email?: Validations.IValidation | Auth.resets.IReset) {
+    // Set lockout based on whether the field is validator or reset (in minutes, 10 if unset)
+    let lockout = 10;
+    if ((email as Validations.IValidation)?.validatorId) {
+      lockout = env.VALIDATION_EMAIL_LOCKOUT;
+    } else {
+      lockout = env.RESET_EMAIL_LOCKOUT;
+    }
+    const createdAt =
+      email?.created_at.getTime() ||
+      DateTime.now()
+        // Fall back to a time that allows them to get an email, 20 minutes past the lockout window
+        .minus({ minutes: lockout + 20 })
+        .toMillis();
+    const timeSinceLastRequest = Date.now() - createdAt;
+    const lockoutInMS = lockout * 60 * 1000;
+    return timeSinceLastRequest >= lockoutInMS;
+  }
 }

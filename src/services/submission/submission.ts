@@ -285,14 +285,14 @@ export default class SubmissionService extends BaseService {
     try {
       // TODO figure this stuff out
       const fromS3 = await this.bucketService.get(sub.s3Label, sub.etag);
-      const bufferString = btoa(
-        fromS3.Body?.toString() || ''
-        // ! what even is this I need to fix it
-        // fromS3.Body?.reduce(
-        //   (data, byte) => data + String.fromCharCode(byte),
-        //   ''
-        // )
-      );
+      const bufferString = fromS3.Body?.toString('base64');
+      // const bufferString = btoa(
+      // fromS3.Body?.toString() || ''
+      // fromS3.Body?.reduce(
+      //   (data, byte) => data + String.fromCharCode(byte),
+      //   ''
+      // )
+      // );
       return `data:application/octet-stream;base64,${bufferString}`;
     } catch (err) {
       this.logger.error(err);

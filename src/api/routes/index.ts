@@ -1,8 +1,8 @@
 import express from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
+import clashRoutes__loader from './clash';
 import commonRoutes__loader from './common';
-import contestRoutes__loader from './contest';
 import classroomRumbleRoute__loader from './rumble';
 
 export default function apiRoute__loader() {
@@ -15,7 +15,7 @@ export default function apiRoute__loader() {
   logger.debug('Loading routes...');
 
   commonRoutes__loader(app);
-  contestRoutes__loader(app);
+  clashRoutes__loader(app);
   classroomRumbleRoute__loader(app);
 
   logger.debug('Routes loaded.');

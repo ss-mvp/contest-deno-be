@@ -1,4 +1,4 @@
-/** URL Scope: /contest/top */
+/** URL Scope: /clash/top */
 
 import { Router } from 'express';
 import Container from 'typedi';

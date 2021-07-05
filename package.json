@@ -1,6 +1,6 @@
 {
   "name": "contest-be",
-  "version": "2.0.0",
+  "version": "1.9.9999",
   "main": "index.js",
   "repository": "https://github.com/story-squad/contest-deno-be.git",
   "author": "Brandon Ramirez <bran.ramirez.don@gmail.com>",

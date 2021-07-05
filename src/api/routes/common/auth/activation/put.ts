@@ -11,7 +11,6 @@ export default function authActivationRoute__put(route: Router) {
   const logger: Logger = Container.get('logger');
   const authServiceInstance = Container.get(AuthService);
 
-  // PUT /activation
   route.put<
     never, // URL parameters
     Auth.IAuthResponse, // Response body

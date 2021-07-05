@@ -2,7 +2,7 @@
 
 These routes are likely specific to the FDSC/Classroom Rumble ecosystem and will not be used across other apps.
 
-## Submissions: `/api/contest/submissions`
+## Submissions: `/api/clash/submissions`
 
 ### Submission Endpoints
 
@@ -27,7 +27,7 @@ These routes are likely specific to the FDSC/Classroom Rumble ecosystem and will
 | `Top3Response` | `{ top3: [], message }`                                  |
 | `AddFlags`     | `{ flags: number[] }`                                    |
 
-## Prompts: `/api/contest/prompts`
+## Prompts: `/api/clash/prompts`
 
 ### Prompt Endpoints
 

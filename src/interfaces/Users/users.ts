@@ -7,6 +7,7 @@ export interface IUser extends Omit<INewUser, 'parentEmail'> {
   password: string;
   email: string;
   roleId: number;
+  dob: string;
   created_at: Date;
   updated_at: Date;
 }

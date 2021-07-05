@@ -1,4 +1,4 @@
-/** URL Scope: /contest */
+/** URL Scope: /clash */
 
 import { Router } from 'express';
 import Container from 'typedi';
@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import { Clash } from '../../../interfaces';
 import { ClashService } from '../../../services';
 
-export default function contestRoute__getLeaderboard(route: Router) {
+export default function clashRoute__getLeaderboard(route: Router) {
   const logger: Logger = Container.get('logger');
   const contestServiceInstance = Container.get(ClashService);
 
