@@ -62,9 +62,16 @@ export default function authHandlerGenerator<
             user.roleId !== Roles.RoleEnum.admin &&
             !roles.includes(user.roleId)
           ) {
-            throw HTTPError.create(401, 'Not authorized (Access Restricted)');
+            throw HTTPError.create(403, {
+              message: 'Invalid permissions to access this resource',
+              required: roles.map((rId) => Roles.RoleEnum[rId]),
+              actual: Roles.RoleEnum[user.roleId],
+            });
           } else if (validationRequired && !user.isValidated) {
-            throw HTTPError.create(401, 'Account must be validated');
+            throw HTTPError.create(
+              403,
+              'Account must be validated to access this resource'
+            );
           }
 
           // Add the user info to the req body if all goes well (minus password)
