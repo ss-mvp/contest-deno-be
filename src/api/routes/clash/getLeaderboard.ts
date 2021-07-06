@@ -18,6 +18,7 @@ export default function clashRoute__getLeaderboard(route: Router) {
   >('/leaderboard', async (req, res, next) => {
     try {
       const leaderboard = await contestServiceInstance.getLeaderboard();
+      console.log('leaderboard', leaderboard);
       res.status(200).json(leaderboard);
     } catch (err) {
       logger.error(err);
