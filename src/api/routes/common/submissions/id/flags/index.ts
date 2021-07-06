@@ -7,7 +7,7 @@ import submissionFlagRoute__deleteById from './delete';
 import submissionFlagRoute__get from './get';
 import submissionFlagRoute__post from './post';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function submissionFlagRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

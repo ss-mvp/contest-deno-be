@@ -1,3 +1,5 @@
+import AWS from 'aws-sdk';
+
 export interface IFileChecksum {
   filekey: string;
   Checksum: string;

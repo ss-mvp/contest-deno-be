@@ -7,7 +7,7 @@ import submissionRoute__get from './get';
 import submissionIdRoute__loader from './id';
 import submissionRoute__post from './post';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function submissionRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { IHTTPError } from './HTTPError.model';
 
 export default (function HTTPErrorInit() {
@@ -40,13 +41,18 @@ export default (function HTTPErrorInit() {
     res.response = responseBody;
     return res;
   }
-  function HTTPErrorInit__isHTTPError(err: unknown) {
+  function HTTPErrorInit__isHTTPError(err: unknown): err is IHTTPError {
     const errAsHTTPErr = err as IHTTPError;
     return errAsHTTPErr.type === 'httpError' || !!errAsHTTPErr.status;
+  }
+  function HTTPErrorInit__isAxiosError(err: unknown): err is AxiosError {
+    const errAsAxiosErr = err as AxiosError;
+    return errAsAxiosErr.isAxiosError;
   }
 
   return {
     create: HTTPErrorInit__create,
     isHTTPError: HTTPErrorInit__isHTTPError,
+    isAxiosError: HTTPErrorInit__isAxiosError,
   };
 })();

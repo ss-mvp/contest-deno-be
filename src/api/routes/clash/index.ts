@@ -6,7 +6,7 @@ import clashTopRoute__loader from './top';
 import clashVotesRoute__loader from './votes';
 import clashWinnerRoute__loader from './winner';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function clashRoutes__loader(app: Router) {
   const logger: Logger = Container.get('logger');

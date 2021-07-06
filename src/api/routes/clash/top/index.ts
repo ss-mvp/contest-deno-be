@@ -7,7 +7,7 @@ import contestTopRoute__get from './get';
 import contestTopRoute__getAdmin from './getAdmin';
 import contestTopRoute__post from './post';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function clashTopRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

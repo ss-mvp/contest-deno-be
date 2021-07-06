@@ -96,10 +96,12 @@ export default function errorHandler__routes(app: Express) {
   app.use(
     // eslint-disable-next-line
     (err: IHTTPError, req: Request, res: Response, next: NextFunction) => {
+      console.log('error handling', err);
       const status = err.status || 500;
-      const message = err.message || 'Something went wrong.';
-      const response = err.response || { message };
-      logger.debug(`[${status}]`, response);
+      const message =
+        err.response?.message || err.message || 'Something went wrong.';
+      const response = Object.assign(err?.response || {}, { message });
+      logger.debug(`[${status}] ${err.message}`);
       res.status(status).json(response);
     }
   );

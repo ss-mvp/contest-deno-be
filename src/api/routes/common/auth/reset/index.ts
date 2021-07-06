@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import authResetRoute__get from './get';
 import authResetRoute__post from './post';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function authResetRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

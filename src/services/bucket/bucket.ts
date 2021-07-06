@@ -5,6 +5,8 @@ import { Logger } from 'winston';
 import { env } from '../../config';
 import { HTTPError } from '../../utils';
 
+const ALLOWED_UPLOAD_EXTS = ['jpg', 'png', 'jpeg'];
+
 @Service()
 export default class BucketService {
   constructor(
@@ -17,7 +19,10 @@ export default class BucketService {
       if (!extension)
         throw HTTPError.create(400, `Could not get file extension`);
       if (!this.isValidFileType(extension))
-        throw HTTPError.create(422, 'Unsupported file type');
+        throw HTTPError.create(422, {
+          message: 'Unsupported file type',
+          allowed: ALLOWED_UPLOAD_EXTS,
+        });
 
       // Generate a unique label for the s3 bucket
       const s3Label = new URLSearchParams({
@@ -85,7 +90,6 @@ export default class BucketService {
   }
 
   private isValidFileType(extension: string) {
-    const allowedExtensions = ['jpg', 'png', 'jpeg'];
-    return allowedExtensions.includes(extension);
+    return ALLOWED_UPLOAD_EXTS.includes(extension);
   }
 }

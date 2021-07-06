@@ -24,13 +24,21 @@ export default function userRoute__post(route: Router) {
     '/',
     authHandler({ roles: [Roles.RoleEnum.admin] }),
     celebrate({
-      // TODO test this schema generator
       [Segments.BODY]: Users.Schema.new(),
     }),
     async (req, res, next) => {
       try {
-        // Clear the user from auth handler off before insert
-        const [user] = await userModelInstance.add(req.body);
+        const [user] = await userModelInstance.add({
+          codename: req.body.codename,
+          firstname: req.body.firstname,
+          password: req.body.password,
+          roleId: req.body.roleId,
+          dob: req.body.dob,
+          email: req.body.email,
+          isValidated: req.body.isValidated,
+          lastname: req.body.lastname,
+          parentEmail: req.body.parentEmail,
+        });
         res.status(200).json(user);
       } catch (err) {
         logger.error(err);

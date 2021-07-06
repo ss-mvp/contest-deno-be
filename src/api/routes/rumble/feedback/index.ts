@@ -7,7 +7,7 @@ import rumbleFeedbackRoute__get from './get';
 import rumbleFeedbackRoute__getComplete from './getComplete';
 import rumbleFeedbackRoute__put from './put';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function rumbleFeedbackRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

@@ -9,7 +9,7 @@ import promptIdRoute__loader from './id';
 import promptRoute__post from './post';
 import promptQueueRoute__loader from './queue';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function promptRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

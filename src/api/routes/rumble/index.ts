@@ -10,7 +10,7 @@ import rumbleSectionRoute__loader from './sections';
 import rumbleStudentsRoute__loader from './students';
 import rumbleTeachersRoute__loader from './teachers';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function classroomRumbleRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

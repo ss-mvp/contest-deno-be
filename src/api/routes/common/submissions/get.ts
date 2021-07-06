@@ -14,6 +14,9 @@ interface GetSubmissionQuery {
   transcriptionSourceId?: number;
 }
 
+/**
+ * Gets a list of submissions based on pagination parameters.
+ */
 export default function submissionRoute__get(route: Router) {
   const logger: Logger = Container.get('logger');
   const subServiceInstance = Container.get(SubmissionService);

@@ -11,7 +11,7 @@ import userRoute__head from './head';
 import userRoute__post from './post';
 import userRoute__put from './put';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function userRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

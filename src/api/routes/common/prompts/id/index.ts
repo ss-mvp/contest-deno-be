@@ -7,7 +7,7 @@ import promptIdRoute__delete from './delete';
 import promptIdRoute__get from './get';
 import promptIdRoute__put from './put';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function promptIdRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

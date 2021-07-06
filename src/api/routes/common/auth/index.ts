@@ -9,7 +9,7 @@ import oAuthRoute__loader from './o';
 import authRoute__register from './register';
 import authResetRoute__loader from './reset';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function authRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

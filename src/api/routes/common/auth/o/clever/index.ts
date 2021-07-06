@@ -8,7 +8,7 @@ import cleverOAuthRoute__getButton from './getButton';
 import cleverOAuthRoute__postMerge from './postMerge';
 import cleverOAuthRoute__postSignup from './postSignup';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function cleverOAuthRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

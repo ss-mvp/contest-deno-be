@@ -6,6 +6,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import { API, Prompts } from '../../../../../interfaces';
 import { PromptModel } from '../../../../../models';
+import { HTTPError } from '../../../../../utils';
 import { authHandler } from '../../../../middlewares';
 
 export default function promptIdRoute__get(route: Router) {
@@ -31,6 +32,8 @@ export default function promptIdRoute__get(route: Router) {
         const [prompt] = await promptModelInstance.get({
           id: req.params.id,
         });
+
+        if (!prompt) throw HTTPError.create(404, 'Prompt not found');
 
         res.status(200).json(prompt);
       } catch (err) {

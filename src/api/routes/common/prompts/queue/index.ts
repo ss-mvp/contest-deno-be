@@ -5,7 +5,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import promptQueueRoute__get from './get';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function promptQueueRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

@@ -5,7 +5,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import rumbleIdRoute__loader from './id';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function rumblesRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

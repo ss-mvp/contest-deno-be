@@ -58,7 +58,11 @@ export default function authHandlerGenerator<
           // Get an instance of the UserModel if we need to role check
           const userModelInstance = Container.get(UserModel);
           const [user] = await userModelInstance.get({ id: +id });
-          if (
+          if (!user) {
+            // Something weird is going on with their token
+            logger.error('Could not find user with id ' + id);
+            return next();
+          } else if (
             user.roleId !== Roles.RoleEnum.admin &&
             !roles.includes(user.roleId)
           ) {

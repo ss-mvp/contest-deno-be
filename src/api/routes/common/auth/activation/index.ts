@@ -7,7 +7,7 @@ import authActivationRoute__get from './get';
 import authActivationRoute__post from './post';
 import authActivationRoute__put from './put';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function authActivationRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

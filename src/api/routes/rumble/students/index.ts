@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import rumbleStudentsRoute__getSections from './getSections';
 import rumbleStudentsRoute__getStudentSubs from './getStudentSubs';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function rumbleStudentsRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

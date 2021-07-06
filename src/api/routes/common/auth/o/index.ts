@@ -5,7 +5,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import cleverOAuthRoute__loader from './clever';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function oAuthRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

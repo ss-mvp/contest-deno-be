@@ -5,7 +5,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import contestVotesRoute__post from './post';
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 export default function clashVotesRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

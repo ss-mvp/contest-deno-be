@@ -8,7 +8,7 @@ import submissionFlagRoute__loader from './flags';
 import submissionIdRoute__get from './get';
 import submissionIdRoute__getFeedback from './getFeedback';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function submissionIdRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

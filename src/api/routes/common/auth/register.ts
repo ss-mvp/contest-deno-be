@@ -37,7 +37,8 @@ export default function authRoute__register(route: Router) {
 
         res.status(201).json(response);
       } catch (err) {
-        logger.error('Error in /register', err);
+        logger.error('Error in /register');
+        logger.error(err);
         next(err);
       }
     }

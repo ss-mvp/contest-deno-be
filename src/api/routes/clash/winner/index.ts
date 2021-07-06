@@ -5,7 +5,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import contestWinnerRoute__get from './get';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function clashWinnerRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

@@ -31,7 +31,7 @@ export default function contestVotesRoute__post(route: Router) {
     celebrate({
       [Segments.BODY]: Joi.object({
         votes: Joi.array().required().length(3).items(Joi.number().min(1)),
-      }),
+      }).options({ allowUnknown: true }),
     }),
     async (req, res, next) => {
       try {

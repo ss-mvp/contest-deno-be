@@ -7,7 +7,7 @@ import rumbleTeachersRoute__getSections from './getSections';
 import rumbleTeachersRoute__postRumbles from './postRumbles';
 import rumbleTeachersRoute__postSections from './postSections';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function rumbleTeachersRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

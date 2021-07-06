@@ -3,6 +3,7 @@ import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import { env } from '../../config';
 import { API, DS, Feedback } from '../../interfaces';
+import { HTTPError } from '../../utils';
 
 @Service()
 export default class DSService {
@@ -14,8 +15,8 @@ export default class DSService {
 
   public async sendSubmissionToDS({
     pages,
-    promptId,
-    submissionId = 0,
+    promptId = 1,
+    submissionId = 1,
   }: {
     pages: API.middleware.upload.IResponseWithChecksum[];
     promptId: number;
@@ -107,13 +108,21 @@ export default class DSService {
     body: DS.api.IDSAPITextSubmissionPostBody
   ): Promise<DS.api.IDSAPITextSubmissionResponse> {
     try {
-      console.log('ds req start', body);
       const { data } = await this.api.post(`/submission/text`, body);
-      console.log('ds req end', data);
       return data;
-    } catch (err) {
-      this.logger.error('text sub', { err });
-      throw err;
+    } catch (err: unknown) {
+      this.logger.error('text sub err');
+      let status = 500;
+      let message = 'Error submitting to DS API';
+      if (HTTPError.isAxiosError(err)) {
+        if (err.response?.status) {
+          status = err.response.status;
+        }
+        if (err.response?.data) {
+          message = err.response.data;
+        }
+      }
+      throw HTTPError.create(status, message);
     }
   }
 }

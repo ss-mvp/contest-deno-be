@@ -6,6 +6,7 @@ export * as DS from './DS';
 // Don't namespace the enums
 export * from './Enum';
 export * as Feedback from './Feedback';
+export * as Files from './Files';
 export * as Prompts from './Prompts';
 export * as Rumbles from './Rumbles';
 export * as Sections from './Sections';

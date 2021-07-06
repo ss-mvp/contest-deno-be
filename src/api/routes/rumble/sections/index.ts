@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import rumbleSectionRoute__getStudent from './getStudents';
 import rumbleSectionRoute__postNewStudent from './postNewStudent';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function rumbleSectionRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

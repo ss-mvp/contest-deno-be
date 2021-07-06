@@ -10,7 +10,7 @@ import rumbleIdRoute__getSubForStudent from './getSubForStudent';
 import rumbleIdRoute__putStartFeedback from './putStartFeedback';
 import rumbleIdRoute__putStartWriting from './putStartWriting';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function rumbleIdRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');

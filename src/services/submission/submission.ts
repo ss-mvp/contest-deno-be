@@ -45,7 +45,7 @@ export default class SubmissionService extends BaseService {
     transcription?: string;
   }) {
     try {
-      this.logger.debug('sending', uploadResponse, 'to ds');
+      this.logger.debug('sending ' + uploadResponse.s3Label + ' to ds');
       const dsResponse = await this.dsService.sendSubmissionToDS({
         pages: [uploadResponse],
         promptId,
