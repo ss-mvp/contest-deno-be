@@ -5,7 +5,6 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import { Submissions } from '../../../../interfaces';
 import { ClashService } from '../../../../services';
-import { authHandler } from '../../../middlewares';
 
 export default function contestWinnerRoute__get(route: Router) {
   const logger: Logger = Container.get('logger');
@@ -16,7 +15,7 @@ export default function contestWinnerRoute__get(route: Router) {
     Submissions.ISubItem, // Response body
     never, // Request body
     never // Query parameters
-  >('/', authHandler(), async (req, res, next) => {
+  >('/', async (req, res, next) => {
     try {
       const subs = await clashServiceInstance.getRecentWinner();
       res.status(200).json(subs);
