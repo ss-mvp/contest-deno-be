@@ -55,6 +55,11 @@ export default class ClashService extends BaseService {
       .minus({ day: 7 });
 
     const leaderboard = await this.subModel.getLeaderboardFrom(fromDate);
+
+    leaderboard.forEach((item) => {
+      item.score = parseInt(`${item.score}`);
+    });
+
     return leaderboard;
   }
 
