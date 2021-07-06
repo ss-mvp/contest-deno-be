@@ -237,7 +237,7 @@ export default class SubmissionService extends BaseService {
       return {
         id: sub.id,
         src,
-        score: sub.score,
+        score: parseInt(`${sub.score}`),
         prompt,
         rotation: sub.rotation,
         codename: user.codename,
