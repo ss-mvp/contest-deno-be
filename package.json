@@ -5,6 +5,7 @@
   "repository": "https://github.com/story-squad/contest-deno-be.git",
   "author": "Brandon Ramirez <bran.ramirez.don@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "start": "node src/index.ts",
     "dev": "nodemon src/index.ts",
