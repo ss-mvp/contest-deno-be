@@ -6,7 +6,8 @@
   "author": "Brandon Ramirez <bran.ramirez.don@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "start": "node src/index.ts",
+    "dev": "nodemon src/index.ts",
     "up": "docker-compose -f docker/docker-compose.yml up -d",
     "latest": "yarn knex migrate:latest",
     "latest:test": "yarn cross-env NODE_ENV=testing knex migrate:latest",
