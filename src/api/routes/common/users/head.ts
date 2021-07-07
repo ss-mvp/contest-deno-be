@@ -4,10 +4,9 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { API, Roles } from '../../../../interfaces';
+import { API } from '../../../../interfaces';
 import { UserModel } from '../../../../models';
 import { parseGetQuery } from '../../../../utils/parsers';
-import { authHandler } from '../../../middlewares';
 
 interface HeadUsersQuery {
   codename?: string;
@@ -29,7 +28,6 @@ export default function userRoute__head(route: Router) {
     API.GetParams<HeadUsersQuery> // Query parameters
   >(
     '/',
-    authHandler({ roles: [Roles.RoleEnum.admin, Roles.RoleEnum.teacher] }),
     celebrate({
       [Segments.QUERY]: Joi.object<HeadUsersQuery>({
         codename: Joi.string().optional(),

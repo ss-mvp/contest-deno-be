@@ -3,9 +3,8 @@
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { Prompts, Roles } from '../../../../../interfaces';
+import { Prompts } from '../../../../../interfaces';
 import { PromptModel } from '../../../../../models';
-import { authHandler } from '../../../../middlewares';
 
 /**
  * This route triggers the event that increments the currently active
@@ -21,18 +20,14 @@ export default function promptQueueRoute__get(route: Router) {
     Prompts.IPromptInQueue[], // Response body
     never, // Request body
     never // Query parameters
-  >(
-    '/',
-    authHandler({ roles: [Roles.RoleEnum.teacher, Roles.RoleEnum.admin] }),
-    async (req, res, next) => {
-      try {
-        const promptQueue = await promptModelInstance.getUpcoming();
-        // Returns an array of prompts that include a `starts_at` date field
-        res.status(200).json(promptQueue);
-      } catch (err) {
-        logger.error(err);
-        next(err);
-      }
+  >('/', async (req, res, next) => {
+    try {
+      const promptQueue = await promptModelInstance.getUpcoming();
+      // Returns an array of prompts that include a `starts_at` date field
+      res.status(200).json(promptQueue);
+    } catch (err) {
+      logger.error(err);
+      next(err);
     }
-  );
+  });
 }

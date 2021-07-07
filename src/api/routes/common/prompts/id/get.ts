@@ -7,7 +7,6 @@ import { Logger } from 'winston';
 import { API, Prompts } from '../../../../../interfaces';
 import { PromptModel } from '../../../../../models';
 import { HTTPError } from '../../../../../utils';
-import { authHandler } from '../../../../middlewares';
 
 export default function promptIdRoute__get(route: Router) {
   const logger: Logger = Container.get('logger');
@@ -21,7 +20,6 @@ export default function promptIdRoute__get(route: Router) {
     never // Query parameters
   >(
     '/',
-    authHandler(),
     celebrate({
       [Segments.PARAMS]: Joi.object<API.WithId>({
         id: Joi.number().required().min(1),

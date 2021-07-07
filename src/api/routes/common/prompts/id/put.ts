@@ -4,9 +4,8 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { API, Prompts, Roles } from '../../../../../interfaces';
+import { API, Prompts } from '../../../../../interfaces';
 import { PromptModel } from '../../../../../models';
-import { authHandler } from '../../../../middlewares';
 
 export default function promptIdRoute__put(route: Router) {
   const logger: Logger = Container.get('logger');
@@ -19,7 +18,6 @@ export default function promptIdRoute__put(route: Router) {
     never // Query parameters
   >(
     '/',
-    authHandler({ roles: [Roles.RoleEnum.admin] }),
     celebrate({
       [Segments.PARAMS]: Joi.object<API.WithId>({
         id: Joi.number().required().min(1),
