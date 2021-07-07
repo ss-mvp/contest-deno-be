@@ -1,8 +1,8 @@
+import { Rumbles } from '..';
 import { Grades, Subjects } from '../Enum';
-import { IRumbleWithSectionInfo } from '../rumbles';
 
 export interface ISectionWithRumbles extends ISection {
-  rumbles: IRumbleWithSectionInfo[];
+  rumbles: Rumbles.IRumbleWithSectionInfo[];
 }
 export interface ISection extends INewSection {
   id: number;

@@ -1,5 +1,4 @@
-import { ISubItem } from '../submissions';
-import { IUser } from '../users';
+import { Submissions, Users } from '..';
 
 export interface IStudent extends INewStudent {
   id: number;
@@ -10,6 +9,6 @@ export interface INewStudent {
   sectionId: number;
 }
 
-export interface IStudentWithSubmissions extends IUser {
-  submissions: ISubItem[];
+export interface IStudentWithSubmissions extends Users.IUser {
+  submissions: Submissions.ISubItem[];
 }

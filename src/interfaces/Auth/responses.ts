@@ -1,6 +1,6 @@
-import { IUser } from '../users';
+import { Users } from '..';
 
 export interface IAuthResponse {
-  user: Omit<IUser, 'password'>;
+  user: Omit<Users.IUser, 'password'>;
   token: string;
 }

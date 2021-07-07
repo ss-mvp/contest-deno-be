@@ -1,4 +1,4 @@
-import { IUser } from '../users';
+import { Users } from '..';
 import { upload } from './middleware';
 
 export type GetParams<
@@ -20,7 +20,7 @@ export type GetParams<
  * We're adding the never property as a fallback to fix linting
  */
 export type WithAuth<T = { __never: never }> = T & {
-  __user: IUser;
+  __user: Users.IUser;
 };
 
 export type WithId<
