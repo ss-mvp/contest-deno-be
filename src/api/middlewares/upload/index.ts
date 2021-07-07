@@ -24,7 +24,6 @@ export default function fileUploadMiddleware__generator<
     res: Response<Res>,
     next: NextFunction
   ) {
-    console.log('');
     let optionObj: IUploadMiddlewareGeneratorOptions = {};
     const fileNames: string[] = [];
 
@@ -41,8 +40,6 @@ export default function fileUploadMiddleware__generator<
     try {
       // Use our promisified wrapper around the form parser for linting and readability
       const { fields, files } = await parseForm(req);
-
-      console.log('form parsed', fields, files);
 
       // Get an array of filenames and filter to keep only the ones specified in generator params
       const fileKeys = Object.keys(files).filter((fname) =>

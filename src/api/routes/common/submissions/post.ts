@@ -35,7 +35,6 @@ export default function submissionRoute__post(route: Router) {
     // }),
     async (req, res, next) => {
       try {
-        console.log('ep hit', req.body);
         const submission = await subServiceInstance.processSubmission({
           // TODO pass in full array instead of indexing, handle multiple uploads
           uploadResponse: req.body.story[0],
@@ -49,7 +48,6 @@ export default function submissionRoute__post(route: Router) {
             Sources.DsTrscSrcEnum.iOS, // Default to being labelled as iOS transcription
           transcription: req.body.transcription,
         });
-        console.log(submission);
         res.status(201).json(submission);
       } catch (err) {
         logger.error(err);

@@ -24,7 +24,6 @@ export default function authHandlerGenerator<
     res: Response<Res>,
     next: NextFunction
   ) {
-    console.log('auth handler', req.body);
     const logger: Logger = Container.get('logger');
     try {
       // Set defaults for these config values
