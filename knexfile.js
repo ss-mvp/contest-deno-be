@@ -18,7 +18,7 @@ module.exports = {
   },
   heroku: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection: process.env.DATABASE_URL + '?ssl=true',
     pool: {
       min: 2,
       max: 10,
