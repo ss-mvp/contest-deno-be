@@ -7,7 +7,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "node src/index.ts",
+    "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
     "up": "docker-compose -f docker/docker-compose.yml up -d",
     "latest": "yarn knex migrate:latest",
