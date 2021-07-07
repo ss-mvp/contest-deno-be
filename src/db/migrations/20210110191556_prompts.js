@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 exports.up = (knex) => {
   return knex.schema.createTable('prompts', (t) => {
     t.increments('id');

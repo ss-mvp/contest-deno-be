@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const seedUsers = [
   {
     codename: 'A Codename',
@@ -8,6 +7,7 @@ const seedUsers = [
     password: 'thisisastringyoucanteverlogin',
     isValidated: true,
     roleId: 1,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'CodenameTwo',
@@ -17,6 +17,7 @@ const seedUsers = [
     password: 'thisisastringyoucanteverloginuhoh',
     isValidated: true,
     roleId: 2,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'CodenameThree',
@@ -26,6 +27,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 3,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'TeacherSuccess',
@@ -35,6 +37,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 2,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'TeacherMerge',
@@ -44,6 +47,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 2,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'StudentSuccess',
@@ -53,6 +57,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 1,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'Student2',
@@ -62,6 +67,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 1,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'Student3',
@@ -71,6 +77,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 1,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'Student4',
@@ -80,6 +87,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: true,
     roleId: 1,
+    dob: new Date(2000, 1, 1),
   },
   {
     codename: 'Student5',
@@ -89,6 +97,7 @@ const seedUsers = [
     password: '$2a$10$cZajEDkFrgEsdEbVYed4IeM6RAy75/FV9KRlJDZ63O1Cc0KNp13tG', // somepass123A
     isValidated: false,
     roleId: 1,
+    dob: new Date(2000, 1, 1),
   },
 ];
 

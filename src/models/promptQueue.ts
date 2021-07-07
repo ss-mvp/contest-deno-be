@@ -1,18 +1,13 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import {
-  INewPromptQueueItem,
-  IPromptQueueItem,
-} from '../interfaces/promptQueue.ts';
-import BaseModel from './baseModel.ts';
+import { Service } from 'typedi';
+import { Prompts } from '../interfaces';
+import BaseModel from './baseModel';
 
 @Service()
 export default class PromptQueueModel extends BaseModel<
-  INewPromptQueueItem,
-  IPromptQueueItem
+  Prompts.queue.INewQueueItem,
+  Prompts.queue.IQueueItem
 > {
   constructor() {
     super('prompt_queue');
   }
 }
-
-serviceCollection.addTransient(PromptQueueModel);

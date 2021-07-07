@@ -1,12 +1,13 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { INewWinner, IWinner } from '../interfaces/winners.ts';
-import BaseModel from './baseModel.ts';
+import { Service } from 'typedi';
+import { Clash } from '../interfaces';
+import BaseModel from './baseModel';
 
 @Service()
-export default class WinnerModel extends BaseModel<INewWinner, IWinner> {
+export default class WinnerModel extends BaseModel<
+  Clash.winners.INewWinner,
+  Clash.winners.IWinner
+> {
   constructor() {
     super('winners');
   }
 }
-
-serviceCollection.addTransient(WinnerModel);

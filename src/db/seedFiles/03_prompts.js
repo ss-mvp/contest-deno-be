@@ -1,7 +1,6 @@
-// deno-lint-ignore-file
-const moment = require('moment');
+const DateTime = require('luxon').DateTime;
 
-const isBeforeEnd = moment.utc() < moment.utc().hours(22);
+const isBeforeEnd = DateTime.utc() < DateTime.utc().set({ hour: 22 });
 
 const seedPrompts = [
   {

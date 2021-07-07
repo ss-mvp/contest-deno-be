@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const subjects = [
   { id: 'english/language arts', subject: 'English/Language Arts' },
   { id: 'math', subject: 'Math' },

@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const sections = [
   {
     name: 'Reuben - English 1A Per 3',

@@ -1,45 +1,44 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { SSOLookups } from '../interfaces/ssoLookups.ts';
-import { INewUser, IUser, IValidationByUser } from '../interfaces/users.ts';
-import BaseModel from './baseModel.ts';
+import { Service } from 'typedi';
+import { Roles, SSOLookups, Users } from '../interfaces';
+import BaseModel from './baseModel';
 
 @Service()
-export default class UserModel extends BaseModel<INewUser, IUser> {
+export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
   constructor() {
     super('users');
   }
 
-  public async getUserByResetEmail(resetEmail: string) {
-    this.logger.debug(`Retrieving user account from reset email ${resetEmail}`);
+  public async getUserByValidationEmail(
+    validationEmail: string
+  ): Promise<Users.IValidationByUser | undefined> {
+    this.logger.debug(
+      `Retrieving user account from validation email ${validationEmail}`
+    );
 
-    const [user] = (await this.db
-      .table('users')
+    const user = await this.db('users')
       .innerJoin('validations', 'users.id', 'validations.userId')
-      .where('validations.email', resetEmail)
-      .order('validations.id', 'DESC')
-      .first()
+      .where('validations.email', validationEmail)
+      .orderBy('validations.id', 'DESC')
       .select(
-        ['validations.email', 'validationEmail'],
-        ['validations.id', 'validationId'],
+        'validations.email as validationEmail',
+        'validations.id as validationId',
         'users.isValidated',
         'users.id',
         'validations.code'
       )
-      .execute()) as IValidationByUser[];
+      .first();
 
-    this.logger.debug('User retrieved');
     return user;
   }
 
   public async getRole(userId: number) {
     this.logger.debug(`Getting role for user (ID: ${userId})`);
 
-    const [role] = (await this.db
-      .table('users')
+    const role = await this.db('users')
       .innerJoin('roles', 'roles.id', 'users.roleId')
       .where('id', userId)
-      .select('roles.id', 'roles.role')
-      .execute()) as { id: number; role: string }[];
+      .select<Roles.IRole>('roles.id', 'roles.role')
+      .first();
 
     return role;
   }
@@ -47,16 +46,13 @@ export default class UserModel extends BaseModel<INewUser, IUser> {
   public async findByCleverId(cleverId: string) {
     this.logger.debug(`Attempting to retrieve user with clever id ${cleverId}`);
 
-    const [user] = ((await this.db
-      .table('users')
+    const user = await this.db('users')
       .innerJoin('sso_lookup', 'users.id', 'sso_lookup.userId')
-      .where('sso_lookup.providerId', SSOLookups.Clever)
-      .where('sso_lookup.accessToken', cleverId)
-      .select('users.*')
-      .execute()) as unknown) as (IUser | undefined)[];
+      .where('sso_lookup.providerId', SSOLookups.LookupEnum.Clever)
+      .andWhere('sso_lookup.accessToken', cleverId)
+      .select<Users.IUser>('users.*')
+      .first();
 
     return user;
   }
 }
-
-serviceCollection.addTransient(UserModel);

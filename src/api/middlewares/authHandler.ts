@@ -1,86 +1,124 @@
-import {
-  createError,
-  jwt,
-  log,
-  NextFunction,
-  Request,
-  Response,
-  serviceCollection,
-} from '../../../deps.ts';
-import env from '../../config/env.ts';
-import { Roles } from '../../interfaces/roles.ts';
-import UserModel from '../../models/users.ts';
+import { NextFunction, Request, Response } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import Container from 'typedi';
+import { Logger } from 'winston';
+import { env } from '../../config';
+import { Auth, Roles } from '../../interfaces';
+import { UserModel } from '../../models';
+import { HTTPError } from '../../utils';
 
 /**
  * Defaults to requiring any authenticated user.
  * Adds to body: { user: IUser };
  */
-export default (config?: IAuthHandlerConfig) => async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  // Set defaults for these config values
-  const roles = config?.roles ?? [1, 2, 3];
-  const authRequired = config?.authRequired ?? true;
-  const validationRequired = config?.validationRequired ?? false;
-
-  const logger: log.Logger = serviceCollection.get('logger');
-  const token = req.get('Authorization');
-
-  if (!token || token === 'null') {
-    // If no token, check if auth is even required...
-    if (authRequired) throw createError(401, 'You must be logged in');
-    // If it's not required, this is like the voting route, where
-    // the token is optional and you can continue without it
-    else return next();
-  } else {
-    // If it's there, we'll try to
+export default function authHandlerGenerator<
+  Param = Record<string, unknown>,
+  Res = Record<string, unknown>,
+  Req extends Auth.WithHandler<unknown> = Auth.WithHandler<
+    Record<string, unknown>
+  >,
+  Query = Record<string, unknown>
+>(config?: IAuthHandlerConfig) {
+  return async function authHandlerMiddleware(
+    req: Request<Param, Res, Req, Query>,
+    res: Response<Res>,
+    next: NextFunction
+  ) {
+    const logger: Logger = Container.get('logger');
     try {
-      logger.debug('Attempting to verify token');
-      const { id, exp } = (await jwt.verify(
-        token,
-        env.JWT.SECRET,
-        env.JWT.ALGO
-      )) as jwt.Payload & { email: string; id: string; codename: string };
+      // Set defaults for these config values
+      const roles = config?.roles ?? [1, 2, 3];
+      const authRequired = config?.authRequired ?? true;
+      const validationRequired = config?.validationRequired ?? false;
+      const token = req.get('Authorization');
 
-      logger.debug('Checking token expiration');
-      if (!exp || exp < Date.now()) {
-        // If token is expired, let them know
-        throw createError(401, 'Token is expired');
-      } else if (!id) {
-        // If token is formatted incorrectly
-        throw createError(401, 'Invalid token body');
+      // Check if we have a token
+      if (!token || token === 'null') {
+        // If no token, check if auth is even required...
+        if (authRequired) throw HTTPError.create(401, 'You must be logged in');
+        // If it's not required, this is like the voting route, where
+        // the token is optional and you can continue without it
+        else return next();
       } else {
-        logger.debug(
-          `Successfully authenticated, authorizing for roles: \
-            ${roles.join(', ')}`
-        );
-        // Get an instance of the UserModel if we need to role check
-        const userModelInstance = serviceCollection.get(UserModel);
-        const [user] = await userModelInstance.get({ id: parseInt(id, 10) });
-        if (user.roleId !== Roles.admin && !roles.includes(user.roleId)) {
-          throw createError(401, 'Not authorized (Access Restricted)');
-        } else if (validationRequired && !user.isValidated) {
-          throw createError(401, 'Account must be validated');
+        logger.debug('Attempting to verify token');
+        const { exp, id } = await decodeJWT(token);
+
+        logger.debug('Checking token expiration');
+        if (!exp || exp < Date.now()) {
+          // If token is expired, let them know
+          throw HTTPError.create(401, 'Token is expired');
+        } else if (!id) {
+          // If token is formatted incorrectly
+          throw HTTPError.create(401, 'Invalid token body');
+        } else {
+          logger.debug(
+            `Successfully authenticated, authorizing for roles: \
+              ${roles.join(', ')}`
+          );
+          // Get an instance of the UserModel if we need to role check
+          const userModelInstance = Container.get(UserModel);
+          const [user] = await userModelInstance.get({ id: +id });
+          if (!user) {
+            // Something weird is going on with their token
+            logger.error('Could not find user with id ' + id);
+            return next();
+          } else if (
+            user.roleId !== Roles.RoleEnum.admin &&
+            !roles.includes(user.roleId)
+          ) {
+            throw HTTPError.create(403, {
+              message: 'Invalid permissions to access this resource',
+              required: roles.map((rId) => Roles.RoleEnum[rId]),
+              actual: Roles.RoleEnum[user.roleId],
+            });
+          } else if (validationRequired && !user.isValidated) {
+            throw HTTPError.create(
+              403,
+              'Account must be validated to access this resource'
+            );
+          }
+
+          // Add the user info to the req body if all goes well (minus password)
+          Reflect.deleteProperty(user, 'password');
+          req.body.__user = user;
+
+          next();
         }
-
-        // Add the user info to the req body if all goes well
-        // But remove unecessary fields
-        Reflect.deleteProperty(user, 'password');
-        Reflect.deleteProperty(user, 'created_at');
-        Reflect.deleteProperty(user, 'updated_at');
-        Reflect.deleteProperty(user, 'isValidated');
-        req.body.user = user;
-
-        next();
       }
     } catch (err) {
       logger.error(err);
-      throw err;
+      next(err);
     }
-  }
-};
+  };
+}
+
+async function decodeJWT(token: string) {
+  // Promisify the jwt verification for a more modern syntax and better linting
+  const decodedToken = await new Promise<
+    {
+      id?: number;
+      email?: string;
+      codename?: string;
+    } & JwtPayload
+  >((resolve, reject) => {
+    jwt.verify(
+      token,
+      env.JWT.SECRET,
+      {
+        algorithms: [env.JWT.ALGO],
+      },
+      (err, decodedToken) => {
+        if (err) {
+          console.log('Error decoding token', err);
+          reject(err);
+        } else if (!!decodedToken) {
+          resolve(decodedToken);
+        }
+      }
+    );
+  });
+  return decodedToken;
+}
 
 interface IAuthHandlerConfig {
   authRequired?: boolean;

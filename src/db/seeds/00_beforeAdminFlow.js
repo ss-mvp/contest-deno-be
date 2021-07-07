@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const { seed_cleanup } = require('../seedFiles/00_cleanup');
 const { seed_roles } = require('../seedFiles/01_roles');
 const { seed_users } = require('../seedFiles/02_users');

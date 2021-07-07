@@ -1,14 +1,12 @@
-import { CleverClient } from '../../deps.ts';
-import env from '../config/env.ts';
+import { env } from '../config';
+import CleverClient from '../services/clever/client';
 
-export default () => {
-  console.log('Initializing clever client...');
+export default function clever__loader() {
+  console.log('Loading Clever client...');
 
-  const client = new CleverClient({
-    ...env.CLEVER_CONFIG,
-    apiVersion: 'v2.1',
-  });
+  const client = new CleverClient(env.CLEVER_CONFIG);
 
-  console.log('Clever initialized!');
+  console.log('Clever client loaded!');
+
   return client;
-};
+}

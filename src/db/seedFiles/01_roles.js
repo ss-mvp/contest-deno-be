@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 async function seed_roles(knex) {
   await knex('roles').insert([
     { role: 'user' },

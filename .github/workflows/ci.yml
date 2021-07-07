@@ -20,19 +20,3 @@ jobs:
 
       - name: Check linting
         run: npm install && npm run lint:check
-
-      - name: Install deno
-        uses: denolib/setup-deno@master
-        with:
-          deno-version: 1.6.3
-
-      - name: Run tests
-        env:
-          DENO_ENV: ci
-          CI_DB_NAME: ${{ secrets.CI_DB_NAME }}
-          CI_DB_HOST: ${{ secrets.CI_DB_HOST }}
-          CI_DB_PORT: ${{ secrets.CI_DB_PORT }}
-          CI_DB_PASS: ${{ secrets.CI_DB_PASS }}
-          CI_DB_USER: ${{ secrets.CI_DB_USER }}
-          UUID_NAMESPACE: ${{ secrets.UUID_NAMESPACE }}
-        run: deno test -c tsconfig.json --allow-read --allow-net --allow-write --allow-env --unstable __tests__/index.test.ts

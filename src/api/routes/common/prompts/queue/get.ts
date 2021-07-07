@@ -1,0 +1,38 @@
+/** URL Scope: /prompts/queue */
+
+import { Router } from 'express';
+import Container from 'typedi';
+import { Logger } from 'winston';
+import { Prompts, Roles } from '../../../../../interfaces';
+import { PromptModel } from '../../../../../models';
+import { authHandler } from '../../../../middlewares';
+
+/**
+ * This route triggers the event that increments the currently active
+ * prompt in the database to the next day. It's admin-only, takes no
+ * input, and sends no output (aside from errors).
+ */
+export default function promptQueueRoute__get(route: Router) {
+  const logger: Logger = Container.get('logger');
+  const promptModelInstance = Container.get(PromptModel);
+
+  route.get<
+    never, // URL parameters
+    Prompts.IPromptInQueue[], // Response body
+    never, // Request body
+    never // Query parameters
+  >(
+    '/',
+    authHandler({ roles: [Roles.RoleEnum.teacher, Roles.RoleEnum.admin] }),
+    async (req, res, next) => {
+      try {
+        const promptQueue = await promptModelInstance.getUpcoming();
+        // Returns an array of prompts that include a `starts_at` date field
+        res.status(200).json(promptQueue);
+      } catch (err) {
+        logger.error(err);
+        next(err);
+      }
+    }
+  );
+}

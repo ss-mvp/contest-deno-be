@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const teachers = [
   { userId: 4, sectionId: 1, primary: true },
   { userId: 4, sectionId: 2, primary: true },

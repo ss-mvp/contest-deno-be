@@ -1,11 +1,10 @@
-import { opine } from '../deps.ts';
-import loaders from './loaders/index.ts';
+import express from 'express';
+import loaders from './loaders';
 
-export default async () => {
-  const app = opine();
+export default async function app__init() {
+  const app = express();
 
-  await loaders({ opineApp: app });
-  console.log('Loaders complete.');
+  await loaders({ expressApp: app });
 
   return app;
-};
+}

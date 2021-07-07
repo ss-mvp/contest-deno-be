@@ -1,10 +1,12 @@
-import { serviceCollection, PostgresAdapter, log } from '../../deps.ts';
+import Knex from 'knex';
+import Container from 'typedi';
+import { Logger } from 'winston';
 
 export default class BaseService {
   constructor() {
-    this.db = serviceCollection.get('pg');
-    this.logger = serviceCollection.get('logger');
+    this.db = Container.get('pg');
+    this.logger = Container.get('logger');
   }
-  protected db: PostgresAdapter;
-  protected logger: log.Logger;
+  protected db: Knex;
+  protected logger: Logger;
 }

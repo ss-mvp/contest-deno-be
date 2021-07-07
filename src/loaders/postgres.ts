@@ -1,45 +1,77 @@
-import { connect } from '../../deps.ts';
-import env from '../config/env.ts';
+import { default as Knex, default as knex } from 'knex';
+import { types } from 'pg';
+import knexfile from '../../knexfile';
+import { env } from '../config';
 
-export default {
-  main: async () => {
-    console.log('Connecting to DB...');
+/**
+ * An async loader function that creates a connection to the
+ * Story Squad main contest database, tests the connection,
+ * and returns it for injection
+ */
+export async function mainDB__loader() {
+  console.log('Connecting to DB...');
 
-    try {
-      const db = await connect({
-        type: 'postgres',
-        ...env.DB_CONFIG,
-      });
+  // Initialize our DS database connection
+  const db = knex(knexfile[env.NODE_ENV]);
 
-      console.log('Testing DB connection...');
-      await db.query('SELECT * FROM users');
+  // This prevents the starts_at Date type column to be returned as
+  // a string 'yyyy-mm-dd' as it is stored, instead of as a Date
+  // This is why starts_at can be a string in the interface
+  types.setTypeParser(1082, (val) => val);
 
-      console.log('DB connected!');
+  try {
+    console.log('Testing DB connection...');
 
-      return db;
-    } catch (err) {
-      console.log(env.DB_CONFIG);
-      console.log(err.message, err);
-    }
-  },
-  ds: async () => {
-    console.log('Connecting to DS DB...');
+    // Run a query to test the connection
+    await db('users').first();
 
-    try {
-      const db = await connect({
-        type: 'postgres',
-        ...env.DS_DB_CONFIG,
-      });
+    // If it works, we're connected
+    console.log('DB connected!');
+  } catch (err) {
+    /**
+     * Most common errors -> how to fix:
+     * - ENV not set -> set ENV :)
+     * - table does not exist -> run migrations!
+     */
+    console.log('Error connecting to Main DB');
+    console.log(env.DB_CONFIG);
+    console.log(err);
+  }
 
-      console.log('Testing DS DB connection...');
-      await db.query('SELECT * FROM submissions');
+  // Return the client for injection
+  return db;
+}
 
-      console.log('DS DB connected!');
+/**
+ * An async loader function that creates a connection to the
+ * Data Science transcription database, tests the connection,
+ * and returns it for injection
+ */
+export async function dsDB__loader(): Promise<Knex> {
+  console.log('Connecting to DS DB...');
 
-      return db;
-    } catch (err) {
-      console.log(env.DS_DB_CONFIG);
-      console.log(err.message, err);
-    }
-  },
-};
+  // Initialize our DS database connection
+  const db = knex(knexfile['ds']);
+
+  try {
+    console.log('Testing DS DB connection...');
+
+    // Run a query to test the connection
+    await db('submissions').first();
+
+    // If it works, we're connected
+    console.log('DS DB connected!');
+  } catch (err) {
+    /**
+     * Most common errors -> how to fix:
+     * - ENV not set -> set ENV :)
+     * - table does not exist -> run migrations!
+     */
+    console.log('Error connecting to DS DB');
+    console.log(env.DS_DB_CONFIG);
+    console.log(err);
+  }
+
+  // Return the client for injection
+  return db;
+}

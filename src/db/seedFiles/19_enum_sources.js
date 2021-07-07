@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const sources = [{ source: 'FDSC' }, { source: 'Rumble' }];
 
 async function seed_source_enum(knex) {

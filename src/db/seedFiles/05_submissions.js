@@ -1,5 +1,4 @@
-// deno-lint-ignore-file
-const moment = require('moment');
+const DateTime = require('luxon').DateTime;
 
 const testSubs = [
   {
@@ -9,9 +8,9 @@ const testSubs = [
     promptId: 1,
     sourceId: 1,
     confidence: 50,
-    score: 25,
+    score: 19,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
   },
   {
     s3Label: 'seedItem1.jpeg',
@@ -22,7 +21,7 @@ const testSubs = [
     confidence: 70,
     score: 40,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
   },
   {
     s3Label: 'seedItem1.jpeg',
@@ -33,7 +32,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc().subtract(1, 'd'),
+    created_at: DateTime.utc().minus({ day: 1 }),
   },
   {
     s3Label: 'seedItem1.jpeg',
@@ -42,9 +41,9 @@ const testSubs = [
     promptId: 2,
     sourceId: 1,
     confidence: 80,
-    score: 45,
+    score: 25,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
   },
   {
     s3Label: 'seedItem1.jpeg',
@@ -55,7 +54,7 @@ const testSubs = [
     confidence: 60,
     score: 25,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
   },
   {
     s3Label: 'seedItem1.jpeg',
@@ -66,7 +65,7 @@ const testSubs = [
     confidence: 100,
     score: 50,
     rotation: 0,
-    created_at: moment.utc(),
+    created_at: DateTime.utc(),
   },
 ];
 

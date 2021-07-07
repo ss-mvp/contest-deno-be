@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 const top3 = [{ submissionId: 4 }, { submissionId: 5 }, { submissionId: 6 }];
 
 async function seed_top3(knex) {

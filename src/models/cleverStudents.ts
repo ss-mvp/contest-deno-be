@@ -1,25 +1,27 @@
-import { Service, serviceCollection } from '../../deps.ts';
-import { ISection } from '../interfaces/cleverSections.ts';
-import { INewStudent, IStudent } from '../interfaces/cleverStudents.ts';
-import BaseModel from './baseModel.ts';
+import { Service } from 'typedi';
+import { Clever, Sections } from '../interfaces';
+import BaseModel from './baseModel';
 
 @Service()
 export default class CleverStudentModel extends BaseModel<
-  INewStudent,
-  IStudent
+  Clever.students.INewStudent,
+  Clever.students.IStudent
 > {
   constructor() {
     super('clever_students');
   }
 
+  /**
+   * Get all of the sections for a student by passing in the student ID.
+   * @param studentId the unique id of the student (from the users table)
+   */
   public async getSectionsById(studentId: number) {
     try {
       this.logger.debug(
         `Attempting to get sections for student with ID: ${studentId}`
       );
 
-      const sections = ((await this.db
-        .table('clever_sections')
+      const sections: Sections.ISection[] = await this.db('clever_sections')
         .innerJoin(
           'clever_students',
           'clever_sections.id',
@@ -27,8 +29,7 @@ export default class CleverStudentModel extends BaseModel<
         )
         .innerJoin('users', 'clever_students.userId', 'users.id')
         .where('users.id', studentId)
-        .select('clever_sections.*')
-        .execute()) as unknown[]) as ISection[];
+        .select('clever_sections.*');
 
       return sections;
     } catch (err) {
@@ -37,5 +38,3 @@ export default class CleverStudentModel extends BaseModel<
     }
   }
 }
-
-serviceCollection.addTransient(CleverStudentModel);
