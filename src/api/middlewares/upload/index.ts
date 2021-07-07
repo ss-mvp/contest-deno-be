@@ -24,6 +24,7 @@ export default function fileUploadMiddleware__generator<
     res: Response<Res>,
     next: NextFunction
   ) {
+    console.log('');
     let optionObj: IUploadMiddlewareGeneratorOptions = {};
     const fileNames: string[] = [];
 
