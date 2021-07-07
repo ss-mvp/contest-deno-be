@@ -21,9 +21,9 @@ export default (() => {
         created_at: Joi.date().required(),
         updated_at: Joi.date().required(),
       }),
-      ...(newUser && {
-        parentEmail: Joi.string().optional(),
-      }),
+      // ...(newUser && {
+      //   parentEmail: Joi.string().optional(),
+      // }),
 
       // Common fields
       dob: Joi.date()[maybeRequired](),
