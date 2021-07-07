@@ -22,7 +22,7 @@ export default (() => {
         updated_at: Joi.date().required(),
       }),
       ...(newUser && {
-        parentEmail: Joi.string().email().optional(),
+        parentEmail: Joi.string().optional(),
       }),
 
       // Common fields
