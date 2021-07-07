@@ -49,7 +49,7 @@ export default function errorHandler__routes(app: Express) {
       });
     }
     err.details.forEach(parseError);
-
+    console.log('joi err', response);
     res.status(400).json(response);
   });
 
