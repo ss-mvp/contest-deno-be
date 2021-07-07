@@ -10,6 +10,7 @@ import { env } from '../config';
  */
 export async function mainDB__loader() {
   console.log('Connecting to DB...');
+  console.log(knexfile, env.NODE_ENV);
 
   // Initialize our DS database connection
   const db = knex(knexfile[env.NODE_ENV]);
@@ -34,7 +35,6 @@ export async function mainDB__loader() {
      * - table does not exist -> run migrations!
      */
     console.log('Error connecting to Main DB');
-    console.log(env.DB_CONFIG);
     console.log(err);
   }
 
@@ -68,7 +68,6 @@ export async function dsDB__loader(): Promise<Knex> {
      * - table does not exist -> run migrations!
      */
     console.log('Error connecting to DS DB');
-    console.log(env.DS_DB_CONFIG);
     console.log(err);
   }
 
