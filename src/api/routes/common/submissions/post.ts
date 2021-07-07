@@ -1,10 +1,9 @@
 /** URL Scope: /submissions */
 
-import { celebrate, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { API, Files, Sources, Submissions } from '../../../../interfaces';
+import { API, Sources, Submissions } from '../../../../interfaces';
 import { SubmissionService } from '../../../../services';
 import { authHandler, upload } from '../../../middlewares';
 
@@ -31,9 +30,9 @@ export default function submissionRoute__post(route: Router) {
     '/',
     authHandler({ validationRequired: true }),
     upload('story', { fileLimit: 1 }),
-    celebrate({
-      [Segments.BODY]: Files.Schema.create('story', { maxFiles: 1 }),
-    }),
+    // celebrate({
+    //   [Segments.BODY]: Files.Schema.create('story', { maxFiles: 1 }),
+    // }),
     async (req, res, next) => {
       try {
         console.log('ep hit', req.body);

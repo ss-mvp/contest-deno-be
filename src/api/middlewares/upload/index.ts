@@ -42,6 +42,8 @@ export default function fileUploadMiddleware__generator<
       // Use our promisified wrapper around the form parser for linting and readability
       const { fields, files } = await parseForm(req);
 
+      console.log('form parsed', fields, files);
+
       // Get an array of filenames and filter to keep only the ones specified in generator params
       const fileKeys = Object.keys(files).filter((fname) =>
         fileNames.includes(fname)
