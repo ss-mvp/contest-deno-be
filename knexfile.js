@@ -16,20 +16,6 @@ module.exports = {
       directory: './src/db/seeds',
     },
   },
-  heroku: {
-    client: 'pg',
-    connection: process.env.DATABASE_URL,
-    pool: {
-      min: 2,
-      max: 10,
-    },
-    migrations: {
-      directory: './src/db/migrations',
-    },
-    seeds: {
-      directory: './src/db/seeds',
-    },
-  },
   testing: {
     client: 'pg',
     connection: process.env.TEST_DB_URL,
