@@ -53,7 +53,7 @@ export default function authHandlerGenerator<
         } else {
           logger.debug(
             `Successfully authenticated, authorizing for roles: \
-              ${roles.join(', ')}`
+              ${roles}`
           );
           // Get an instance of the UserModel if we need to role check
           const userModelInstance = Container.get(UserModel);

@@ -96,7 +96,12 @@ function parseFields(fields: Record<string, string[]>) {
   // Pull the non-file form inputs into a hash table
   const formInputs: Record<string, string> = {};
   Object.keys(fields).forEach((inputName) => {
-    formInputs[inputName] = fields[inputName].join('');
+    if (typeof formInputs[inputName] === 'string') {
+      formInputs[inputName] = fields[inputName].reduce(
+        (acc, next) => acc + next,
+        ''
+      );
+    }
   });
   return formInputs;
 }
