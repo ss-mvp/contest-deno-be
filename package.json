@@ -6,7 +6,7 @@
   "author": "Brandon Ramirez <bran.ramirez.don@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "pm2 start --name \"contest\" ~/.nvm/versions/node/v16.4.2/bin/yarn node -- --max_old_space_size=8192 -r ts-node/register ./src/index.ts",
+    "start": "pm2 start --name \"contest\" ~/.nvm/versions/node/v16.4.2/bin/yarn.js node -- --max_old_space_size=8192 -r ts-node/register ./src/index.ts",
     "build": "tsc",
     "heroku-postbuild": "npm run build",
     "dev": "nodemon src/index.ts",
