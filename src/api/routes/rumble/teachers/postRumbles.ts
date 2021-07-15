@@ -36,7 +36,7 @@ export default function rumbleTeachersRoute__postRumbles(route: Router) {
           start_time: Joi.date().optional(),
         }),
         sectionIds: Joi.array().min(1).items(Joi.number().min(1)),
-      }),
+      }).options({ allowUnknown: true }),
     }),
     async (req, res, next) => {
       try {
