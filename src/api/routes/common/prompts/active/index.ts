@@ -1,4 +1,4 @@
-/** URL Scope: /prompts */
+/** Current URL Scope: /prompts */
 
 import { Router } from 'express';
 import Container from 'typedi';

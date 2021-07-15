@@ -1,4 +1,4 @@
-/** URL Scope: /users */
+/** Current URL Scope: /users */
 
 import { Router } from 'express';
 import Container from 'typedi';

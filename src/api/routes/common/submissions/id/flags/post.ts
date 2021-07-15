@@ -1,4 +1,4 @@
-/** URL Scope: /submissions/:id/flags */
+/** Current URL Scope: /submissions/:id/flags */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';

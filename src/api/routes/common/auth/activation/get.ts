@@ -1,4 +1,4 @@
-/** URL Scope: /auth/activation */
+/** Current URL Scope: /auth/activation */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';

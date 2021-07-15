@@ -1,4 +1,4 @@
-/** URL Scope: /prompts/:id */
+/** Current URL Scope: /prompts/:id */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';

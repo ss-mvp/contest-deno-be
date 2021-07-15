@@ -1,4 +1,4 @@
-/** URL Scope: /rumble/sections */
+/** Current URL Scope: /rumble/sections */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';

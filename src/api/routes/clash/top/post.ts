@@ -1,4 +1,4 @@
-/** URL Scope: /clash/top */
+/** Current URL Scope: /clash/top */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';

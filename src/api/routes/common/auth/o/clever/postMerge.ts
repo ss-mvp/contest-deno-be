@@ -1,4 +1,4 @@
-/** URL Scope: /auth/o/clever */
+/** Current URL Scope: /auth/o/clever */
 
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';

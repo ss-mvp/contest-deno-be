@@ -1,4 +1,4 @@
-/** URL Scope: /auth/o/clever */
+/** Current URL Scope: /auth/o/clever */
 
 import { Router } from 'express';
 import Container from 'typedi';

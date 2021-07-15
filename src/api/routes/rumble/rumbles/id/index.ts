@@ -1,4 +1,4 @@
-/** URL Scope: /rumble/rumbles */
+/** Current URL Scope: /rumble/rumbles */
 
 import { Router } from 'express';
 import Container from 'typedi';

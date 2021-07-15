@@ -1,4 +1,4 @@
-/** URL Scope: /auth/activation */
+/** Current URL Scope: /auth/activation */
 
 import { Router } from 'express';
 import Container from 'typedi';

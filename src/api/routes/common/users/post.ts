@@ -1,4 +1,4 @@
-/** URL Scope: /users */
+/** Current URL Scope: /users */
 
 import { celebrate, Segments } from 'celebrate';
 import { Router } from 'express';

@@ -1,4 +1,4 @@
-/** URL Scope: /clash/top */
+/** Current URL Scope: /clash/top */
 
 import { Router } from 'express';
 import Container from 'typedi';

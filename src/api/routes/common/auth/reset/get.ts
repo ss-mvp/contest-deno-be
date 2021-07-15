@@ -1,10 +1,10 @@
-/** URL Scope: /auth/reset */
+/** Current URL Scope: /auth/reset */
 
+import { AuthService } from '@services';
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { AuthService } from '../../../../../services';
 
 interface GetResetQueryParams {
   email: string;

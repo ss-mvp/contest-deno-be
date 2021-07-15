@@ -1,4 +1,4 @@
-/** URL Scope: /submissions */
+/** Current URL Scope: /submissions */
 
 import { Router } from 'express';
 import Container from 'typedi';

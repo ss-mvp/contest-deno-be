@@ -1,12 +1,12 @@
-/** URL Scope: /auth */
+/** Current URL Scope: /auth */
 
+import { constraints } from '@config';
+import { Auth } from '@interfaces';
+import { AuthService } from '@services';
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
-import { constraints } from '../../../../../config';
-import { Auth } from '../../../../../interfaces';
-import { AuthService } from '../../../../../services';
 
 export default function authResetRoute__post(route: Router) {
   const logger: Logger = Container.get('logger');
