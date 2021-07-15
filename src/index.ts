@@ -1,3 +1,5 @@
+// Necessary for imports
+import 'module-alias/register';
 // Necessary for decorators
 import 'reflect-metadata';
 import app__init from './app';

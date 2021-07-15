@@ -1,12 +1,11 @@
+import { env } from '@config';
+import { API, Auth, Roles, Users, Validations } from '@interfaces';
+import { ResetModel, UserModel, ValidationModel } from '@models';
+import { hashPassword, HTTPError } from '@utils';
 import bcrypt from 'bcrypt';
 import Knex from 'knex';
 import { DateTime } from 'luxon';
 import { Service } from 'typedi';
-import { env } from '../../config';
-import { API, Auth, Roles, Users, Validations } from '../../interfaces';
-import { ResetModel, UserModel, ValidationModel } from '../../models';
-import { HTTPError } from '../../utils';
-import { hashPassword } from '../../utils/parsers';
 import BaseService from '../baseService';
 import { MailService } from '../mail';
 import {
@@ -83,7 +82,7 @@ export default class AuthService extends BaseService {
         );
         // Remove password hash from response body
         Reflect.deleteProperty(user, 'password');
-        const token = generateToken(user);
+        const token = this.generateToken(user);
         response = { user, token };
         this.logger.debug(`User (ID: ${user.id}) successfully registered`);
       });
@@ -109,7 +108,7 @@ export default class AuthService extends BaseService {
       this.logger.debug(`Password verified`);
       // Remove password hash from response body
       Reflect.deleteProperty(user, 'password');
-      const token = generateToken(user);
+      const token = this.generateToken(user);
       return { user, token };
     } catch (err) {
       this.logger.error(err);
