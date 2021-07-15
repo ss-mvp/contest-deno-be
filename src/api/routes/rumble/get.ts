@@ -5,6 +5,7 @@ import Container from 'typedi';
 import { Logger } from 'winston';
 import { API, Enum, Sections } from '../../../interfaces';
 import { CleverService } from '../../../services';
+import { authHandler } from '../../middlewares';
 
 interface GetRumbleInitResponse {
   enumData: Enum.IEnumData;
@@ -25,7 +26,7 @@ export default function classroomRumbleRoute__get(route: Router) {
     GetRumbleInitResponse, // Response body
     API.WithAuth, // Request body
     never // Query parameters
-  >('/', async (req, res, next) => {
+  >('/', authHandler(), async (req, res, next) => {
     try {
       const data = await cleverServiceInstance.getUserInfo(req.body.__user);
       res.status(200).json(data);
