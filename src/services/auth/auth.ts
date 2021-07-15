@@ -336,6 +336,36 @@ export default class AuthService extends BaseService {
       );
     }
   }
+
+  public async getCodenameReminder(email: string) {
+    try {
+      this.logger.debug('Getting codename for user with email ' + email);
+
+      const user = await this.userModel.get({ email }, { first: true });
+      if (user) {
+        // If we DID find the user, let's send their email
+        await this.mailer.sendCodenameReminderEmail(user);
+        this.logger.debug(
+          'Codename reminder email sent successfully to ' + email + '!'
+        );
+      } else {
+        /**
+         * If the requested user does not exist, the request should still complete
+         * successfully, just nothing should happen. Here, we know that the user is
+         * undefined, but let's not throw an error or anything. We just want to make
+         * sure we're not trying to send emails to nonexistent users.
+         *
+         * The frontend should say something along the lines of:
+         *
+         * "If an account exists for this email, you should receive your codename shortly."
+         */
+      }
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
   public hashPassword = hashPassword;
   public generateToken = generateToken;
 

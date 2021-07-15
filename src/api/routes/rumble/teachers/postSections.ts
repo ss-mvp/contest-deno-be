@@ -15,7 +15,7 @@ export default function rumbleTeachersRoute__postSections(route: Router) {
   const logger: Logger = Container.get('logger');
   const rumbleServiceInstance = Container.get(RumbleService);
 
-  route.get<
+  route.post<
     API.WithId, // URL parameters
     Sections.ISection, // Response body
     API.WithAuth<Sections.ISectionPostBody>, // Request body

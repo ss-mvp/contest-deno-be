@@ -20,7 +20,7 @@ export default function rumbleIdRoute__getStudents(route: Router) {
     never, // Request body
     never // Query parameters
   >(
-    '/',
+    '/students',
     authHandler({ roles: [Roles.RoleEnum.admin, Roles.RoleEnum.teacher] }),
     async (req, res, next) => {
       try {

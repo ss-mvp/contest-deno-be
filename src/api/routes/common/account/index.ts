@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import accountCodenameRoute__loader from './codename';
 import accountPasswordRoute__loader from './password';
 
-const route = Router();
+const route = Router({ mergeParams: true });
 
 export default function accountRoute__loader(app: Router) {
   const logger: Logger = Container.get('logger');
