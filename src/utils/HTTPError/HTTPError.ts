@@ -35,10 +35,23 @@ export default (function HTTPErrorInit() {
       }
     });
 
+    // Create a standard error object
     const res: IHTTPError = new Error(errorMessage || 'Something went wrong');
-    res.status = errorStatus || 500;
-    res.type = 'httpError';
-    res.response = responseBody;
+
+    // Extend that standard error object
+    res.status = errorStatus || 500; // Default status to 500
+    res.type = 'httpError'; // This is a flag for us to use in the isHTTPError checker
+    res.response = responseBody; // This has no default, and can be undefined
+
+    // Customize our error object's toString functionality
+    res.toString = function () {
+      // Here we define a stringified value with the values that we already processed above
+      return `[HTTPError:${res.status}] ${
+        // Display the custom response if there is one, else print the message
+        res.response ? JSON.stringify(res.response) : res.message
+      }`;
+    };
+
     return res;
   }
   function HTTPErrorInit__isHTTPError(err: unknown): err is IHTTPError {

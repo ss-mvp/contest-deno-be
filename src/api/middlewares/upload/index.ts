@@ -13,13 +13,13 @@ interface IUploadMiddlewareGeneratorOptions {
  * @param fileNames a list of string keys to search the form data for
  * @returns Express middleware that handles file uploads to S3
  */
-export default function fileUploadMiddleware__generator<
+export default function upload<
   Param = Record<string, unknown>,
   Res = Record<string, unknown>,
   Req = Record<string, unknown>,
   Query = Record<string, unknown>
 >(...options: (IUploadMiddlewareGeneratorOptions | string)[]) {
-  return async function fileUploadMiddleware(
+  return async function upload__middleware(
     req: Request<Param, Res, Req, Query>,
     res: Response<Res>,
     next: NextFunction

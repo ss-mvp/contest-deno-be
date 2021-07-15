@@ -1,5 +1,6 @@
 import { Service } from 'typedi';
 import { Roles, SSOLookups, Users } from '../interfaces';
+import { hashPassword } from '../utils';
 import BaseModel from './baseModel';
 
 @Service()
@@ -54,5 +55,19 @@ export default class UserModel extends BaseModel<Users.INewUser, Users.IUser> {
       .first();
 
     return user;
+  }
+
+  public async update(id: number, changes: Partial<Users.IUser>) {
+    // If the user is changing a password, let's hash it
+    let hashedPassword;
+    if (changes.password) {
+      hashedPassword = await hashPassword(changes.password);
+    }
+    return super.update(
+      id,
+      hashedPassword
+        ? Object.assign(changes, { password: hashedPassword })
+        : changes
+    );
   }
 }

@@ -96,7 +96,8 @@ export default function errorHandler__routes(app: Express) {
   app.use(
     // eslint-disable-next-line
     (err: IHTTPError, req: Request, res: Response, next: NextFunction) => {
-      console.log('error handling', err);
+      console.log(err.toString());
+      console.log(err);
       const status = err.status || 500;
       const message =
         err.response?.message || err.message || 'Something went wrong.';

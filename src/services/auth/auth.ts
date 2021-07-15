@@ -6,6 +6,7 @@ import { env } from '../../config';
 import { API, Auth, Roles, Users, Validations } from '../../interfaces';
 import { ResetModel, UserModel, ValidationModel } from '../../models';
 import { HTTPError } from '../../utils';
+import { hashPassword } from '../../utils/parsers';
 import BaseService from '../baseService';
 import { MailService } from '../mail';
 import {
@@ -336,13 +337,7 @@ export default class AuthService extends BaseService {
       );
     }
   }
-  public async hashPassword(password: string) {
-    this.logger.debug('Hashing password');
-    const salt = await bcrypt.genSalt(8);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    this.logger.debug('Password hashed');
-    return hashedPassword;
-  }
+  public hashPassword = hashPassword;
   public generateToken = generateToken;
 
   // Use this to consistently restrict the sending of multiple emails too rapidly

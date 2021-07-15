@@ -43,7 +43,7 @@ export default (() => {
       isValidated: Joi.boolean().optional(),
     }).options({ abortEarly: false });
     // TODO explore options for custom, relational validation
-    // ?.[(newUser && 'someCustomOptionsForCheckingAgeVSEmailIdk')]
+    // ?.[(newUser && 'someCustomOptionsForCheckingAgeVSEmailIdk')]()
   }
   function newSchema() {
     return create('new');
