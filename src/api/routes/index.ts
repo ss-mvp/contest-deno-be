@@ -2,8 +2,8 @@ import express from 'express';
 import Container from 'typedi';
 import { Logger } from 'winston';
 import clashRoutes__loader from './clash';
-import commonRoutes__loader from './common';
 import classroomRumbleRoute__loader from './rumble';
+import commonRoutes__loader from './__common';
 
 export default function apiRoute__loader() {
   // Get our configured logger instance from our Container layer
