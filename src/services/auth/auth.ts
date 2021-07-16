@@ -372,7 +372,7 @@ export default class AuthService extends BaseService {
   // Use this to consistently restrict the sending of multiple emails too rapidly
   public canSendNewEmail(email?: Validations.IValidation | Auth.resets.IReset) {
     // Set lockout based on whether the field is validator or reset (in minutes, 10 if unset)
-    let lockout = 10;
+    let lockout: number;
     if ((email as Validations.IValidation)?.validatorId) {
       lockout = env.VALIDATION_EMAIL_LOCKOUT;
     } else {
