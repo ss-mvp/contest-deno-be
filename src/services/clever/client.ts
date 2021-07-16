@@ -31,7 +31,7 @@ export default class CleverClient {
   private redirectURI: string;
   /** The basic auth that uses your client's config to get your user's token */
   private basic: string;
-  /** This is the link that should open then a user clicks "Log in With Clever" */
+  /** This is the link that should open when a user clicks "Log in With Clever" */
   private buttonURI: string;
 
   /**
